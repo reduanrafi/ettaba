@@ -13,20 +13,22 @@ class CreateMerchantBalanceAddHistoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('merchant_balance_add_histories', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('transaction_id')->unique();
-            $table->decimal('amount', 15, 2);
-            $table->string('gateway_name');
-            $table->decimal('gateway_charge', 15, 2);
-            $table->decimal('total_paid', 15, 2);
-            $table->string('status')->default('pending'); // pending, success, failed, cancelled, refunded
-            $table->string('payment_reference')->nullable();
-            $table->timestamps();
+        if (!Schema::hasTable('merchant_balance_add_histories')) {
+            Schema::create('merchant_balance_add_histories', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('transaction_id')->unique();
+                $table->decimal('amount', 15, 2);
+                $table->string('gateway_name');
+                $table->decimal('gateway_charge', 15, 2);
+                $table->decimal('total_paid', 15, 2);
+                $table->string('status')->default('pending'); // pending, success, failed, cancelled, refunded
+                $table->string('payment_reference')->nullable();
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            });
+        }
     }
 
     /**

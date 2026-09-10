@@ -13,9 +13,11 @@ class AddMerchantSearchAccessToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('merchant_search_access')->default(false)->after('is_active');
-        });
+        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'merchant_search_access')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('merchant_search_access')->default(false)->after('is_active');
+            });
+        }
     }
 
     /**

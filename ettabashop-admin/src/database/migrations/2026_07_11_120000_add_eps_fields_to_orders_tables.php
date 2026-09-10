@@ -15,18 +15,22 @@ class AddEpsFieldsToOrdersTables extends Migration
     public function up()
     {
         // 1. Add fields to orders table
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('transaction_id')->nullable()->after('unique_order_id')->index();
-            $table->string('payment_status')->default('pending')->after('transaction_id');
-            $table->decimal('virtual_balance_used', 10, 2)->default(0.00)->after('payment_status');
-        });
+        if (Schema::hasTable('orders') && !Schema::hasColumn('orders', 'transaction_id')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->string('transaction_id')->nullable()->after('unique_order_id')->index();
+                $table->string('payment_status')->default('pending')->after('transaction_id');
+                $table->decimal('virtual_balance_used', 10, 2)->default(0.00)->after('payment_status');
+            });
+        }
 
         // 2. Add fields to anonymous_orders table
-        Schema::table('anonymous_orders', function (Blueprint $table) {
-            $table->string('transaction_id')->nullable()->after('unique_order_id')->index();
-            $table->string('payment_status')->default('pending')->after('transaction_id');
-            $table->decimal('virtual_balance_used', 10, 2)->default(0.00)->after('payment_status');
-        });
+        if (Schema::hasTable('anonymous_orders') && !Schema::hasColumn('anonymous_orders', 'transaction_id')) {
+            Schema::table('anonymous_orders', function (Blueprint $table) {
+                $table->string('transaction_id')->nullable()->after('unique_order_id')->index();
+                $table->string('payment_status')->default('pending')->after('transaction_id');
+                $table->decimal('virtual_balance_used', 10, 2)->default(0.00)->after('payment_status');
+            });
+        }
 
         // 3. Modify status enums on both tables to allow 'pending_payment'
         DB::statement("ALTER TABLE orders MODIFY COLUMN status ENUM('pending', 'accepted', 'canceled', 'on_delivery', 'delivered', 'completed', 'pending_payment') DEFAULT 'pending'");

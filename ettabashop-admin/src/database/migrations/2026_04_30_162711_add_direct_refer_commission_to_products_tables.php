@@ -13,12 +13,16 @@ class AddDirectReferCommissionToProductsTables extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->string('direct_refer_commission')->nullable()->after('unit');
-        });
-        Schema::table('hand_cash_products', function (Blueprint $table) {
-            $table->string('direct_refer_commission')->nullable()->after('unit');
-        });
+        if (Schema::hasTable('products') && !Schema::hasColumn('products', 'direct_refer_commission')) {
+            Schema::table('products', function (Blueprint $table) {
+                $table->string('direct_refer_commission')->nullable()->after('unit');
+            });
+        }
+        if (Schema::hasTable('hand_cash_products') && !Schema::hasColumn('hand_cash_products', 'direct_refer_commission')) {
+            Schema::table('hand_cash_products', function (Blueprint $table) {
+                $table->string('direct_refer_commission')->nullable()->after('unit');
+            });
+        }
     }
 
     /**

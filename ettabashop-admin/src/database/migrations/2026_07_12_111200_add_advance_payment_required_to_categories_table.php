@@ -13,9 +13,11 @@ class AddAdvancePaymentRequiredToCategoriesTable extends Migration
      */
     public function up()
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->boolean('advance_payment_required')->default(0)->after('icon');
-        });
+        if (Schema::hasTable('categories') && !Schema::hasColumn('categories', 'advance_payment_required')) {
+            Schema::table('categories', function (Blueprint $table) {
+                $table->boolean('advance_payment_required')->default(0)->after('icon');
+            });
+        }
     }
 
     /**
