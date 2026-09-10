@@ -14,7 +14,7 @@ class AddDirectSellingBalanceToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->decimal('direct_selling_balance', 10, 2)->default(0.00)->after('virtual_balance');
+            $table->decimal('direct_selling_balance', 10, 2)->default(0.00);
         });
     }
 

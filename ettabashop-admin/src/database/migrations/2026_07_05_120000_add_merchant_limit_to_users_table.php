@@ -14,7 +14,7 @@ class AddMerchantLimitToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('merchant_limit')->default(0)->after('customer_limit');
+            $table->integer('merchant_limit')->default(0);
         });
     }
 
