@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class VirtualBalance extends Model
+{
+    use HasFactory;
+
+    /****************************
+     * Property area
+     *****************************/
+    protected $fillable = [
+        'user_id',
+        'amount',
+        'transaction_code',
+        'status',
+        'is_accepted',
+        'is_rejected',
+        'is_completed',
+    ];
+
+    /****************************
+     * Model Relation area
+     *****************************/
+
+    public function user()
+    {
+        return $this->belongsTo(  User::class, 'user_id');
+    }
+
+    /****************************
+     * Public Methods area
+     *****************************/
+
+    /***
+     * Method to get data.
+     * @param $data
+     * @return
+     */
+
+    public function GetData($data)
+    {
+        //$data['status']='incoming';
+        return $data;
+    }
+
+    /****************************
+     * Public Methods area
+     *****************************/
+}

@@ -1,0 +1,42 @@
+# Root gitignore for Ettaba Shop Monorepo
+
+# Environment files
+.env
+.env.backup
+.env.production
+*.env
+
+# Vendor & Node modules
+vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel Storage & Cache
+*/src/storage/*.key
+*/src/storage/logs/*
+!*/src/storage/logs/.gitignore
+*/src/storage/framework/cache/*
+!*/src/storage/framework/cache/.gitignore
+*/src/storage/framework/sessions/*
+!*/src/storage/framework/sessions/.gitignore
+*/src/storage/framework/views/*
+!*/src/storage/framework/views/.gitignore
+*/src/bootstrap/cache/*
+!*/src/bootstrap/cache/.gitignore
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Deployment keys & secrets
+deploy/id_*
+*.key
+*.pem

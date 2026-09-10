@@ -1,0 +1,12 @@
+/assets/images/brand_logos/*
+!/assets/images/brand_logos/.gitkeep
+/assets/images/categories/*
+!/assets/images/categories/.gitkeep
+/assets/images/posts/*
+!/assets/images/posts/.gitkeep
+/assets/images/products/*
+!/assets/images/products/.gitkeep
+/assets/images/shops/*
+!/assets/images/shops/.gitkeep
+/assets/images/slider/*
+!/assets/images/slider/.gitkeep
