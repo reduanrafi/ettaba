@@ -15,6 +15,8 @@ fi
 
 cd "$PROJECT_DIR"
 
+git config --global --add safe.directory "$PROJECT_DIR" || true
+
 echo "--> Pulling latest changes from repository..."
 git fetch origin main
 git reset --hard origin/main
