@@ -40,3 +40,5 @@ Thumbs.db
 deploy/id_*
 *.key
 *.pem
+*.sql
+*.sql.gz
