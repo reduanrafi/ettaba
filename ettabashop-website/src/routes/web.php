@@ -39,7 +39,7 @@ Route::post('/generate-otp', [\App\Http\Controllers\Website\PasswordController::
 Route::post('/verify-otp', [\App\Http\Controllers\Website\PasswordController::class, 'VerifyOTP'])->name('verifyOTP');
 Route::post('/reset-password', [\App\Http\Controllers\Website\PasswordController::class, 'ForgotPasswordChange'])->name('resetPassword');
 
-Route::get('/test', [\App\Http\Controllers\Website\TestController::class, 'index'])->name('website.index');
+Route::get('/test', [\App\Http\Controllers\Website\TestController::class, 'index'])->name('website.test');
 Route::view('/design-v2', 'website.home_new')->name('website.design-v2');
 
 
