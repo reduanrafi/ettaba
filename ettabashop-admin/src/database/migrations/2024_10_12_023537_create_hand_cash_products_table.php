@@ -13,7 +13,8 @@ class CreateHandCashProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hand_cash_products', function (Blueprint $table) {
+        if (!Schema::hasTable('hand_cash_products')) {
+            Schema::create('hand_cash_products', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('category_id')->nullable();
             $table->unsignedBigInteger('brand_id')->nullable();
@@ -65,6 +66,7 @@ class CreateHandCashProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();
         });
+        }
     }
 
     /**

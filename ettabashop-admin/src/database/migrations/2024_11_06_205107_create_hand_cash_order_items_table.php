@@ -13,20 +13,22 @@ class CreateHandCashOrderItemsTable extends Migration
      */
     public function up()
     {
-        Schema::create('hand_cash_order_items', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('hand_cash_order_id');
-            $table->unsignedBigInteger('owner_id');
-            $table->unsignedBigInteger('hand_cash_product_id');
-            $table->integer('quantity');
-            $table->integer('price');
-            $table->integer('trp');
-            $table->integer('tcb');
+        if (!Schema::hasTable('hand_cash_order_items')) {
+            Schema::create('hand_cash_order_items', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('hand_cash_order_id');
+                $table->unsignedBigInteger('owner_id');
+                $table->unsignedBigInteger('hand_cash_product_id');
+                $table->integer('quantity');
+                $table->integer('price');
+                $table->integer('trp');
+                $table->integer('tcb');
 
-            $table->timestamps();
-            $table->foreign('hand_cash_order_id')->references('id')->on('orders')->onDelete('cascade');
-            $table->foreign('hand_cash_product_id')->references('id')->on('products')->onDelete('cascade');
-        });
+                $table->timestamps();
+                $table->foreign('hand_cash_order_id')->references('id')->on('orders')->onDelete('cascade');
+                $table->foreign('hand_cash_product_id')->references('id')->on('products')->onDelete('cascade');
+            });
+        }
     }
 
     /**
