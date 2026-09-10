@@ -236,10 +236,10 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
         Route::get('/', [DirectOrderController::class,'Index'])->name('dOrder.index');
         Route::get('/detail/{id}', [DirectOrderController::class,'Detail'])->name('dOrder.detail');
 
-        Route::get('/invoice/{id}', [OrderController::class,'invoice'])->name('order.invoice');
-        Route::get('/shop', [OrderController::class,'Shop'])->name('order.shop');
-        Route::get('/change-status', [OrderStatusController::class,'ChangeStatus'])->name('order.changeStatus');
-        Route::get('/order-done', [OrderStatusController::class,'Done'])->name('order.done');
+        Route::get('/invoice/{id}', [OrderController::class,'invoice'])->name('dOrder.invoice');
+        Route::get('/shop', [OrderController::class,'Shop'])->name('dOrder.shop');
+        Route::get('/change-status', [OrderStatusController::class,'ChangeStatus'])->name('dOrder.changeStatus');
+        Route::get('/order-done', [OrderStatusController::class,'Done'])->name('dOrder.done');
 
     });
 });
