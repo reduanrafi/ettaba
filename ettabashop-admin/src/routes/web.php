@@ -257,9 +257,9 @@ Route::group(['middleware' => ['handcash']], function () {
     Route::get('/ENC/{id}',   [\App\Http\Controllers\HandCash\SaleController::class,'index']);
     Route::get('/hand-cash-orders/',   [\App\Http\Controllers\HandCash\OrdersController::class,'index'])->name('handcash.orders.index');
 
-    Route::get('/my-withdraws/',   [WRController::class,'index'])->name('mywithdraws');
-    Route::get('/create-withdraw-request',   [WRController::class,'create'])->name('withdraw.create');
-    Route::post('/save-withdraw-request',   [WRController::class,'Store'])->name('withdraw.save');
+    Route::get('/my-withdraws/',   [WRController::class,'index'])->name('handcash.mywithdraws');
+    Route::get('/create-withdraw-request',   [WRController::class,'create'])->name('handcash.withdraw.create');
+    Route::post('/save-withdraw-request',   [WRController::class,'Store'])->name('handcash.withdraw.save');
 
     Route::get('/add-money', [\App\Http\Controllers\HandCash\MerchantAddMoneyController::class, 'create'])->name('handcash.virtual_balance.create');
     Route::post('/add-money/initiate', [\App\Http\Controllers\HandCash\MerchantAddMoneyController::class, 'initiate'])->name('handcash.add_money.initiate');
