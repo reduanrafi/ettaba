@@ -62,7 +62,10 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-
+        if ($request->has('phone')) {
+            $cleanedPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$request->phone);
+            $request->merge(['phone' => $cleanedPhone]);
+        }
 
         $this->validator($request->all())->validate();
 
@@ -71,21 +74,21 @@ class RegisterController extends Controller
             $parent = $this->userService->getTheParent($request->referral_code);
 
             if ($parent == null) {
-                return redirect()->back()->with(['error' => 'Invalid referral code']);
+                return redirect()->back()->withInput()->with(['error' => 'Invalid referral code']);
             } else if ($parent->is_active == 0) {
-                return redirect()->back()->with(['error' => 'The referrer is inactive']);
+                return redirect()->back()->withInput()->with(['error' => 'The referrer is inactive']);
             }
 
             $customerType = $request->customer_type;
             if ($customerType == 'buy_earn') {
                 $partnerCount = \App\Models\User::where('parent_id', $parent->id)->where('customer_type', 'buy_earn')->count();
                 if ($parent->partner_limit <= $partnerCount) {
-                    return redirect()->back()->with(['error' => 'This referral code has reached its partner limit. Try another code.']);
+                    return redirect()->back()->withInput()->with(['error' => 'This referral code has reached its partner limit. Try another code.']);
                 }
             } else if ($customerType == 'buy_only') {
                 $customerCount = \App\Models\User::where('parent_id', $parent->id)->where('customer_type', 'buy_only')->count();
                 if ($parent->customer_limit <= $customerCount) {
-                    return redirect()->back()->with(['error' => 'This referral code has reached its customer limit. Try another code.']);
+                    return redirect()->back()->withInput()->with(['error' => 'This referral code has reached its customer limit. Try another code.']);
                 }
             }
         }
@@ -110,7 +113,7 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'alpha_num', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'customer_type' => ['required'],
             'account_number' => ['required_if:customer_type,buy_earn', 'nullable', 'string', 'in:first,subsequent'],
@@ -118,6 +121,10 @@ class RegisterController extends Controller
 //            'division_id' => [ 'required'],
 //            'upazila_id' => [ 'required'],
 
+        ], [
+            'phone.required' => 'মোবাইল নাম্বার বা ইউজার আইডি দেওয়া আবশ্যক।',
+            'phone.alpha_num' => 'মোবাইল নাম্বার বা আইডিতে কোনো স্পেস বা চিহ্ন (+, -, স্পেস ইত্যাদি) দেওয়া যাবে না। শুধু ইংরেজি সংখ্যা ও লেটার ব্যবহার করুন।',
+            'phone.unique' => 'এই মোবাইল নাম্বার/আইডিটি ইতিমধ্যে ব্যবহার করা হয়েছে।',
         ]);
 
     }
@@ -140,7 +147,7 @@ class RegisterController extends Controller
 
         $parentId = $data['parent_id'];
 
-
+        $cleanPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$data['phone']);
 
         if ($data['customer_type'] == 'buy_earn') {
 
@@ -153,7 +160,7 @@ class RegisterController extends Controller
 //            'district_id' => $data['district_id'],
 //            'upazila_id' => $data['upazila_id'],
             //'email' => $data['email'],
-            'phone' => $data['phone'],
+            'phone' => $cleanPhone,
             'type' => $data['type'],
             'referral_code' => "created",
             'referral_limit' => $referralLimit,

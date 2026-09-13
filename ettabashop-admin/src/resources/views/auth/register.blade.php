@@ -61,10 +61,11 @@
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for="phone" class="col-md-4 col-form-label text-md-right">{{ __('Phone') }}</label>
+                            <label for="phone" class="col-md-4 col-form-label text-md-right">{{ __('Phone / User ID') }}</label>
 
                             <div class="col-md-6">
-                                <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" required autocomplete="phone">
+                                <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" required autocomplete="off" placeholder="Only letters and numbers, no spaces or symbols">
+                                <small class="form-text text-muted">* Only letters and numbers allowed. No spaces, +, -, or symbols.</small>
 
                                 @error('phone')
                                 <span class="invalid-feedback" role="alert">
@@ -131,6 +132,38 @@
         const referralInput = document.getElementById('referral_code');
         const emailGroup = document.getElementById('email_group');
         const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+
+        function sanitizePhone(input) {
+            if (!input) return;
+            const original = input.value;
+            const sanitized = original.replace(/[^a-zA-Z0-9]/g, '');
+            if (original !== sanitized) {
+                input.value = sanitized;
+            }
+        }
+
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                sanitizePhone(this);
+            });
+            phoneInput.addEventListener('keypress', function(e) {
+                const char = String.fromCharCode(e.which || e.keyCode);
+                if (!/^[a-zA-Z0-9]$/.test(char) && (e.which || e.keyCode) > 31) {
+                    e.preventDefault();
+                }
+            });
+            phoneInput.addEventListener('paste', function() {
+                setTimeout(() => sanitizePhone(phoneInput), 20);
+            });
+        }
+
+        const form = document.querySelector('form');
+        if (form && phoneInput) {
+            form.addEventListener('submit', function() {
+                sanitizePhone(phoneInput);
+            });
+        }
 
         function toggleFields() {
             if (typeSelect.value === 'store_administrator') {

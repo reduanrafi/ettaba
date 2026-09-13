@@ -52,7 +52,7 @@ class RegisterController extends Controller
     {
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'alpha_num', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'type' => ['required', 'string', 'in:store_owner,store_administrator,direct_selling'],
         ];
@@ -67,6 +67,9 @@ class RegisterController extends Controller
         }
 
         return Validator::make($data, $rules, [
+            'phone.required' => 'The phone number / ID is required.',
+            'phone.alpha_num' => 'The phone number / ID must contain only letters and numbers without any spaces or symbols (+, -, space, etc.).',
+            'phone.unique' => 'This phone number / ID has already been taken.',
             'referral_code.exists' => 'The referral code is invalid.',
         ]);
     }
@@ -79,6 +82,11 @@ class RegisterController extends Controller
      */
     public function register(\Illuminate\Http\Request $request)
     {
+        if ($request->has('phone')) {
+            $cleanedPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$request->phone);
+            $request->merge(['phone' => $cleanedPhone]);
+        }
+
         $this->validator($request->all())->validate();
 
         if ($request->type == 'store_administrator') {
@@ -121,12 +129,13 @@ class RegisterController extends Controller
         $parentId = $service->getTheParent($data);
         //dd($parentId);
 
-        $email = !empty($data['email']) ? $data['email'] : $data['phone'] . '@ettaba.com';
+        $cleanPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$data['phone']);
+        $email = !empty($data['email']) ? $data['email'] : $cleanPhone . '@ettaba.com';
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $email,
-            'phone' => $data['phone'],
+            'phone' => $cleanPhone,
             'type' => $data['type'],
             'customer_type' => $data['type'] == 'direct_selling' ? 'direct_selling' : null,
             'unique_id' => 0, // temporary, will be updated by observer

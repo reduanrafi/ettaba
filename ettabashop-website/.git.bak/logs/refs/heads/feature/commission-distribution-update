@@ -1,0 +1,8 @@
+0000000000000000000000000000000000000000 0c0fdf786762a330f6abcaf7e74054d89f77dfbe rafiwt <rafi@wetechglobal.org> 1776847697 +0600	branch: Created from HEAD
+0c0fdf786762a330f6abcaf7e74054d89f77dfbe 44f73dc0d21beb5a5f1d3c69726c0f058faba824 rafiwt <rafi@wetechglobal.org> 1776847714 +0600	commit: Update generation commission logic: separate money and point pools and percentages
+44f73dc0d21beb5a5f1d3c69726c0f058faba824 aa447e9f407c364f3a68d36fab428f6a5f0b34c3 rafiwt <rafi@wetechglobal.org> 1777962475 +0600	commit: fix: direct refer commission not working in website - Move OrderItem insert before DistributeCommission in OrderObserver - Add direct_refer_commission logic in CustomerGenerationCommissionDistributionService
+aa447e9f407c364f3a68d36fab428f6a5f0b34c3 64340817e97272c7a604d7ce85fa19cb958f0044 reduanrafi <mr12129567@gmail.com> 1780725413 +0600	commit: updates til 66 26
+64340817e97272c7a604d7ce85fa19cb958f0044 0cca78d22ea1b079340895392b27c0392178f4f1 reduanrafi <mr12129567@gmail.com> 1783925431 +0600	commit: new EPS payment system integrated
+0cca78d22ea1b079340895392b27c0392178f4f1 168cf93a0c9cbe168e9e0331c31172c9f22bc158 reduanrafi <mr12129567@gmail.com> 1785317527 +0600	commit: eps payment updated
+168cf93a0c9cbe168e9e0331c31172c9f22bc158 450b04e8928d71c223cf0d848eabc957ab03e9cb reduanrafi <mr12129567@gmail.com> 1785912900 +0600	commit: first order commission put off
+450b04e8928d71c223cf0d848eabc957ab03e9cb c87b079df09f861b71af5c34b3c1ee55ccdfa693 reduanrafi <mr12129567@gmail.com> 1786255254 +0600	commit: register page and profile tree done

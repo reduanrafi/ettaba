@@ -86,6 +86,9 @@ class User extends Authenticatable
         $data['type'] = 'customer';
         $data['password'] = Hash::make($data['password']);
         $data['is_active'] = 0;
+        if (isset($data['phone'])) {
+            $data['phone'] = preg_replace('/[^a-zA-Z0-9]/', '', (string)$data['phone']);
+        }
 
         return $data;
     }

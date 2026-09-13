@@ -117,6 +117,9 @@ class User extends Authenticatable
         $data['is_active'] = 0;
         $data['unique_id'] = 0;
         $data['referral_code'] = 'temp';
+        if (isset($data['phone'])) {
+            $data['phone'] = preg_replace('/[^a-zA-Z0-9]/', '', (string)$data['phone']);
+        }
 
         return $data;
     }

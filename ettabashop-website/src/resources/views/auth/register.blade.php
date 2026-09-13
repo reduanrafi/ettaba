@@ -101,10 +101,12 @@
 
                                         <!-- 2. Phone -->
                                         <div class="col-lg-12 no-pdd">
-                                            <div class="d-flex align-items-center mb-3">
+                                            <div class="d-flex align-items-center mb-1">
                                                 <div class="sn-field mb-0 w-100">
-                                                    <input type="text" name="phone"
-                                                        placeholder="{{ __('forms.phonePlaceholder') }}" required>
+                                                    <input type="text" name="phone" id="phone_field"
+                                                        value="{{ old('phone') }}"
+                                                        placeholder="{{ __('forms.phonePlaceholder') }}" required
+                                                        autocomplete="off">
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                             fill="currentColor" class="bi bi-phone" viewBox="0 0 16 16">
@@ -115,9 +117,10 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="আপনার ফোন নাম্বার দিন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="কোনো স্পেস, +, - বা চিহ্ন ছাড়া শুধু সংখ্যা ও ইংরেজি লেটার লিখুন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
+                                            <small class="text-muted d-block mb-3" style="font-size: 11px; color: #777;">* কোনো স্পেস, +, - বা স্পেশাল চিহ্ন দেওয়া যাবে না (শুধু সংখ্যা ও লেটার)</small>
                                             @error('phone')
                                                 <div class="text-danger error">{{ $message }}</div>
                                             @enderror
@@ -293,6 +296,42 @@
                                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                                 <script>
                                     $(document).ready(function() {
+                                        // Real-time phone / username sanitization (only alphanumeric [a-zA-Z0-9], no spaces or symbols)
+                                        function sanitizePhoneInput(input) {
+                                            var original = $(input).val();
+                                            var sanitized = original.replace(/[^a-zA-Z0-9]/g, '');
+                                            if (original !== sanitized) {
+                                                $(input).val(sanitized);
+                                            }
+                                        }
+
+                                        $('input[name="phone"]').on('input', function() {
+                                            sanitizePhoneInput(this);
+                                        });
+
+                                        $('input[name="phone"]').on('keypress', function(e) {
+                                            var charCode = (e.which) ? e.which : e.keyCode;
+                                            var charStr = String.fromCharCode(charCode);
+                                            if (!/^[a-zA-Z0-9]$/.test(charStr) && charCode > 31) {
+                                                e.preventDefault();
+                                                return false;
+                                            }
+                                        });
+
+                                        $('input[name="phone"]').on('paste', function(e) {
+                                            var self = this;
+                                            setTimeout(function() {
+                                                sanitizePhoneInput(self);
+                                            }, 20);
+                                        });
+
+                                        $('form').on('submit', function() {
+                                            var phoneField = $('input[name="phone"]');
+                                            if (phoneField.length) {
+                                                sanitizePhoneInput(phoneField[0]);
+                                            }
+                                        });
+
                                         $('#customer_type_select').on('change', function() {
                                             var val = $(this).val();
                                             if (val === 'buy_earn') {
