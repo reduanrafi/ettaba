@@ -51,10 +51,11 @@ class CustomerGenerationCommissionDistributionService
             $this->saveCommission($user->parent_id, $order->id, $referralCommission, 'referral', $order->user_id);
         }
 
-        // 3. Direct Refer Commission (per product)
+        // Direct Refer Commission: every order, referrer gets product's direct_refer_commission amount
         $totalDirectReferCommission = 0;
-        if ($order->orderItems != null) {
-            foreach ($order->orderItems as $item) {
+        $orderWithItems = Order::with('orderItems.product')->find($orderId);
+        if ($orderWithItems && $orderWithItems->orderItems) {
+            foreach ($orderWithItems->orderItems as $item) {
                 $product = $item->product;
                 if ($product && $product->direct_refer_commission > 0) {
                     $totalDirectReferCommission += $product->direct_refer_commission * $item->quantity;
@@ -62,11 +63,13 @@ class CustomerGenerationCommissionDistributionService
             }
         }
 
-        if ($totalDirectReferCommission > 0 && $user && $user->parent_id != null) {
-            $this->saveCommission($user->parent_id, $order->id, $totalDirectReferCommission, 'direct_refer', $order->user_id);
-        }
-
         $userGroup = $this->getUserGroup($order->user_id);
+        Log::info($userGroup);
+
+        if ($totalDirectReferCommission > 0 && $userGroup && $userGroup->g2 != null) {
+            $this->saveCommission($userGroup->g2, $order->id, $totalDirectReferCommission, 'direct_refer', $user->id);
+            Log::info("Direct refer commission {$totalDirectReferCommission} saved for referrer level 2 (g2) {$userGroup->g2}");
+        }
         
         // 3. Team Point Distribution: 0.5 part is for team distribution. 
         $teamBasePoints = $order->trp * 0.5;
