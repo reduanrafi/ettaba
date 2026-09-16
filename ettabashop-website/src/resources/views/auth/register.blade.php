@@ -80,7 +80,7 @@
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="sn-field mb-0 w-100">
                                                     <input type="text" name="name"
-                                                        placeholder="{{ __('forms.fullNamePlaceholder') }}">
+                                                        placeholder="আপনার পুরো নাম লিখুন">
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                             fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
@@ -91,7 +91,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="নাম আপনার NID অনুযায়ী হতে হবে" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="নাম আপনার NID/সরকারি সার্টিফিকেট অনুযায়ী লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('name')
@@ -105,7 +105,7 @@
                                                 <div class="sn-field mb-0 w-100">
                                                     <input type="text" name="phone" id="phone_field"
                                                         value="{{ old('phone') }}"
-                                                        placeholder="{{ __('forms.phonePlaceholder') }}" required
+                                                        placeholder="মোবাইল/ইউজার নেইম" required
                                                         autocomplete="off">
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -117,7 +117,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="কোনো স্পেস, +, - বা চিহ্ন ছাড়া শুধু সংখ্যা ও ইংরেজি লেটার লিখুন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="কোনো স্পেস বা স্পেশাল চিহ্ন দেওয়া যাবেনা। শুধু সংখ্যা ও লেটার লেখা যাবে।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             <small class="text-muted d-block mb-3" style="font-size: 11px; color: #777;">* কোনো স্পেস, +, - বা স্পেশাল চিহ্ন দেওয়া যাবে না (শুধু সংখ্যা ও লেটার)</small>
@@ -131,7 +131,7 @@
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="sn-field mb-0 w-100">
                                                     <select class="form-control" name="customer_type" id="customer_type_select" required>
-                                                        <option value="">একাউন্ট নির্বাচন করুন</option>
+                                                        <option value="">একউন্ট নির্বাচন করুন</option>
                                                         <option value="buy_only">Customer Account</option>
                                                         <option value="buy_earn">Partner Account</option>
                                                         <option value="direct_selling">Direct Selling Account</option>
@@ -146,7 +146,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="প্রতিমাসে একবার পরিবর্তন করা যাবে" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="কাস্টমার একাউন্টের ক্ষেত্রে কোনো শর্ত প্রযোজ্য নেই। পার্টনার একাউন্টের ক্ষেত্রে শর্ত প্রযোজ্য। শর্ত ও বিস্তারিত নিয়মাবলি আপনার রেফারকারীর কাছ থেকে জেনে নিন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('customer_type')
@@ -199,7 +199,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="ইত্তেবা শপে পুরবে থেকেই একাউন্ট আছে এমন কারো রেফার প্রয়োজন । অনুগ্রহ করে আপনার পরিচিত কারো eID লিখুন !  " style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="যে পার্টনারের নিচে একাউন্ট করতে চান, তার eID এখানে লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('referral_code')
@@ -223,7 +223,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="রেফার-২ এর eID দিন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="যার একাউন্ট করছেন তিনি কার পরিচয়ে ইত্তেবা'র সাথে যুক্ত হতে যাচ্ছে, তার eID এখানে লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('referral_code_2')
@@ -236,7 +236,7 @@
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="sn-field mb-0 w-100">
                                                     <input type="password" name="password"
-                                                        placeholder="{{ __('forms.passwordPlaceholder') }}">
+                                                        placeholder="পাসওয়ার্ড লিখুন">
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                             fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
@@ -247,7 +247,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="আপনার পাসওয়ার্ড দিন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="সর্বনিম্ন ৮ সংখ্যা থেকে সর্বোচ্চ ৩২ সংখ্যার মধ্যে একটি পাসওয়ার্ড লিখুন এবং মনে রাখুন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('password')
@@ -260,7 +260,7 @@
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="sn-field mb-0 w-100">
                                                     <input type="password" name="password_confirmation"
-                                                        placeholder="{{ __('forms.confirmPasswordPlaceholder') }}">
+                                                        placeholder="পাসওয়ার্ড পুনরায় লিখুন">
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                             fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
@@ -271,7 +271,7 @@
                                                 </div>
                                                 <div style="margin-left: 10px; flex-shrink: 0;">
                                                     <span data-toggle="tooltip" data-placement="top"
-                                                        title="পাসওয়ার্ড নিশ্চিত করুন" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                        title="কনফার্ম করার জন্য একই পাসওয়ার্ড পুনরায় লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
                                             @error('password_confirmation')

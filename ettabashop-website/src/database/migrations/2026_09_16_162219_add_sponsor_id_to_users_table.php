@@ -14,7 +14,9 @@ class AddSponsorIdToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('sponsor_id')->nullable()->after('parent_id');
+            if (!Schema::hasColumn('users', 'sponsor_id')) {
+                $table->unsignedBigInteger('sponsor_id')->nullable()->after('parent_id');
+            }
         });
     }
 
