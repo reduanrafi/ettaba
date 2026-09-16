@@ -46,6 +46,7 @@ class User extends Authenticatable
         'is_active',
         'is_new',
         'is_blocked',
+        'sponsor_id',
         'direct_selling_balance',
     ];
 

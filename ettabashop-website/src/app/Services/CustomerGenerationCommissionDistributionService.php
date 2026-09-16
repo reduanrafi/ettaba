@@ -59,9 +59,9 @@ class CustomerGenerationCommissionDistributionService
         $userGroup = $this->getUserGroup($order->user_id);
         Log::info($userGroup);
 
-        if ($totalDirectReferCommission > 0 && $userGroup && $userGroup->g2 != null) {
-            $this->SaveUserPendingFund($userGroup->g2, $order->id, $totalDirectReferCommission, 'direct_refer', $user->id);
-            Log::info("Direct refer commission {$totalDirectReferCommission} saved for referrer level 2 (g2) {$userGroup->g2}");
+        if ($totalDirectReferCommission > 0 && $user && $user->sponsor_id != null) {
+            $this->SaveUserPendingFund($user->sponsor_id, $order->id, $totalDirectReferCommission, 'direct_refer', $user->id);
+            Log::info("Direct refer commission {$totalDirectReferCommission} saved for sponsor {$user->sponsor_id}");
         }
 
         // Req #4: Generation Commission (Team Point & Money distribution)

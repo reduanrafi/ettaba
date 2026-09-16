@@ -96,6 +96,18 @@ class RegisterController extends Controller
         $request['parent_id'] = $parent != null ? $parent->id : NULL;
         $request['parent'] = $parent;
 
+        $sponsor = null;
+        if ($request->filled('referral_code_2')) {
+            $sponsor = $this->userService->getTheParent($request->referral_code_2);
+            if ($sponsor == null) {
+                return redirect()->back()->withInput()->with(['error' => 'Invalid refer eID']);
+            } else if ($sponsor->is_active == 0) {
+                return redirect()->back()->withInput()->with(['error' => 'The refer eID is inactive']);
+            }
+        }
+
+        $request['sponsor_id'] = $sponsor != null ? $sponsor->id : NULL;
+
         event(new Registered($user = $this->create($request->all())));
 
         $this->guard()->login($user);
@@ -171,6 +183,7 @@ class RegisterController extends Controller
             'account_number' => $data['account_number'] ?? null,
             'unique_id' => 'created',
             'parent_id' => ($parentId != 0 ? $parentId : NULL),
+            'sponsor_id' => $data['sponsor_id'] ?? null,
             'password' => Hash::make($data['password']),
         ]);
 
