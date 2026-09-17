@@ -134,7 +134,6 @@
                                                         <option value="">একউন্ট নির্বাচন করুন</option>
                                                         <option value="buy_only">Customer Account</option>
                                                         <option value="buy_earn">Partner Account</option>
-                                                        <option value="direct_selling">Direct Selling Account</option>
                                                     </select>
                                                     <i>
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
