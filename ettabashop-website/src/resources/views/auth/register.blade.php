@@ -120,7 +120,6 @@
                                                         title="কোনো স্পেস বা স্পেশাল চিহ্ন দেওয়া যাবেনা। শুধু সংখ্যা ও লেটার লেখা যাবে।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
                                                 </div>
                                             </div>
-                                            <small class="text-muted d-block mb-3" style="font-size: 11px; color: #777;">* কোনো স্পেস, +, - বা স্পেশাল চিহ্ন দেওয়া যাবে না (শুধু সংখ্যা ও লেটার)</small>
                                             @error('phone')
                                                 <div class="text-danger error">{{ $message }}</div>
                                             @enderror
@@ -180,7 +179,31 @@
                                             @enderror
                                         </div>
 
-                                        <!-- 5. Referral -->
+                                        <!-- 5. Referral-2 -->
+                                        <div class="col-lg-12 no-pdd" id="referral_code_2_wrapper">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="sn-field mb-0 w-100">
+                                                    <input type="text" style="color:#C17A74" name="referral_code_2"
+                                                        placeholder="রেফার eID লিখুন">
+                                                    <i>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                            fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                                            <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                                            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                                                        </svg>
+                                                    </i>
+                                                </div>
+                                                <div style="margin-left: 10px; flex-shrink: 0;">
+                                                    <span data-toggle="tooltip" data-placement="top"
+                                                        title="যার একাউন্ট করছেন তিনি কার পরিচয়ে ইত্তেবা'র সাথে যুক্ত হতে যাচ্ছে, তার eID এখানে লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
+                                                </div>
+                                            </div>
+                                            @error('referral_code_2')
+                                                <div class="text-danger error">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <!-- 6. Referral -->
                                         <div class="col-lg-12 no-pdd" id="referral_code_wrapper">
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="sn-field mb-0 w-100">
@@ -202,30 +225,6 @@
                                                 </div>
                                             </div>
                                             @error('referral_code')
-                                                <div class="text-danger error">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- 6. Referral-2 -->
-                                        <div class="col-lg-12 no-pdd" id="referral_code_2_wrapper">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <div class="sn-field mb-0 w-100">
-                                                    <input type="text" style="color:#C17A74" name="referral_code_2"
-                                                        placeholder="রেফার eID লিখুন">
-                                                    <i>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                            fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
-                                                            <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                                                            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
-                                                        </svg>
-                                                    </i>
-                                                </div>
-                                                <div style="margin-left: 10px; flex-shrink: 0;">
-                                                    <span data-toggle="tooltip" data-placement="top"
-                                                        title="যার একাউন্ট করছেন তিনি কার পরিচয়ে ইত্তেবা'র সাথে যুক্ত হতে যাচ্ছে, তার eID এখানে লিখুন।" style="cursor: pointer; background: #e44d3a; color: white; padding: 2px 8px; border-radius: 50%; font-size: 14px; display: inline-block;">?</span>
-                                                </div>
-                                            </div>
-                                            @error('referral_code_2')
                                                 <div class="text-danger error">{{ $message }}</div>
                                             @enderror
                                         </div>
