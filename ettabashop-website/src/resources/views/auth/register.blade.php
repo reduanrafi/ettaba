@@ -30,7 +30,7 @@
         <div class="signin-popup">
             <div class="signin-pop">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-6 d-none d-lg-block">
                         <div class="cmp-info">
                             <div class="cm-logo text-center" style="margin-top: 50px;">
                                 <img src="{{ asset('assets/images/cm-logo.png') }}" alt="" style="max-width: 200px; margin-bottom: 40px;">
