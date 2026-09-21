@@ -32,24 +32,10 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="cmp-info">
-                            <div class="cm-logo">
-                                <img src="{{ asset('assets/images/cm-logo.png') }}" alt="">
-                                <h3>1. General Account বা সাধারণ কাস্টমার</h3>
-                                <p>
-                                    General Account নির্বাচনের দ্বারা একজন কাস্টমার শুধুমাত্র পণ্যের সাথে থাকা TCB অর্থাৎ
-                                    টোটাল ক্যাশব্যাক প্রাপ্ত হবেন।
-                                    অন্য কোনো বোনাস এই একাউন্টের জন্য প্রযোজ্য নয় এবং এই ধরনের একাউন্টের জন্য কোনো শর্তও
-                                    প্রযোজ্য নয়।</p>
-
-
+                            <div class="cm-logo text-center" style="margin-top: 50px;">
+                                <img src="{{ asset('assets/images/cm-logo.png') }}" alt="" style="max-width: 200px; margin-bottom: 40px;">
+                                <img src="{{ asset('assets/auth/images/banner.png') }}" alt="" style="width: 100%; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                             </div>
-                            <div class="cm-logo">
-                                <h3>2. Partner Account বা পার্টনার কাস্টমার</h3>
-                                <p>Partner Account নির্বাচনের দ্বারা একজন কাস্টমার পণ্যের সাথে থাকা TCB অর্থাৎ টোটাল
-                                    ক্যাশব্যাকের পাশাপাশি কোম্পানির অন্যান্য সকল বোনাস প্রাপ্ত হবে। এবং এই ধরনের একাউন্টের
-                                    জন্য কিছু শর্ত প্রযোজ্য হবে। বিস্তারিত আপনার রেফারকৃত ব্যক্তির কাছে জেনে নিন।</p>
-                            </div>
-                            {{-- <img src="{{ asset('assets/auth/images/banner.png') }}" alt=""> --}}
                         </div>
                     </div>
 
@@ -346,6 +332,11 @@
                                                 $('input[name="referral_code"]').val('');
                                                 $('#referral_code_2_wrapper').hide();
                                                 $('input[name="referral_code_2"]').val('');
+                                            } else if (val === 'buy_only') {
+                                                $('#account_number_wrapper').hide();
+                                                $('select[name="account_number"]').val('');
+                                                $('#referral_code_wrapper').hide(); // Hide second field for Customer Account
+                                                $('#referral_code_2_wrapper').show();
                                             } else {
                                                 $('#account_number_wrapper').hide();
                                                 $('select[name="account_number"]').val('');
