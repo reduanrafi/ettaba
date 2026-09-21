@@ -6,7 +6,7 @@
             <div class="header-data">
                 <div class="logo">
                     <a href="{{ route('website.index') }}" title=""><img src="{{ asset('assets/images/logo/logo.png') }}"
-                            alt=""></a>
+                            alt="" style="max-height: 60px; width: auto; max-width: 100%;"></a>
                 </div>
 
 
