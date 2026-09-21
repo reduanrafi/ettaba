@@ -330,6 +330,9 @@
                                             }
                                         });
 
+                                        // Store original readonly state
+                                        var isOriginalReadonly = $('input[name="referral_code"]').prop('readonly');
+
                                         $('#customer_type_select').on('change', function() {
                                             var val = $(this).val();
                                             if (val === 'buy_earn') {
@@ -348,6 +351,20 @@
                                                 $('select[name="account_number"]').val('');
                                                 $('#referral_code_wrapper').show();
                                                 $('#referral_code_2_wrapper').show();
+                                            }
+
+                                            // Mirroring logic for Customer Account
+                                            if (val === 'buy_only') {
+                                                $('input[name="referral_code"]').prop('readonly', true);
+                                                $('input[name="referral_code"]').val($('input[name="referral_code_2"]').val());
+                                            } else {
+                                                $('input[name="referral_code"]').prop('readonly', isOriginalReadonly);
+                                            }
+                                        });
+
+                                        $('input[name="referral_code_2"]').on('input', function() {
+                                            if ($('#customer_type_select').val() === 'buy_only') {
+                                                $('input[name="referral_code"]').val($(this).val());
                                             }
                                         });
                                     });
