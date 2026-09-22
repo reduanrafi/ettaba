@@ -46,6 +46,14 @@ if [ -d "$PROJECT_DIR/ettabashop-website/src" ]; then
     # Check if .env exists
     if [ ! -f .env ]; then
         echo "Warning: .env file missing in ettabashop-website/src!"
+    else
+        # Automatically fix the IMAGE_URL setting on the live server
+        if grep -q "^IMAGE_URL=" .env; then
+            sed -i 's|^IMAGE_URL=.*|IMAGE_URL=https://admin.ettabashop.com/|g' .env
+        else
+            echo "IMAGE_URL=https://admin.ettabashop.com/" >> .env
+        fi
+        echo "Updated IMAGE_URL in website .env"
     fi
 
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
