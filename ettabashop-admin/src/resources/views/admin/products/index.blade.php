@@ -25,13 +25,12 @@
                             <table id="productDataTable" class="table table-bordered table-hover table-responsive no-padding">
                                 <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Code</th>
+                                    <th>Product Code</th>
                                     <th>Product name</th>
                                     <th>Thumb</th>
                                     <th>Created date</th>
                                     <th>Featured</th>
-                                    <th>Image</th>
+                                    <th>Add more image</th>
                                     <th>Action</th>
                                 </tr>
 
@@ -40,7 +39,6 @@
                                @if($products)
                                    @foreach($products as $product)
                                        <tr>
-                                           <td>{{ $product->id }}</td>
                                            <td>{{ $product->unique_id }}</td>
                                            <td>{{ $product->name_en }}</td>
                                            <td>
@@ -48,7 +46,7 @@
                                                <img src="{{ asset($product->featured_image) }}" width="50" height="50">
                                                @endif
                                            </td>
-                                           <td>{{ date('y-m-d',strtotime($product->created_at)) }}</td>
+                                           <td>{{ date('Y-m-d H:i A',strtotime($product->created_at)) }}</td>
                                              <td class="text-center">
 
                                                @if($product->is_featured==1)
@@ -70,8 +68,11 @@
                                            {{--<td ><a href="{{ route('subject.config',['subject_id'=>$product->id]) }}" class=" btn btn-xs btn-success">Config</a></td>--}}
                                            <td>
                                                <a href="{{ route('product.edit',['product'=>$product->id]) }}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
-                                               <a href="{{ route('product.hardDelete',['product'=>$product->id]) }}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>
-                                               <a href="{{ route('product.softDelete',['product'=>$product->id,"isDeleted"=>1]) }}" class="btn btn-xs btn-default"><i class="fa fa-eye"></i> Hide</a>
+                                               @if($product->is_deleted == 0)
+                                                   <a href="{{ route('product.softDelete',['product'=>$product->id]) }}" class="btn btn-xs btn-default"><i class="fa fa-eye-slash"></i> Hide</a>
+                                               @else
+                                                   <a href="{{ route('product.revert',['product'=>$product->id]) }}" class="btn btn-xs btn-success"><i class="fa fa-eye"></i> Unhide</a>
+                                               @endif
 
                                            </td>
 

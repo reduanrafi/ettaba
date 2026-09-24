@@ -47,19 +47,11 @@
                                             </div>
                                         @endif
                                         <div class="row">
-                                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <div class="form-group">
-                                                    <label for="productNameEn">Product Name English</label>
+                                                    <label for="productNameEn">Product Name</label>
                                                     <input type="text" min="0" class="form-control" id="productNameEn"
                                                            name="name_en" placeholder="Product Name">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6 pull-right col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="productNameBn">Product Name Bangla</label>
-                                                    <input type="text" min="0" class="form-control" id="productNameBn"
-                                                           name="name_bn" placeholder="Product Name">
                                                 </div>
                                             </div>
                                         </div>
@@ -136,9 +128,16 @@
                                             </div>
                                             <div class="col-md-4 col-sm-12 col-xs-12">
                                                 <div class="form-group">
-                                                    <label for="cb_en">Cash back</label>
+                                                    <label for="cb_en">Direct Customer Cashback</label>
                                                     <input type="text" min="0" class="form-control" id="cb_en"
-                                                           name="cb_en" placeholder=" Cash Back">
+                                                           name="cb_en" placeholder="Direct Customer Cashback">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-sm-12 col-xs-12">
+                                                <div class="form-group">
+                                                    <label for="direct_refer_commission">Direct Refer Commission</label>
+                                                    <input type="number" min="0" class="form-control" id="direct_refer_commission"
+                                                           name="direct_refer_commission" placeholder="Amount">
                                                 </div>
                                             </div>
 
@@ -161,13 +160,6 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-2 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="direct_refer_commission">Direct Refer Commission</label>
-                                                    <input type="number" min="0" class="form-control" id="direct_refer_commission"
-                                                           name="direct_refer_commission" placeholder="Amount">
-                                                </div>
-                                            </div>
                                             <div class="col-md-2 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <label for="tcb_en_readonly">TCB</label>
@@ -263,6 +255,9 @@
 
                 let tcb = cb + (trp * 2);
                 $('#tcb_en_readonly').val(tcb.toFixed(2));
+                
+                let vat = erp * 0.15;
+                $('#vat').val(vat.toFixed(2));
             }
 
             $('input[name="rate_en"], #erp_en, #cb_en, #direct_refer_commission').on('input', function() {

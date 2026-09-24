@@ -46,14 +46,14 @@ class ProductController extends Controller
 
         return view('admin.'.$this->pluralVariableName.'.create',[
 
-            'categories'=>Category::all()
+            'categories'=>Category::where('is_deleted', 0)->get()
         ]);
     }
 
     public function Edit($id)
     {
         $data = $this->globalObject->findOrFail($id);
-        $categories = Category::all();
+        $categories = Category::where('is_deleted', 0)->get();
         return view('admin.'.$this->pluralVariableName.'.edit',[
             $this->singularVariableName=>$data,
             $this->pluralVariableName=>$this->globalObject->all(),
@@ -66,8 +66,12 @@ class ProductController extends Controller
 
         try
         {
-            //dd($this->globalObject->create($this->globalObject->GetData($request->all())));
-            if ($this->globalObject->create($this->globalObject->GetData($request->all())))
+            $data = $request->all();
+            if(!isset($data['name_bn'])) {
+                $data['name_bn'] = $data['name_en'];
+            }
+            //dd($this->globalObject->create($this->globalObject->GetData($data)));
+            if ($this->globalObject->create($this->globalObject->GetData($data)))
             {
                 return redirect()->back()->with(['success'=> $this->moduleName." created successfully"]);
             }
@@ -88,8 +92,25 @@ class ProductController extends Controller
 
         try
         {
+            $data = $request->all();
+            if(!isset($data['name_bn'])) {
+                $data['name_bn'] = $data['name_en'] ?? $oldData->name_en;
+            }
+            
+            $isNameChanged = isset($data['name_en']) && $data['name_en'] != $oldData->name_en;
+            $isDescChanged = isset($data['description_en']) && $data['description_en'] != $oldData->description_en;
+            $isDelAreaChanged = isset($data['delivery_area_en']) && $data['delivery_area_en'] != $oldData->delivery_area_en;
 
-            if ($oldData->update($this->globalObject->GetData($request->all())))
+            if ($isNameChanged || $isDescChanged || $isDelAreaChanged) {
+                \App\Models\ProductHistory::create([
+                    'product_id' => $id,
+                    'old_name' => $oldData->name_en,
+                    'old_description' => $oldData->description_en,
+                    'old_delivery_area' => $oldData->delivery_area_en,
+                ]);
+            }
+
+            if ($oldData->update($this->globalObject->GetData($data)))
             {
                 return redirect()->back()->with(['success'=>$this->moduleName."  updated successfully"]);
             }
