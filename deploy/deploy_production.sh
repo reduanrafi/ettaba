@@ -33,7 +33,6 @@ if [ -d "$PROJECT_DIR/ettabashop-admin/src" ]; then
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
     php artisan migrate --force
     php artisan optimize:clear
-    php artisan config:cache
     php artisan route:cache
     php artisan view:cache
     rm -rf public/storage
@@ -59,7 +58,6 @@ if [ -d "$PROJECT_DIR/ettabashop-website/src" ]; then
 
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
     php artisan optimize:clear
-    php artisan config:cache
     php artisan route:cache
     php artisan view:cache
     rm -rf public/storage
