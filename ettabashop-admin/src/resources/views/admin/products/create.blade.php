@@ -16,7 +16,7 @@
                     <!-- /.box-header -->
                     <!-- form start -->
 
-                    <form class="form-horizontal" action="{{ route('product.store') }}" method="post"
+                    <form id="productForm" class="form-horizontal" action="{{ route('product.store') }}" method="post"
                           enctype="multipart/form-data">
                         @csrf
 
@@ -92,18 +92,25 @@
                                             </select>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                            <div class="col-md-3 col-sm-12 col-xs-12">
                                                 <div class="form-group">
-                                                    <label for="priceEn">Seller Rate</label>
+                                                    <label for="sellerPayable">Seller Payable Amount</label>
+                                                    <input type="text" min="0" class="form-control" id="sellerPayable"
+                                                           readonly placeholder="Payable Amount">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12 col-xs-12">
+                                                <div class="form-group">
+                                                    <label for="priceEn">Seller Rate with VAT</label>
                                                     <input type="text" min="0" class="form-control" id="priceEn"
-                                                           name="rate_en" placeholder="Rate">
+                                                           name="rate_en" placeholder="Rate" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <label for="priceEn">MRP</label>
                                                     <input type="text" min="0" class="form-control" id="priceEn"
-                                                           name="mrp_en" placeholder="Price">
+                                                           name="mrp_en" placeholder="Price" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                                                 </div>
                                             </div>
 
@@ -123,21 +130,24 @@
                                                 <div class="form-group">
                                                     <label for="erp_en">ERP</label>
                                                     <input type="text" min="0" class="form-control" id="erp_en"
-                                                           name="erp_en" placeholder="Ettaba Retail Price">
+                                                           name="erp_en" placeholder="Ettaba Retail Price" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                                    <small id="erpError" class="text-danger" style="display:none;font-weight:bold;">Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <label for="cb_en">Direct Customer Cashback</label>
                                                     <input type="text" min="0" class="form-control" id="cb_en"
-                                                           name="cb_en" placeholder="Direct Customer Cashback">
+                                                           name="cb_en" placeholder="Direct Customer Cashback" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                                    <small id="cbHelper" class="text-primary font-weight-bold"></small>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 col-sm-12 col-xs-12">
                                                 <div class="form-group">
                                                     <label for="direct_refer_commission">Direct Refer Commission</label>
-                                                    <input type="number" min="0" class="form-control" id="direct_refer_commission"
-                                                           name="direct_refer_commission" placeholder="Amount">
+                                                    <input type="text" min="0" class="form-control" id="direct_refer_commission"
+                                                           name="direct_refer_commission" placeholder="Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                                    <small id="referHelper" class="text-primary font-weight-bold"></small>
                                                 </div>
                                             </div>
 
@@ -148,7 +158,7 @@
                                                 <div class="form-group">
                                                     <label for="quantity">Quantity</label>
                                                     <input type="text" min="0" class="form-control" id="quantity"
-                                                           name="quantity" placeholder="Quantity">
+                                                           name="quantity" placeholder="Quantity" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                                                 </div>
                                             </div>
 
@@ -180,7 +190,7 @@
                                                 <div class="form-group">
                                                     <label for="vat">VAT</label>
                                                     <input type="text" min="0" class="form-control" id="vat"
-                                                           name="vat_percent" placeholder="VAT">
+                                                           name="vat_percent" placeholder="VAT" readonly>
                                                 </div>
                                             </div>
 
@@ -248,6 +258,39 @@
                 let cb = parseFloat($('#cb_en').val()) || 0;
                 let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
 
+                let vat = erp * 0.15;
+                $('#vat').val(vat.toFixed(2));
+
+                let payable = rate - vat;
+                $('#sellerPayable').val(payable > 0 ? payable.toFixed(2) : 0);
+
+                let netErp = erp - vat;
+                let maxLimit = netErp * 0.25;
+                if(maxLimit < 0) maxLimit = 0;
+
+                $('#cbHelper').text('Max allowed: ৳' + maxLimit.toFixed(2));
+                $('#referHelper').text('Max allowed: ৳' + maxLimit.toFixed(2));
+
+                if(cb > maxLimit) {
+                    $('#cb_en').css('border-color', 'red');
+                } else {
+                    $('#cb_en').css('border-color', '');
+                }
+
+                if(directRefer > maxLimit) {
+                    $('#direct_refer_commission').css('border-color', 'red');
+                } else {
+                    $('#direct_refer_commission').css('border-color', '');
+                }
+
+                if(erp > 0 && erp < (rate + 5)) {
+                    $('#erp_en').css('border-color', 'red');
+                    $('#erpError').show();
+                } else {
+                    $('#erp_en').css('border-color', '');
+                    $('#erpError').hide();
+                }
+
                 let trp = (erp - (rate + cb + directRefer)) / 25;
                 if (trp < 0) trp = 0;
                 
@@ -255,13 +298,37 @@
 
                 let tcb = cb + (trp * 2);
                 $('#tcb_en_readonly').val(tcb.toFixed(2));
-                
-                let vat = erp * 0.15;
-                $('#vat').val(vat.toFixed(2));
             }
 
             $('input[name="rate_en"], #erp_en, #cb_en, #direct_refer_commission').on('input', function() {
                 calculateTRP();
+            });
+
+            $('#productForm').on('submit', function(e){
+                let rate = parseFloat($('input[name="rate_en"]').val()) || 0;
+                let erp = parseFloat($('#erp_en').val()) || 0;
+                let cb = parseFloat($('#cb_en').val()) || 0;
+                let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
+                let vat = erp * 0.15;
+                let netErp = erp - vat;
+                let maxLimit = netErp * 0.25;
+                
+                if(erp > 0 && erp < (rate + 5)) {
+                    e.preventDefault();
+                    alert('Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।');
+                    return false;
+                }
+                if(cb > maxLimit) {
+                    e.preventDefault();
+                    alert('Direct Customer Cashback Max limit is ' + maxLimit.toFixed(2));
+                    return false;
+                }
+                if(directRefer > maxLimit) {
+                    e.preventDefault();
+                    alert('Direct Refer Commission Max limit is ' + maxLimit.toFixed(2));
+                    return false;
+                }
+                return true;
             });
         })
     </script>

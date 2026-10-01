@@ -170,6 +170,7 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
         Route::get('/un-hide-product/{product}', [ProductController::class,'UnHide'])->name('product.revert');
         Route::get('/delete-product/{product}', [ProductController::class,'Delete'])->name('product.hardDelete');
         Route::get('/deleted-products/', [ProductController::class,'HiddenProducts'])->name('product.deleted');
+        Route::get('/product-history/{id}', [ProductController::class,'History'])->name('product.history');
         Route::get('/delete-product-image/{product}', [ProductImageController::class,'Delete'])->name('image.hardDelete');
     });
 

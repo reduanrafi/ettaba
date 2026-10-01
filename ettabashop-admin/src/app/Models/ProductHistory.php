@@ -13,6 +13,11 @@ class ProductHistory extends Model
         'product_id',
         'old_name',
         'old_description',
-        'old_delivery_area'
+        'old_delivery_area',
+        'old_rate',
+        'old_mrp',
+        'old_erp',
+        'old_cb',
+        'old_direct_refer_commission'
     ];
 }

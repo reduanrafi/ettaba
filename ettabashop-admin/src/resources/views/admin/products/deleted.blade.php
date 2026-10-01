@@ -70,7 +70,6 @@
                                            {{--<td ><a href="{{ route('subject.config',['subject_id'=>$product->id]) }}" class=" btn btn-xs btn-success">Config</a></td>--}}
                                            <td>
                                                <a href="{{ route('product.edit',['product'=>$product->id]) }}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
-                                               <a href="{{ route('product.hardDelete',['product'=>$product->id]) }}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> Delete</a>
                                                <a href="{{ route('product.revert',['product'=>$product->id]) }}" class="btn btn-xs btn-default"><i class="fa fa-eye"></i> Un Hide</a>
 
                                            </td>

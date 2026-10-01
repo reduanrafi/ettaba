@@ -68,6 +68,7 @@
                                            {{--<td ><a href="{{ route('subject.config',['subject_id'=>$product->id]) }}" class=" btn btn-xs btn-success">Config</a></td>--}}
                                            <td>
                                                <a href="{{ route('product.edit',['product'=>$product->id]) }}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
+                                               <a href="{{ route('product.history',['id'=>$product->id]) }}" class="btn btn-xs btn-info"><i class="fa fa-history"></i> History</a>
                                                @if($product->is_deleted == 0)
                                                    <a href="{{ route('product.softDelete',['product'=>$product->id]) }}" class="btn btn-xs btn-default"><i class="fa fa-eye-slash"></i> Hide</a>
                                                @else

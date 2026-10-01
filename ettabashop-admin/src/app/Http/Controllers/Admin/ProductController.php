@@ -67,6 +67,25 @@ class ProductController extends Controller
         try
         {
             $data = $request->all();
+            $rate = floatval($data['rate_en'] ?? 0);
+            $erp = floatval($data['erp_en'] ?? 0);
+            $cb = floatval($data['cb_en'] ?? 0);
+            $directRefer = floatval($data['direct_refer_commission'] ?? 0);
+            
+            $vat = $erp * 0.15;
+            $netErp = $erp - $vat;
+            $maxLimit = $netErp * 0.25;
+            
+            if ($erp > 0 && $erp < ($rate + 5)) {
+                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।']);
+            }
+            if ($cb > $maxLimit) {
+                return redirect()->back()->with(['error' => 'Direct Customer Cashback Max limit is ' . number_format($maxLimit, 2)]);
+            }
+            if ($directRefer > $maxLimit) {
+                return redirect()->back()->with(['error' => 'Direct Refer Commission Max limit is ' . number_format($maxLimit, 2)]);
+            }
+
             if(!isset($data['name_bn'])) {
                 $data['name_bn'] = $data['name_en'];
             }
@@ -93,6 +112,25 @@ class ProductController extends Controller
         try
         {
             $data = $request->all();
+            $rate = floatval($data['rate_en'] ?? 0);
+            $erp = floatval($data['erp_en'] ?? 0);
+            $cb = floatval($data['cb_en'] ?? 0);
+            $directRefer = floatval($data['direct_refer_commission'] ?? 0);
+            
+            $vat = $erp * 0.15;
+            $netErp = $erp - $vat;
+            $maxLimit = $netErp * 0.25;
+            
+            if ($erp > 0 && $erp < ($rate + 5)) {
+                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।']);
+            }
+            if ($cb > $maxLimit) {
+                return redirect()->back()->with(['error' => 'Direct Customer Cashback Max limit is ' . number_format($maxLimit, 2)]);
+            }
+            if ($directRefer > $maxLimit) {
+                return redirect()->back()->with(['error' => 'Direct Refer Commission Max limit is ' . number_format($maxLimit, 2)]);
+            }
+
             if(!isset($data['name_bn'])) {
                 $data['name_bn'] = $data['name_en'] ?? $oldData->name_en;
             }
@@ -100,13 +138,23 @@ class ProductController extends Controller
             $isNameChanged = isset($data['name_en']) && $data['name_en'] != $oldData->name_en;
             $isDescChanged = isset($data['description_en']) && $data['description_en'] != $oldData->description_en;
             $isDelAreaChanged = isset($data['delivery_area_en']) && $data['delivery_area_en'] != $oldData->delivery_area_en;
+            $isRateChanged = isset($data['rate_en']) && $data['rate_en'] != $oldData->rate_en;
+            $isMrpChanged = isset($data['mrp_en']) && $data['mrp_en'] != $oldData->mrp_en;
+            $isErpChanged = isset($data['erp_en']) && $data['erp_en'] != $oldData->erp_en;
+            $isCbChanged = isset($data['cb_en']) && $data['cb_en'] != $oldData->cb_en;
+            $isDirectReferChanged = isset($data['direct_refer_commission']) && $data['direct_refer_commission'] != $oldData->direct_refer_commission;
 
-            if ($isNameChanged || $isDescChanged || $isDelAreaChanged) {
+            if ($isNameChanged || $isDescChanged || $isDelAreaChanged || $isRateChanged || $isMrpChanged || $isErpChanged || $isCbChanged || $isDirectReferChanged) {
                 \App\Models\ProductHistory::create([
                     'product_id' => $id,
                     'old_name' => $oldData->name_en,
                     'old_description' => $oldData->description_en,
                     'old_delivery_area' => $oldData->delivery_area_en,
+                    'old_rate' => $oldData->rate_en,
+                    'old_mrp' => $oldData->mrp_en,
+                    'old_erp' => $oldData->erp_en,
+                    'old_cb' => $oldData->cb_en,
+                    'old_direct_refer_commission' => $oldData->direct_refer_commission,
                 ]);
             }
 
@@ -195,5 +243,12 @@ class ProductController extends Controller
         return view('admin.'.$this->pluralVariableName.'.deleted',[
             $this->pluralVariableName=>$this->retrievedDataList
         ]);
+    }
+    
+    public function History($id)
+    {
+        $product = Product::findOrFail($id);
+        $histories = \App\Models\ProductHistory::where('product_id', $id)->orderBy('created_at', 'desc')->get();
+        return view('admin.products.history', compact('product', 'histories'));
     }
 }

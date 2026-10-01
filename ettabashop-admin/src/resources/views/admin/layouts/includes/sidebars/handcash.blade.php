@@ -55,10 +55,10 @@
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
         </a>
     </li>
-    <!-- <li class="">
-        <a href="{{ route('mywithdraws') }}">
+    <li class="">
+        <a href="{{ route('handcash.mywithdraws') }}">
             <i class="fa fa-book"></i> <span>MyWithdraws</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
         </a>
-    </li> -->
+    </li>
 </ul>
