@@ -9,7 +9,7 @@
     <div class="carousel-inner">
         @foreach($sliders as $k=>$slider)
         <div class="carousel-item @if($k==0) active @endif">
-            <img class="img-fluid" src="{{env('IMAGE_URL').$slider->image }}" alt="Image">
+            <img class="img-fluid" src="{{config('app.image_url').$slider->image }}" alt="Image">
             <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                 <div class="p-3" style="max-width: 700px;">
                     <h4 class="text-light text-uppercase font-weight-medium mb-3">{{ (app()->getLocale()=='en'?$slider->title_en:$slider->title_bn) }}</h4>

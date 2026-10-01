@@ -9,7 +9,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
                     <div class="card product-item border-0 mb-4">
                         <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
-                            <img class=" "   height="250" src=" {{env('IMAGE_URL').$product->featured_image}}" alt="">
+                            <img class=" "   height="250" src=" {{config('app.image_url').$product->featured_image}}" alt="">
                             {{--                            <img class="img-fluid w-100"--}}
                             {{--                                 src="{{ asset('assets/website/img/product-'.rand(1,8).'.jpg')}}" alt="">--}}
                         </div>

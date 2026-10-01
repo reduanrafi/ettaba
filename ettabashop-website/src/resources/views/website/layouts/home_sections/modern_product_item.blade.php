@@ -1,7 +1,7 @@
 <div class="product-tile h-100 shadow-sm border-0 rounded-lg overflow-hidden animate-fade-in bg-white">
     <div class="product-tile-image position-relative">
         <a href="{{ route('product.detail', ['slug' => $product->slug]) }}" class="d-block overflow-hidden">
-            <img src="{{ env('IMAGE_URL') . $product->featured_image }}" class="img-fluid w-100 transition-transform"
+            <img src="{{ config('app.image_url') . $product->featured_image }}" class="img-fluid w-100 transition-transform"
                 alt="{{ $product->name_en }}">
         </a>
         @if($product->tcb_en > 0)

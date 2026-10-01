@@ -9,12 +9,12 @@
                 <div class="col-lg-4 col-md-6 col-6 pb-1">
                     <div class="card product-item border-0 mb-4">
 {{--                        <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">--}}
-{{--                            <img class=" "   height="250" src=" {{env('IMAGE_URL').$product->featured_image}}" alt="">--}}
+{{--                            <img class=" "   height="250" src=" {{config('app.image_url').$product->featured_image}}" alt="">--}}
 {{--                            --}}{{--                            <img class="img-fluid w-100"--}}
 {{--                            --}}{{--                                 src="{{ asset('assets/website/img/product-'.rand(1,8).'.jpg')}}" alt="">--}}
 {{--                        </div>--}}
                         <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0 text-center">
-                            <img class="img-fluid" style="object-fit: cover; height: 250px;" src="{{ env('IMAGE_URL').$product->featured_image }}" alt="Product Image">
+                            <img class="img-fluid" style="object-fit: cover; height: 250px;" src="{{ config('app.image_url').$product->featured_image }}" alt="Product Image">
                         </div>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
                             <h6 class="text-truncate mb-3">{{ $local=='bn'?$product->name_en:$product->name_en}} </h6>

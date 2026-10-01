@@ -2,7 +2,7 @@
 @section('facebook')
     <title>{{ $product->name_en}}</title>
     <meta property="og:title" content="{{ $product->name_en}}" />
-    <meta property="og:image" content="{{env('IMAGE_URL') . $product->featured_image }}" />
+    <meta property="og:image" content="{{config('app.image_url') . $product->featured_image }}" />
     <meta property="og:description" content="{{ $product->description_en }}" />
 @endsection
 @section('content')
@@ -13,11 +13,11 @@
                     <div class="carousel-inner border">
 
                         <div class="carousel-item active">
-                            <img class="w-100 h-100" src="{{env('IMAGE_URL') . $product->featured_image}}" alt="Image">
+                            <img class="w-100 h-100" src="{{config('app.image_url') . $product->featured_image}}" alt="Image">
                         </div>
                         @foreach($product->productImages as $image)
                             <div class="carousel-item">
-                                <img class="w-100 h-100" src="{{env('IMAGE_URL') . $image->image}}" alt="Image">
+                                <img class="w-100 h-100" src="{{config('app.image_url') . $image->image}}" alt="Image">
                             </div>
                         @endforeach
 

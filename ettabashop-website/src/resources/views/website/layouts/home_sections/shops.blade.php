@@ -9,7 +9,7 @@
                 @foreach ($shops as $shop)
                     <div class="vendor-item border p-4">
                         <a href="{{ route('shop.detail', ['id' => $shop->user_id]) }}">
-                            <img src="{{ env('IMAGE_URL') . $shop->logo_image }}" alt="">
+                            <img src="{{ config('app.image_url') . $shop->logo_image }}" alt="">
                         </a>
                     </div>
                 @endforeach

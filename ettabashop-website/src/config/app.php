@@ -53,6 +53,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    'image_url' => env('IMAGE_URL', 'https://admin.ettabashop.com/'),
 
     'asset_url' => env('ASSET_URL', null),
 

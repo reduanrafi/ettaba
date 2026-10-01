@@ -36,7 +36,7 @@
                         <a href="{{ route('shop.detail', ['id' => $shop->user_id]) }}" class="text-decoration-none text-dark d-flex flex-column h-100 p-3">
                             <div class="d-flex justify-content-center mb-3 mt-2">
                                 <div class="rounded-circle overflow-hidden shadow-sm" style="width: 70px; height: 70px; border: 2px solid #f8f9fa;">
-                                    <img class="img-fluid w-100 h-100" style="object-fit: cover;" src="{{ env('IMAGE_URL') . $shop->logo_image }}" alt="{{ $shop->name_bn }}">
+                                    <img class="img-fluid w-100 h-100" style="object-fit: cover;" src="{{ config('app.image_url') . $shop->logo_image }}" alt="{{ $shop->name_bn }}">
                                 </div>
                             </div>
                             <div class="mt-auto">
