@@ -103,7 +103,7 @@
                 <div class="icon">
                     <i class="ion ion-wallet"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.virtual_balance.create') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -117,7 +117,7 @@
                 <div class="icon">
                     <i class="fa fa-users"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.orders.index') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -131,7 +131,7 @@
                 <div class="icon">
                     <i class="fa fa-star"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.orders.index') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -145,7 +145,7 @@
                 <div class="icon">
                     <i class="fa fa-bank"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.mywithdraws') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
     </div>
@@ -167,7 +167,7 @@
                 <div class="icon">
                     <i class="fa fa-users"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.orders.index') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -181,7 +181,7 @@
                 <div class="icon">
                     <i class="fa fa-star"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.orders.index') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 
@@ -195,7 +195,7 @@
                 <div class="icon">
                     <i class="fa fa-bank"></i>
                 </div>
-                <a href="#" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                <a href="{{ route('handcash.mywithdraws') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
             </div>
         </div>
 

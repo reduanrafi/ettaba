@@ -17,6 +17,7 @@ use App\Models\Shop;
 use App\Models\User;
 use App\Models\UserPendingFund;
 use App\Models\Withdraw;
+use App\Models\WithdrawHistory;
 use Carbon\Carbon;
 use Facades\App\Services\CompanyFundsService;
 use Illuminate\Http\Request;
@@ -142,8 +143,10 @@ class DashboardController extends Controller
             ->whereDate('created_at', Carbon::today())
             ->sum('trp');
 
-        // 4. Today Withdrawal (Inactive for now)
-        $todayWithdrawal = 0;
+        // 4. Today Withdrawal
+        $todayWithdrawal = WithdrawHistory::where('user_id', $userId)
+            ->whereDate('created_at', Carbon::today())
+            ->sum('amount');
 
         // 5. Total Received Customer (Every cashback/purchasing overall counts as a customer)
         $totalReceivedCustomer = HandCashOrder::where('owner_id', $userId)
@@ -153,8 +156,8 @@ class DashboardController extends Controller
         $totalMerchantRewards = HandCashOrder::where('owner_id', $userId)
             ->sum('trp');
 
-        // 7. Total Withdrawal (Inactive for now)
-        $totalWithdrawal = 0;
+        // 7. Total Withdrawal
+        $totalWithdrawal = Withdraw::where('user_id', $userId)->sum('amount');
 
         // 8. Active Counter (Inactive for now)
         $activeCounter = 0;

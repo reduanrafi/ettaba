@@ -12,6 +12,12 @@
                                    class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i
                                             class="fa fa-plus"></i>Create Withdraw request</a>
                             </div>
+                        @elseif(\Illuminate\Support\Facades\Auth::user()->type=='store_administrator')
+                            <div class="pull-right box-tools">
+                                <a href="{{ route('handcash.withdraw.create') }}"
+                                   class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i
+                                            class="fa fa-plus"></i>Create Withdraw request</a>
+                            </div>
                         @Endif
                     </div>
                     <div class="col-md-8 col-md-offset-2" id="messageDiv">
@@ -49,13 +55,21 @@
 
                                     <td>{{ $wr->id }}</td>
                                     <td>
-                                        <a href="{{ route('customer.show',['customer'=>$wr->user->id]) }}">
+                                        @if(\Illuminate\Support\Facades\Auth::user()->type=="admin")
+                                            <a href="{{ route('customer.show',['customer'=>$wr->user->id]) }}">
+                                                @if($wr->user->profile!=null)
+                                                    {{ $wr->user->profile->first_name }} {{ $wr->user->profile->last_name }}
+                                                @else
+                                                    {{ $wr->user->phone }}
+                                                @endif
+                                            </a>
+                                        @else
                                             @if($wr->user->profile!=null)
                                                 {{ $wr->user->profile->first_name }} {{ $wr->user->profile->last_name }}
                                             @else
                                                 {{ $wr->user->phone }}
                                             @endif
-                                        </a>
+                                        @endif
                                     </td>
                                     <td>{{ $wr->phone }}</td>
                                     <td>{{ $wr->bank_account_number }}</td>

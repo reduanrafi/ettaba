@@ -57,11 +57,11 @@ class WithdrawRequest extends Model
 
     public function CheckUsersWithdrawRequest()
     {
+        $withdrawRequest = WithdrawRequest::whereIn('status', ['pending', 'accepted'])
+            ->where('user_id', Auth::user()->id)
+            ->count();
 
-        $withdrawRequest = WithdrawRequest::where('status','!=','done')->where('user_id',Auth::user()->id)->get();
-
-       return count($withdrawRequest);
-
+       return $withdrawRequest;
     }
 
     public function updateStatus($status,$id)

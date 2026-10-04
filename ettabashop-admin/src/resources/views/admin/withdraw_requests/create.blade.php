@@ -17,7 +17,7 @@
                     <div class="box-header with-border">
                         <h3 class="box-title">Make withdraw request</h3>
                         <div class="pull-right box-tools">
-                            <a href="{{ route('mywithdraws') }} "
+                            <a href="{{ Auth::user()->type == 'store_administrator' ? route('handcash.mywithdraws') : route('mywithdraws') }}"
                                class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i class="fa fa-mail-forward"></i> View All</a>
                         </div>
                     </div>
@@ -25,7 +25,12 @@
                     <!-- form start -->
 
                     <div class="box-body">
-                    <form class="form-horizontal" method="post" action="{{ route('withdraw.save') }}"
+                    @if(Auth::user()->type == 'store_administrator')
+                        <div class="alert alert-info" style="margin-bottom: 20px; font-size: 15px;">
+                            <i class="fa fa-money"></i> <strong>Available Merchant Balance:</strong> ৳ {{ number_format(Auth::user()->virtual_balance ?? 0, 2) }}
+                        </div>
+                    @endif
+                    <form class="form-horizontal" method="post" action="{{ Auth::user()->type == 'store_administrator' ? route('handcash.withdraw.save') : route('withdraw.save') }}"
                           enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">

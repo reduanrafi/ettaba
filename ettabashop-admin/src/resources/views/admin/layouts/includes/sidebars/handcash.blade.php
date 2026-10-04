@@ -13,8 +13,8 @@
         </a>
     </li>
     <li class="">
-        <a href="#">
-            <i class="fa fa-dashboard"></i> <span>Withdraws</span>
+        <a href="{{ route('handcash.mywithdraws') }}">
+            <i class="fa fa-bank"></i> <span>Withdraws</span>
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
         </a>
     </li>
