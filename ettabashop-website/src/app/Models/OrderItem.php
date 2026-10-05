@@ -9,7 +9,7 @@ class OrderItem extends Model
     /****************************
      * Property area
      *****************************/
-    protected $fillable = ['order_id','product_id','quantity','trp','price'];
+    protected $fillable = ['order_id','product_id','quantity','trp','price','product_name','product_unit'];
 
     /****************************
      * Model Relation area

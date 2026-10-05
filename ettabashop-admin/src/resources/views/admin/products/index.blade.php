@@ -28,6 +28,7 @@
                                     <th>Product Code</th>
                                     <th>Product name</th>
                                     <th>Thumb</th>
+                                    <th>Qty/Stock</th>
                                     <th>Created date</th>
                                     <th>Featured</th>
                                     <th>Add more image</th>
@@ -46,6 +47,7 @@
                                                <img src="{{ asset($product->featured_image) }}" width="50" height="50">
                                                @endif
                                            </td>
+                                           <td><span class="label label-info" style="font-size: 13px;">{{ $product->quantity ?? 0 }} {{ $product->unit ?? '' }}</span></td>
                                            <td>{{ date('Y-m-d H:i A',strtotime($product->created_at)) }}</td>
                                              <td class="text-center">
 
@@ -68,7 +70,9 @@
                                            {{--<td ><a href="{{ route('subject.config',['subject_id'=>$product->id]) }}" class=" btn btn-xs btn-success">Config</a></td>--}}
                                            <td>
                                                <a href="{{ route('product.edit',['product'=>$product->id]) }}" class="btn btn-xs btn-primary"><i class="fa fa-edit"></i> Edit</a>
-                                               <a href="{{ route('product.history',['id'=>$product->id]) }}" class="btn btn-xs btn-info"><i class="fa fa-history"></i> History</a>
+                                               @if(\Illuminate\Support\Facades\Auth::user()->type == 'admin')
+                                                   <a href="{{ route('product.history',['id'=>$product->id]) }}" class="btn btn-xs btn-info"><i class="fa fa-history"></i> History</a>
+                                               @endif
                                                @if($product->is_deleted == 0)
                                                    <a href="{{ route('product.softDelete',['product'=>$product->id]) }}" class="btn btn-xs btn-default"><i class="fa fa-eye-slash"></i> Hide</a>
                                                @else

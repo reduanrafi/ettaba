@@ -65,8 +65,8 @@
                     @foreach($order->orderItems as $item)
                         <tr>
 
-                            <td>{{ $item->product->name_en }}({{ $item->product->unit }})</td>
-                            <td>{{ $item->product->unique_id }}</td>
+                            <td>{{ $item->product_name ?? ($item->product ? $item->product->name_en : 'Product') }}{{ ($item->product_unit ?? ($item->product ? $item->product->unit : '')) ? ' (' . ($item->product_unit ?? $item->product->unit) . ')' : '' }}</td>
+                            <td>{{ $item->product ? $item->product->unique_id : 'N/A' }}</td>
                             <td>{{ ($item->product->owner->shop!=null?$item->product->owner->shop->name_en:$item->product->owner->name) }}</td>
 
                             <td class="text-center">{{ $item->price }}</td>

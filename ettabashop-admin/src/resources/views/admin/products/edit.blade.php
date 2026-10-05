@@ -1,365 +1,687 @@
 @extends('admin.layouts.layout')
-@section('content')
 
-    <section class="content">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="box box-info">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Product Create Form</h3>
-                        <div class="pull-right box-tools">
-                            <a href="{{ route('product.index') }} "
-                               class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i class="fa fa-mail-forward"></i> View All</a>
-                        </div>
-                    </div>
-                    <!-- /.box-header -->
-                    <!-- form start -->
-                    @if ($errors->any())
-                        <div class="col-md-6 col-md-offset-2">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <span>{{ $error }}</span>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                    @if(Session::has('message'))
-                        <div class="col-md-6 col-md-offset-2">
-                            <span> {{ Session::get('message') }}</span>
-                        </div>
-                    @endif
-                    <form id="productForm" class="form-horizontal" action="{{ route('product.update',['product'=>$product->id]) }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        {!! method_field('PUT') !!}
-                        <div class="box-body">
-                            <div class="row">
-                                <div class="col-md-8 col-md-offset-2" id="messageDiv">
-                                    @if(Session::has('success'))
-                                        @include('admin.layouts.message.success')
-                                    @elseif(Session::has('error'))
-                                        @include('admin.layouts.message.error')
-                                    @endif
-                                </div>
-
-                                <div class="col-md-offset-2 col-md-8">
-                                    <div class="box-body">
-                                        @if ($errors->any())
-                                            <div class="col-md-6 col-md-offset-2">
-                                                <ul>
-                                                    @foreach ($errors->all() as $error)
-                                                        <span>{{ $error }}</span>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        @endif
-                                        @if(Session::has('message'))
-                                            <div class="col-md-6 col-md-offset-2">
-                                                <span> {{ Session::get('message') }}</span>
-                                            </div>
-                                        @endif
-                                        <div class="row">
-                                            <div class="col-md-12 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="productNameEn">Product Name</label>
-                                                    <input type="text" min="0" class="form-control" id="productNameEn"
-                                                           name="name_en" value="{{ $product->name_en }}" placeholder="Product Name">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="slug">Slug</label>
-                                            <input type="text" min="0" class="form-control" id="slug"
-                                                     value="{{ $product->slug }}" readonly placeholder="Slug">
-                                        </div>
-
-
-                                        <div class="form-group">
-                                            <label for="description_en">Product
-                                                description English</label>
-                                            <textarea id="editor1" name="description_en" class="form-control" rows="10"> {{ $product->description_en }} </textarea>
-                                        </div>
-
-
-                                            <div class="form-group">
-                                                <label for="description_bn">Delivery area en</label>
-                                                <textarea name="delivery_area_en" class="form-control" rows="4">{{ $product->delivery_area_en }}</textarea>
-                                            </div>
-
-                                        <div class="form-group">
-                                            <label for="productNameBn">Product Category</label>
-                                            <select name="category_id" class="form-control" id="selectCategory">
-                                                @foreach($categories as $category)
-                                                    <option class="form-control"
-                                                            @if($product->category_id ==$category->id) selected @endif
-                                                            value="{{$category->id}}">
-                                                        {{ $category->name_en }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="priceEn">Price English</label>
-                                                    <input type="text" min="0" class="form-control" id="priceEn"
-                                                           name="mrp_en" value="{{ $product->mrp_en }}" placeholder="Price" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6 pull-right col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="priceBn">Price Bangla</label>
-                                                    <input type="text" min="0" class="form-control" id="priceBn"
-                                                           name="mrp_bn" value="{{ $product->mrp_bn }}" placeholder="Price in bangla">
-                                                </div>
-                                            </div>
-                                        </div>
-                                            <div class="row">
-                                                <div class="col-md-2 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="sellerPayable">Seller Payable Amount</label>
-                                                        <input type="text" min="0" class="form-control" id="sellerPayable"
-                                                               readonly placeholder="Payable Amount">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="priceEn">Seller Rate with VAT</label>
-                                                        <input type="text" min="0" class="form-control" id="priceEn"
-                                                               name="rate_en"
-                                                               value="{{ $product->rate_en }}"
-                                                               placeholder="Ettaba Retail Price" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                    </div>
-                                                </div>
-
-
-                                                <div class="col-md-4 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="erp_en">ERP English</label>
-                                                        <input type="text" min="0" class="form-control" id="erp_en"
-                                                               name="erp_en"
-                                                               value="{{ $product->erp_en }}"
-                                                               placeholder="Ettaba Retail Price" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                        <small id="erpError" class="text-danger" style="display:none;font-weight:bold;">Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="cb_en">Direct Customer Cashback</label>
-                                                        <input type="text" min="0" class="form-control" id="cb_en"
-                                                               name="cb_en"
-                                                               value="{{ $product->cb_en }}"
-                                                               placeholder="Direct Customer Cashback" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                        <small id="cbHelper" class="text-primary font-weight-bold"></small>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="direct_refer_commission">Direct Refer Commission</label>
-                                                        <input type="text" min="0" class="form-control" id="direct_refer_commission"
-                                                               name="direct_refer_commission" value="{{ $product->direct_refer_commission }}" placeholder="Amount" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                        <small id="referHelper" class="text-primary font-weight-bold"></small>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-
-                                                <div class="col-md-3 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="tcb_en">TCB English</label>
-                                                        <input type="text" min="0" class="form-control" id="tcb_en"
-                                                               name="tcb_en"
-                                                               readonly
-                                                               value="{{ $product->tcb_en }}"
-                                                               placeholder="Total Cash Back">
-                                                    </div>
-                                                </div>
-
-
-                                                <div class="col-md-3 col-sm-12 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label for="TRPen">TRP English</label>
-                                                        <input type="text" min="0" class="form-control" id="TRPen"
-                                                               name="trp_en"
-                                                               readonly
-                                                               value="{{ $product->trp_en }}"
-                                                               placeholder="Total Rewards Points">
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-
-                                            <div class="row">
-                                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="quantity">Quantity</label>
-                                                    <input type="text" min="0" class="form-control" id="quantity"
-                                                           name="quantity" value="{{ $product->quantity }}" placeholder="Quantity" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="unit">Unit</label>
-                                                    <input type="text" min="0" class="form-control" id="unit"
-                                                           name="unit" value="{{ $product->unit }}" placeholder="Unit">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="vat">VAT</label>
-                                                    <input type="text" min="0" class="form-control" id="vat"
-                                                           name="vat_percent" value="{{ $product->vat_percent }}" placeholder="VAT" readonly>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4 col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="discount">Discount</label>
-                                                    <input type="text" min="0" class="form-control" id="discount"
-                                                           name="discount" value="{{ $product->discount }}" placeholder="Discount">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4  col-sm-12 col-xs-12">
-                                                <div class="form-group">
-                                                    <label for="soldAmount">Sold amount</label>
-                                                    <input type="text" min="0" class="form-control" id="soldAmount"
-                                                           name="sold_amount" value="{{ $product->sold_amount }}" placeholder="Sold amount">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="productNameBn">Featured image</label>
-                                            <input type="file" class="form-control" id="product-image"
-                                                   name="featured_image" placeholder="Product image">
-                                            <div class="text-center">
-                                                <img class="img-fluid" src="{{ asset($product->featured_image) }}" width="350" height="400">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="submit" class="btn btn-success" value="Save">
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-        <!-- /.row -->
-    </section>
-@endsection
 @section('extra-style')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
+
+    <style>
+        .seller-app-wrapper {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #1e293b;
+            max-width: 980px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+        .app-header-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: #ffffff;
+            border-radius: 18px;
+            padding: 22px 24px;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .app-header-title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header-subtitle {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        .app-header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            text-decoration: none !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .app-header-btn:hover {
+            background: #ffffff;
+            color: #1e3a8a !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+
+        .app-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+            border: 1px solid #edf2f7;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .app-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .app-card-title i {
+            color: #3b82f6;
+            font-size: 16px;
+        }
+
+        .app-form-group {
+            margin-bottom: 18px;
+        }
+        .app-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .app-label .required {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+        .app-input, .app-textarea, .select2-container--bootstrap4 .select2-selection {
+            width: 100% !important;
+            background: #f8fafc !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            padding: 10px 14px !important;
+            font-size: 14px !important;
+            color: #0f172a !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+            box-shadow: none !important;
+            outline: none !important;
+            min-height: 46px;
+        }
+        .app-input:focus, .app-textarea:focus, .select2-container--bootstrap4.select2-container--focus .select2-selection {
+            background: #ffffff !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12) !important;
+        }
+        .app-input[readonly] {
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            cursor: not-allowed;
+            border-color: #e2e8f0 !important;
+        }
+        .app-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        /* Dynamic Helper Badge */
+        .app-badge-helper {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-top: 6px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            transition: all 0.2s ease;
+        }
+        .app-badge-helper.limit-exceeded {
+            background: #fef2f2 !important;
+            color: #b91c1c !important;
+            border-color: #fecaca !important;
+        }
+        .app-input-error {
+            border-color: #ef4444 !important;
+            background: #fff5f5 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12) !important;
+        }
+
+        /* Live Calculation Dashboard */
+        .calc-dashboard {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            margin-top: 6px;
+        }
+        .calc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #cbd5e1;
+            font-size: 13px;
+        }
+        .calc-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .calc-item-label {
+            color: #475569;
+            font-weight: 500;
+        }
+        .calc-item-value {
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .calc-pool-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Upload preview box */
+        .image-upload-wrapper {
+            position: relative;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .image-upload-wrapper:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .image-upload-icon {
+            font-size: 32px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+        .image-preview-box {
+            margin-top: 12px;
+            text-align: center;
+        }
+        .image-preview-box img {
+            max-height: 160px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+
+        /* Submit Button */
+        .app-btn-submit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff !important;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .app-btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -4px rgba(16, 185, 129, 0.5);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        @media (max-width: 768px) {
+            .app-header-card {
+                padding: 18px;
+                border-radius: 14px;
+            }
+            .app-card {
+                padding: 16px;
+                border-radius: 14px;
+            }
+            .app-btn-submit {
+                font-size: 15px;
+                padding: 14px 20px;
+            }
+        }
+    </style>
 @endsection
+
+@section('content')
+    <section class="content" style="padding-top: 15px;">
+        <div class="seller-app-wrapper">
+            
+            <!-- App Header -->
+            <div class="app-header-card">
+                <div>
+                    <h1 class="app-header-title">
+                        <i class="fa fa-pencil-square-o"></i> Edit Product
+                    </h1>
+                    <p class="app-header-subtitle">পণ্য আপডেট করুন: <strong>{{ $product->name_en }}</strong> (Code: #{{ $product->unique_id }})</p>
+                </div>
+                <div>
+                    <a href="{{ route('product.index') }}" class="app-header-btn">
+                        <i class="fa fa-list"></i> All Products
+                    </a>
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            @if(Session::has('success'))
+                <div class="alert alert-success" style="border-radius: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(16,185,129,0.15);">
+                    <i class="fa fa-check-circle"></i> {{ Session::get('success') }}
+                </div>
+            @elseif(Session::has('error'))
+                <div class="alert alert-danger" style="border-radius: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(239,68,68,0.15);">
+                    <i class="fa fa-exclamation-circle"></i> {{ Session::get('error') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger" style="border-radius: 12px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form id="productForm" action="{{ route('product.update', ['product' => $product->id]) }}" method="post" enctype="multipart/form-data">
+                @csrf
+                {!! method_field('PUT') !!}
+
+                <!-- Section 1: Basic Information -->
+                <div class="app-card">
+                    <div class="app-card-title">
+                        <i class="fa fa-cube"></i> Basic Product Information
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="productNameEn">
+                                    Product Name <span class="required">*</span>
+                                </label>
+                                <input type="text" class="app-input" id="productNameEn" name="name_en" required
+                                       placeholder="Product Name" value="{{ old('name_en', $product->name_en) }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="slug">
+                                    Product Slug
+                                </label>
+                                <input type="text" class="app-input" id="slug" readonly
+                                       value="{{ $product->slug }}" placeholder="slug">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="selectCategory">
+                                    Category <span class="required">*</span>
+                                </label>
+                                <select name="category_id" class="form-control" id="selectCategory" required>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ (old('category_id', $product->category_id) == $category->id) ? 'selected' : '' }}>
+                                            {{ $category->name_bn }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description (Native, App-like, Emoji Supported) -->
+                    <div class="app-form-group">
+                        <label class="app-label" for="description_en">
+                            Product Description (Bangla / English)
+                            <small class="text-muted" style="font-weight: normal; margin-left: 4px;">(ইমোজি ও টেক্সট সরাসরি লিখতে পারবেন)</small>
+                        </label>
+                        <textarea id="description_en" name="description_en" class="app-textarea" rows="5"
+                                  placeholder="পণ্যের বিস্তারিত বিবরণ লিখুন... 🌟✨">{{ old('description_en', $product->description_en) }}</textarea>
+                    </div>
+
+                    <!-- Delivery Area and Fee -->
+                    <div class="app-form-group" style="margin-bottom: 0;">
+                        <label class="app-label" for="delivery_area_en">
+                            <i class="fa fa-truck text-muted"></i> Delivery Area & Delivery Fee
+                        </label>
+                        <textarea id="delivery_area_en" name="delivery_area_en" class="app-textarea" rows="3"
+                                  placeholder="ডেলিভারি এরিয়া এবং চার্জ লিখুন...">{{ old('delivery_area_en', $product->delivery_area_en) }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Section 2: Pricing & Commission Rules -->
+                <div class="app-card">
+                    <div class="app-card-title">
+                        <i class="fa fa-tag"></i> Pricing & Reward Settings
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="priceEn">
+                                    Seller Rate with VAT (৳) <span class="required">*</span>
+                                </label>
+                                <input type="text" class="app-input" id="priceEn" name="rate_en" required
+                                       placeholder="e.g. 130" value="{{ old('rate_en', $product->rate_en) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="erp_en">
+                                    ERP (Ettaba Retail Price) (৳) <span class="required">*</span>
+                                </label>
+                                <input type="text" class="app-input" id="erp_en" name="erp_en" required
+                                       placeholder="e.g. 230" value="{{ old('erp_en', $product->erp_en) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                <div id="erpError" style="display: none; color: #dc2626; font-size: 12px; font-weight: 700; margin-top: 5px;">
+                                    <i class="fa fa-exclamation-triangle"></i> Seller Rate এবং ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে!
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="mrp_en">
+                                    MRP (Market Retail Price) (৳) <span class="required">*</span>
+                                </label>
+                                <input type="text" class="app-input" id="mrp_en" name="mrp_en" required
+                                       placeholder="e.g. 250" value="{{ old('mrp_en', $product->mrp_en) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Direct Cashback & Direct Refer Commission (50% Combined Pool) -->
+                    <div class="row" style="margin-top: 8px;">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="cb_en">
+                                    Direct Customer Cashback (৳)
+                                </label>
+                                <input type="text" class="app-input" id="cb_en" name="cb_en"
+                                       placeholder="0.00" value="{{ old('cb_en', $product->cb_en) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                <div id="cbHelper" class="app-badge-helper">
+                                    <i class="fa fa-info-circle"></i> Max allowed: ৳0.00
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="direct_refer_commission">
+                                    Direct Refer Commission (৳)
+                                </label>
+                                <input type="text" class="app-input" id="direct_refer_commission" name="direct_refer_commission"
+                                       placeholder="0.00" value="{{ old('direct_refer_commission', $product->direct_refer_commission) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                <div id="referHelper" class="app-badge-helper">
+                                    <i class="fa fa-info-circle"></i> Max allowed: ৳0.00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Financial & Profit Protection Dashboard -->
+                    <div class="calc-dashboard">
+                        <div style="font-weight: 700; color: #1e3a8a; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                            <span><i class="fa fa-shield"></i> Financial & 50% Margin Protection Summary</span>
+                            <span id="rateDifferenceBadge" class="calc-pool-badge">Diff: ৳0.00</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Net ERP Amount (ERP - Seller Rate):</span>
+                                    <span class="calc-item-value" id="netMarginText">৳0.00</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Max 50% Reward Pool (Cashback + Refer):</span>
+                                    <span class="calc-item-value text-primary" id="maxRewardPoolText">৳0.00</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Seller Payable Amount (Rate - VAT):</span>
+                                    <span class="calc-item-value text-success" id="sellerPayableText">৳0.00</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Calculated TRP:</span>
+                                    <span class="calc-item-value" id="trpText">0.00</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Calculated TCB:</span>
+                                    <span class="calc-item-value" id="tcbText">0.00</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-item-label">VAT (15% of ERP):</span>
+                                    <span class="calc-item-value" id="vatText">৳0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden calculated fields sent with request -->
+                    <input type="hidden" id="sellerPayable" name="seller_payable" value="0">
+                    <input type="hidden" id="TRPen" name="trp_en" value="{{ $product->trp_en }}">
+                    <input type="hidden" id="tcb_en" name="tcb_en" value="{{ $product->tcb_en }}">
+                    <input type="hidden" id="vat" name="vat_percent" value="{{ $product->vat_percent }}">
+                </div>
+
+                <!-- Section 3: Inventory & Media -->
+                <div class="app-card">
+                    <div class="app-card-title">
+                        <i class="fa fa-archive"></i> Inventory & Media
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="quantity">
+                                    Available Stock / Quantity <span class="required">*</span>
+                                </label>
+                                <input type="text" class="app-input" id="quantity" name="quantity" required
+                                       placeholder="e.g. 50" value="{{ old('quantity', $product->quantity) }}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="unit">
+                                    Unit <small class="text-muted">(Pcs, Kg, Box, Litre, etc.)</small>
+                                </label>
+                                <input type="text" class="app-input" id="unit" name="unit"
+                                       placeholder="e.g. Pcs" value="{{ old('unit', $product->unit) }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="app-form-group" style="margin-bottom: 0;">
+                        <label class="app-label">Featured Image</label>
+                        <div class="image-upload-wrapper" onclick="document.getElementById('productImageInput').click();">
+                            <i class="fa fa-cloud-upload image-upload-icon"></i>
+                            <div style="font-weight: 600; color: #1e293b; font-size: 14px;">Click to change product image</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">PNG, JPG, JPEG (Square recommended, max 2MB)</div>
+                            <input type="file" id="productImageInput" name="featured_image" accept="image/*" style="display: none;" onchange="previewProductImage(this);">
+                            
+                            <div class="image-preview-box" id="imagePreviewContainer" style="{{ !empty($product->featured_image) ? 'display: block;' : '' }}">
+                                <img id="imagePreviewImg" src="{{ !empty($product->featured_image) ? asset($product->featured_image) : '' }}" alt="Product Image">
+                                <div style="margin-top: 6px; font-size: 12px; color: #10b981; font-weight: 600;">Current Image</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Action -->
+                <div style="margin-top: 24px;">
+                    <button type="submit" id="submitBtn" class="app-btn-submit">
+                        <i class="fa fa-save"></i> Update Product
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </section>
+@endsection
+
 @section('extra-script')
-    <script src="{{asset('assets/admin')}}/bower_components/ckeditor/ckeditor.js"></script>
-    <script src="{{asset('assets/admin')}}/bower_components/ckeditor/ckeditor.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <script>
         $('#selectCategory').select2({
             theme: 'bootstrap4',
+            placeholder: 'Select a Category'
         });
-        $(function () {
-            // Replace the <textarea id="editor1"> with a CKEditor
-            // instance, using default configuration.
-            CKEDITOR.replace('editor1')
-            //bootstrap WYSIHTML5 - text editor
-            //$('.textarea').wysihtml5()
 
-            function calculateTRP() {
-                let rate = parseFloat($('input[name="rate_en"]').val()) || 0;
+        function previewProductImage(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreviewImg').attr('src', e.target.result);
+                    $('#imagePreviewContainer').fadeIn(200);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(function () {
+            function recalculateProductFinancials() {
+                let rate = parseFloat($('#priceEn').val()) || 0;
                 let erp = parseFloat($('#erp_en').val()) || 0;
                 let cb = parseFloat($('#cb_en').val()) || 0;
                 let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
 
+                // VAT calculation
                 let vat = erp * 0.15;
                 $('#vat').val(vat.toFixed(2));
+                $('#vatText').text('৳ ' + vat.toFixed(2));
 
+                // Seller Payable calculation
                 let payable = rate - vat;
-                $('#sellerPayable').val(payable > 0 ? payable.toFixed(2) : 0);
+                let payableFormatted = (payable > 0 ? payable.toFixed(2) : '0.00');
+                $('#sellerPayable').val(payableFormatted);
+                $('#sellerPayableText').text('৳ ' + payableFormatted);
 
-                let netErp = erp - vat;
-                let maxLimit = netErp * 0.25;
-                if(maxLimit < 0) maxLimit = 0;
-                
-                $('#cbHelper').text('Max allowed: ৳' + maxLimit.toFixed(2));
-                $('#referHelper').text('Max allowed: ৳' + maxLimit.toFixed(2));
-                
-                if(cb > maxLimit) {
-                    $('#cb_en').css('border-color', 'red');
-                } else {
-                    $('#cb_en').css('border-color', '');
-                }
-                
-                if(directRefer > maxLimit) {
-                    $('#direct_refer_commission').css('border-color', 'red');
-                } else {
-                    $('#direct_refer_commission').css('border-color', '');
-                }
-                
-                if(erp > 0 && erp < (rate + 5)) {
-                    $('#erp_en').css('border-color', 'red');
+                // Rule 3: Seller Rate vs ERP difference at least 10 Tk
+                let diff = erp - rate;
+                $('#rateDifferenceBadge').text('Diff: ৳' + diff.toFixed(2));
+
+                if (erp > 0 && erp < (rate + 10)) {
+                    $('#erp_en').addClass('app-input-error');
                     $('#erpError').show();
+                    $('#rateDifferenceBadge').css({'background': '#fee2e2', 'color': '#b91c1c'});
                 } else {
-                    $('#erp_en').css('border-color', '');
+                    $('#erp_en').removeClass('app-input-error');
                     $('#erpError').hide();
+                    $('#rateDifferenceBadge').css({'background': '#dbeafe', 'color': '#1e40af'});
                 }
 
+                // Rule 4: Net ERP Amount = (ERP - Seller Rate)
+                let netMargin = Math.max(0, erp - rate);
+                let totalMaxRewardPool = netMargin * 0.50; // 50% pool
+
+                $('#netMarginText').text('৳ ' + netMargin.toFixed(2));
+                $('#maxRewardPoolText').text('৳ ' + totalMaxRewardPool.toFixed(2));
+
+                // Dynamic helper text for Cashback and Refer Commission
+                let maxAllowedForCb = Math.max(0, totalMaxRewardPool - directRefer);
+                let maxAllowedForRefer = Math.max(0, totalMaxRewardPool - cb);
+
+                $('#cbHelper').html('<i class="fa fa-info-circle"></i> Max allowed: ৳' + maxAllowedForCb.toFixed(2));
+                $('#referHelper').html('<i class="fa fa-info-circle"></i> Max allowed: ৳' + maxAllowedForRefer.toFixed(2));
+
+                // Input validation styling
+                let totalEnteredRewards = cb + directRefer;
+                let isExceeded = totalEnteredRewards > (totalMaxRewardPool + 0.01);
+
+                if (isExceeded || cb > (maxAllowedForCb + 0.01)) {
+                    $('#cb_en').addClass('app-input-error');
+                    $('#cbHelper').addClass('limit-exceeded').html('<i class="fa fa-times-circle"></i> Limit exceeded! Max: ৳' + maxAllowedForCb.toFixed(2));
+                } else {
+                    $('#cb_en').removeClass('app-input-error');
+                    $('#cbHelper').removeClass('limit-exceeded');
+                }
+
+                if (isExceeded || directRefer > (maxAllowedForRefer + 0.01)) {
+                    $('#direct_refer_commission').addClass('app-input-error');
+                    $('#referHelper').addClass('limit-exceeded').html('<i class="fa fa-times-circle"></i> Limit exceeded! Max: ৳' + maxAllowedForRefer.toFixed(2));
+                } else {
+                    $('#direct_refer_commission').removeClass('app-input-error');
+                    $('#referHelper').removeClass('limit-exceeded');
+                }
+
+                // TRP & TCB calculations
                 let trp = (erp - (rate + cb + directRefer)) / 25;
                 if (trp < 0) trp = 0;
-                
                 $('#TRPen').val(trp.toFixed(2));
+                $('#trpText').text(trp.toFixed(2));
 
                 let tcb = cb + (trp * 2);
                 $('#tcb_en').val(tcb.toFixed(2));
+                $('#tcbText').text(tcb.toFixed(2));
             }
 
-            $('input[name="rate_en"], #erp_en, #cb_en, #direct_refer_commission').on('input', function() {
-                calculateTRP();
+            $('#priceEn, #erp_en, #cb_en, #direct_refer_commission').on('input', function() {
+                recalculateProductFinancials();
             });
-            
-            // Initial call to populate values
-            calculateTRP();
 
-            $('#productForm').on('submit', function(e){
-                let rate = parseFloat($('input[name="rate_en"]').val()) || 0;
+            // Initial calculation run
+            recalculateProductFinancials();
+
+            // Client-side submit guard
+            $('#productForm').on('submit', function(e) {
+                let rate = parseFloat($('#priceEn').val()) || 0;
                 let erp = parseFloat($('#erp_en').val()) || 0;
                 let cb = parseFloat($('#cb_en').val()) || 0;
                 let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
-                let vat = erp * 0.15;
-                let netErp = erp - vat;
-                let maxLimit = netErp * 0.25;
-                
-                if(erp > 0 && erp < (rate + 5)) {
+                let netMargin = Math.max(0, erp - rate);
+                let totalMaxRewardPool = netMargin * 0.50;
+
+                if (erp > 0 && erp < (rate + 10)) {
                     e.preventDefault();
-                    alert('Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।');
+                    alert('Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে।');
+                    $('#erp_en').focus();
                     return false;
                 }
-                if(cb > maxLimit) {
+
+                if ((cb + directRefer) > (totalMaxRewardPool + 0.05)) {
                     e.preventDefault();
-                    alert('Direct Customer Cashback Max limit is ' + maxLimit.toFixed(2));
+                    alert('Direct Customer Cashback ও Direct Refer Commission মিলে সর্বোচ্চ ৳' + totalMaxRewardPool.toFixed(2) + ' দেওয়া যাবে (Net Margin এর ৫০%)।');
                     return false;
                 }
-                if(directRefer > maxLimit) {
-                    e.preventDefault();
-                    alert('Direct Refer Commission Max limit is ' + maxLimit.toFixed(2));
-                    return false;
-                }
+
                 return true;
             });
-        })
+        });
     </script>
 @endsection

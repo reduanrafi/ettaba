@@ -72,18 +72,21 @@ class ProductController extends Controller
             $cb = floatval($data['cb_en'] ?? 0);
             $directRefer = floatval($data['direct_refer_commission'] ?? 0);
             
-            $vat = $erp * 0.15;
-            $netErp = $erp - $vat;
-            $maxLimit = $netErp * 0.25;
+            $netMargin = max(0, $erp - $rate);
+            $maxCombinedLimit = $netMargin * 0.50;
             
-            if ($erp > 0 && $erp < ($rate + 5)) {
-                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।']);
+            if ($erp > 0 && $erp < ($rate + 10)) {
+                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে।']);
             }
-            if ($cb > $maxLimit) {
-                return redirect()->back()->with(['error' => 'Direct Customer Cashback Max limit is ' . number_format($maxLimit, 2)]);
+            if (($cb + $directRefer) > ($maxCombinedLimit + 0.05)) {
+                return redirect()->back()->with(['error' => 'Direct Customer Cashback ও Direct Refer Commission মিলে সর্বোচ্চ ' . number_format($maxCombinedLimit, 2) . ' টাকা দেওয়া যাবে (Net ERP Amount এর ৫০%)।']);
             }
-            if ($directRefer > $maxLimit) {
-                return redirect()->back()->with(['error' => 'Direct Refer Commission Max limit is ' . number_format($maxLimit, 2)]);
+            if ($cb < 0 || $directRefer < 0) {
+                return redirect()->back()->with(['error' => 'Cashback অথবা Refer Commission ঋণাত্মক হতে পারবে না।']);
+            }
+
+            if (isset($data['quantity'])) {
+                $data['quantity'] = is_numeric($data['quantity']) ? intval($data['quantity']) : 0;
             }
 
             if(!isset($data['name_bn'])) {
@@ -117,18 +120,21 @@ class ProductController extends Controller
             $cb = floatval($data['cb_en'] ?? 0);
             $directRefer = floatval($data['direct_refer_commission'] ?? 0);
             
-            $vat = $erp * 0.15;
-            $netErp = $erp - $vat;
-            $maxLimit = $netErp * 0.25;
+            $netMargin = max(0, $erp - $rate);
+            $maxCombinedLimit = $netMargin * 0.50;
             
-            if ($erp > 0 && $erp < ($rate + 5)) {
-                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ৫ টাকা ব্যবধান থাকতে হবে।']);
+            if ($erp > 0 && $erp < ($rate + 10)) {
+                return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে।']);
             }
-            if ($cb > $maxLimit) {
-                return redirect()->back()->with(['error' => 'Direct Customer Cashback Max limit is ' . number_format($maxLimit, 2)]);
+            if (($cb + $directRefer) > ($maxCombinedLimit + 0.05)) {
+                return redirect()->back()->with(['error' => 'Direct Customer Cashback ও Direct Refer Commission মিলে সর্বোচ্চ ' . number_format($maxCombinedLimit, 2) . ' টাকা দেওয়া যাবে (Net ERP Amount এর ৫০%)।']);
             }
-            if ($directRefer > $maxLimit) {
-                return redirect()->back()->with(['error' => 'Direct Refer Commission Max limit is ' . number_format($maxLimit, 2)]);
+            if ($cb < 0 || $directRefer < 0) {
+                return redirect()->back()->with(['error' => 'Cashback অথবা Refer Commission ঋণাত্মক হতে পারবে না।']);
+            }
+
+            if (isset($data['quantity'])) {
+                $data['quantity'] = is_numeric($data['quantity']) ? intval($data['quantity']) : 0;
             }
 
             if(!isset($data['name_bn'])) {
@@ -136,15 +142,19 @@ class ProductController extends Controller
             }
             
             $isNameChanged = isset($data['name_en']) && $data['name_en'] != $oldData->name_en;
-            $isDescChanged = isset($data['description_en']) && $data['description_en'] != $oldData->description_en;
+            $isDescChanged = isset($data['description_en']) && trim(strip_tags($data['description_en'])) != trim(strip_tags($oldData->description_en));
             $isDelAreaChanged = isset($data['delivery_area_en']) && $data['delivery_area_en'] != $oldData->delivery_area_en;
             $isRateChanged = isset($data['rate_en']) && $data['rate_en'] != $oldData->rate_en;
             $isMrpChanged = isset($data['mrp_en']) && $data['mrp_en'] != $oldData->mrp_en;
             $isErpChanged = isset($data['erp_en']) && $data['erp_en'] != $oldData->erp_en;
             $isCbChanged = isset($data['cb_en']) && $data['cb_en'] != $oldData->cb_en;
             $isDirectReferChanged = isset($data['direct_refer_commission']) && $data['direct_refer_commission'] != $oldData->direct_refer_commission;
+            $isQuantityChanged = isset($data['quantity']) && $data['quantity'] != $oldData->quantity;
+            $isVatChanged = isset($data['vat_percent']) && $data['vat_percent'] != $oldData->vat_percent;
+            $isTcbChanged = isset($data['tcb_en']) && $data['tcb_en'] != $oldData->tcb_en;
+            $isTrpChanged = isset($data['trp_en']) && $data['trp_en'] != $oldData->trp_en;
 
-            if ($isNameChanged || $isDescChanged || $isDelAreaChanged || $isRateChanged || $isMrpChanged || $isErpChanged || $isCbChanged || $isDirectReferChanged) {
+            if ($isNameChanged || $isDescChanged || $isDelAreaChanged || $isRateChanged || $isMrpChanged || $isErpChanged || $isCbChanged || $isDirectReferChanged || $isQuantityChanged || $isVatChanged || $isTcbChanged || $isTrpChanged) {
                 \App\Models\ProductHistory::create([
                     'product_id' => $id,
                     'old_name' => $oldData->name_en,
@@ -155,6 +165,10 @@ class ProductController extends Controller
                     'old_erp' => $oldData->erp_en,
                     'old_cb' => $oldData->cb_en,
                     'old_direct_refer_commission' => $oldData->direct_refer_commission,
+                    'old_quantity' => $oldData->quantity,
+                    'old_vat' => $oldData->vat_percent,
+                    'old_tcb' => $oldData->tcb_en,
+                    'old_trp' => $oldData->trp_en,
                 ]);
             }
 
@@ -247,6 +261,9 @@ class ProductController extends Controller
     
     public function History($id)
     {
+        if (Auth::user()->type !== 'admin') {
+            abort(403, 'Unauthorized access.');
+        }
         $product = Product::findOrFail($id);
         $histories = \App\Models\ProductHistory::where('product_id', $id)->orderBy('created_at', 'desc')->get();
         return view('admin.products.history', compact('product', 'histories'));

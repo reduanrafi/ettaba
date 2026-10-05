@@ -18,6 +18,10 @@ class ProductHistory extends Model
         'old_mrp',
         'old_erp',
         'old_cb',
-        'old_direct_refer_commission'
+        'old_direct_refer_commission',
+        'old_quantity',
+        'old_vat',
+        'old_tcb',
+        'old_trp'
     ];
 }
