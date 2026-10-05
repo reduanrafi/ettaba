@@ -76,10 +76,10 @@ class WithdrawRequestController extends Controller
             $availableBalance = $earning ? floatval($earning->amount) : 0;
         }
 
-        if ($requestAmount < 50) {
-            return redirect()->back()->with(['error' => "আপনি 50 টাকার কম উত্তোলন করতে পারবেন না ! "]);
-        } else if ($availableBalance < 50) {
-            return redirect()->back()->with(['error' => "আপনার একাউন্টে পর্যাপ্ত ব্যাল্যান্স নেই । উত্তোলনের জন্য অ্যাকাউন্টে কমপক্ষে 50 টাকা থাকতে হবে !"]);
+        if ($requestAmount < 100) {
+            return redirect()->back()->with(['error' => "আপনি 100 টাকার কম উত্তোলন করতে পারবেন না ! "]);
+        } else if ($availableBalance < 100) {
+            return redirect()->back()->with(['error' => "আপনার একাউন্টে পর্যাপ্ত ব্যাল্যান্স নেই । উত্তোলনের জন্য অ্যাকাউন্টে কমপক্ষে 100 টাকা থাকতে হবে !"]);
         } else if ($requestAmount > $availableBalance) {
             return redirect()->back()->with(['error' => "আপনি " . $availableBalance . " টাকার বেশি উত্তোলন করতে পারবেন না ! "]);
         }

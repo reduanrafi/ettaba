@@ -22,10 +22,10 @@
                 <div class="form-group row">
                     <label for="inputName" class="col-sm-2 col-form-label">Withdraw amount</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control"
+                        <input type="number" step="any" min="100" class="form-control"
                                required
                                name="amount"
-                               placeholder="টাকার পরিমান ইংরেজিতে লিখুন">
+                               placeholder="টাকার পরিমান ইংরেজিতে লিখুন (কমপক্ষে ১০০)">
                     </div>
                 </div>
                 <div class="form-group row">

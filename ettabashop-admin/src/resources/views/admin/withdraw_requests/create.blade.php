@@ -36,10 +36,10 @@
                         <div class="form-group row">
                             <label for="inputName" class="col-sm-2 col-form-label">Amount</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control"
+                                <input type="number" step="any" min="100" class="form-control"
                                        required
                                        name="amount"
-                                       placeholder="Withdraw amount">
+                                       placeholder="Withdraw amount (Min: ৳100)">
                             </div>
                         </div>
                         <div class="form-group row">
