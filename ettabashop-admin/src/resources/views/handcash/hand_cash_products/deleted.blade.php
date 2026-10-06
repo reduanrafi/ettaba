@@ -25,7 +25,6 @@
                             <table id="productDataTable" class="table table-bordered table-hover table-responsive no-padding">
                                 <thead>
                                 <tr>
-                                    <th>Id</th>
                                     <th>Code</th>
                                     <th>Product name</th>
                                     <th>Thumb</th>
@@ -40,7 +39,6 @@
                                @if($products)
                                    @foreach($products as $product)
                                        <tr>
-                                           <td>{{ $product->id }}</td>
                                            <td>{{ $product->unique_id }}</td>
                                            <td>{{ $product->name_en }}</td>
                                            <td>
