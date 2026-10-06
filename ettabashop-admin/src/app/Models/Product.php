@@ -50,11 +50,12 @@ class Product extends Model
 
         'quantity',
         'unit',
+        'weight',
+        'weight_unit',
         'direct_refer_commission',
         'is_sold_out',
         'is_featured',
         'slug'
-
     ];
     protected $appends = [
         'count',

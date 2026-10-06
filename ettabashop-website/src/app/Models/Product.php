@@ -34,6 +34,8 @@ class Product extends Model
         'price_bn',
         'quantity',
         'unit',
+        'weight',
+        'weight_unit',
         'is_sold_out',
         'is_featured',
         'slug'

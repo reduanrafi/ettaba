@@ -454,32 +454,40 @@
 
                     <!-- Live Financial & Profit Protection Dashboard -->
                     <div class="calc-dashboard">
+                        @if(Auth::check() && Auth::user()->type == 'admin')
                         <div style="font-weight: 700; color: #1e3a8a; font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
                             <span><i class="fa fa-shield"></i> Financial & 50% Margin Protection Summary</span>
                             <span id="rateDifferenceBadge" class="calc-pool-badge">Diff: ৳0.00</span>
                         </div>
-                        <div class="row">
+                        <div class="row" style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1;">
                             <div class="col-md-6 col-sm-12">
-                                <div class="calc-item">
+                                <div class="calc-item" style="border-bottom: none;">
                                     <span class="calc-item-label">Net ERP Amount (ERP - Seller Rate):</span>
                                     <span class="calc-item-value" id="netMarginText">৳0.00</span>
                                 </div>
-                                <div class="calc-item">
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="calc-item" style="border-bottom: none;">
                                     <span class="calc-item-label">Max 50% Reward Pool (Cashback + Refer):</span>
                                     <span class="calc-item-value text-primary" id="maxRewardPoolText">৳0.00</span>
                                 </div>
+                            </div>
+                        </div>
+                        @endif
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
                                 <div class="calc-item">
-                                    <span class="calc-item-label">Seller Payable Amount (Rate - VAT):</span>
+                                    <span class="calc-item-label">Seller Payable Amount</span>
                                     <span class="calc-item-value text-success" id="sellerPayableText">৳0.00</span>
+                                </div>
+                                <div class="calc-item">
+                                    <span class="calc-item-label">Total Reward Points :</span>
+                                    <span class="calc-item-value" id="trpText">0.00</span>
                                 </div>
                             </div>
                             <div class="col-md-6 col-sm-12">
                                 <div class="calc-item">
-                                    <span class="calc-item-label">Calculated TRP:</span>
-                                    <span class="calc-item-value" id="trpText">0.00</span>
-                                </div>
-                                <div class="calc-item">
-                                    <span class="calc-item-label">Calculated TCB:</span>
+                                    <span class="calc-item-label">Total Customer Cashback:</span>
                                     <span class="calc-item-value" id="tcbText">0.00</span>
                                 </div>
                                 <div class="calc-item">
@@ -518,10 +526,44 @@
                         <div class="col-md-6 col-sm-12">
                             <div class="app-form-group">
                                 <label class="app-label" for="unit">
-                                    Unit <small class="text-muted">(Pcs, Kg, Box, Litre, etc.)</small>
+                                    Unit <span class="required">*</span>
                                 </label>
-                                <input type="text" class="app-input" id="unit" name="unit"
-                                       placeholder="e.g. Pcs" value="{{ old('unit', $product->unit) }}">
+                                @php
+                                    $unitsList = ['Pcs', 'Kg', 'Gm', 'Liter', 'Box', 'ml', 'Pair', 'Dozen', 'Set', 'Bottle', 'Package'];
+                                    $currentUnit = old('unit', $product->unit ?? 'Pcs');
+                                    if ($currentUnit && !in_array($currentUnit, $unitsList)) {
+                                        $unitsList[] = $currentUnit;
+                                    }
+                                @endphp
+                                <select class="app-input" id="unit" name="unit">
+                                    @foreach($unitsList as $u)
+                                        <option value="{{ $u }}" {{ $currentUnit == $u ? 'selected' : '' }}>{{ $u }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="weight">
+                                    Product Weight <small class="text-muted">(gm/kg)</small>
+                                </label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" class="app-input" id="weight" name="weight"
+                                           placeholder="e.g. 500" value="{{ old('weight', $product->weight !== null ? (float)$product->weight : '') }}"
+                                           style="flex: 2;"
+                                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                    <select class="app-input" id="weight_unit" name="weight_unit"
+                                            style="flex: 1; font-weight: 600; cursor: pointer;">
+                                        <option value="gm" {{ old('weight_unit', $product->weight_unit ?? 'gm') == 'gm' ? 'selected' : '' }}>gm</option>
+                                        <option value="kg" {{ old('weight_unit', $product->weight_unit) == 'kg' ? 'selected' : '' }}>kg</option>
+                                    </select>
+                                </div>
+                                <small class="text-muted" style="font-size: 11px; margin-top: 4px; display: block;">
+                                    <i class="fa fa-info-circle"></i> ওয়েবসাইটে ডেলিভারি চার্জ হিসাবের জন্য পণ্যের ওজন ও একক (gm/kg) নির্বাচন করুন।
+                                </small>
                             </div>
                         </div>
                     </div>

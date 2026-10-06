@@ -89,6 +89,13 @@ class ProductController extends Controller
                 $data['quantity'] = is_numeric($data['quantity']) ? intval($data['quantity']) : 0;
             }
 
+            if (isset($data['weight'])) {
+                $data['weight'] = (is_numeric($data['weight']) && floatval($data['weight']) >= 0) ? floatval($data['weight']) : null;
+            }
+            if (isset($data['weight_unit'])) {
+                $data['weight_unit'] = in_array(strtolower($data['weight_unit']), ['gm', 'kg']) ? strtolower($data['weight_unit']) : 'gm';
+            }
+
             if(!isset($data['name_bn'])) {
                 $data['name_bn'] = $data['name_en'];
             }
@@ -135,6 +142,13 @@ class ProductController extends Controller
 
             if (isset($data['quantity'])) {
                 $data['quantity'] = is_numeric($data['quantity']) ? intval($data['quantity']) : 0;
+            }
+
+            if (isset($data['weight'])) {
+                $data['weight'] = (is_numeric($data['weight']) && floatval($data['weight']) >= 0) ? floatval($data['weight']) : null;
+            }
+            if (isset($data['weight_unit'])) {
+                $data['weight_unit'] = in_array(strtolower($data['weight_unit']), ['gm', 'kg']) ? strtolower($data['weight_unit']) : 'gm';
             }
 
             if(!isset($data['name_bn'])) {
