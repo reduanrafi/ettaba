@@ -75,6 +75,13 @@ class ProductController extends Controller
             $netMargin = max(0, $erp - $rate);
             $maxCombinedLimit = $netMargin * 0.50;
             
+            $vat = $erp * 0.15;
+            $minSellerRate = $vat + 1;
+
+            if ($erp > 0 && $rate < $minSellerRate) {
+                return redirect()->back()->with(['error' => 'সেলার রেট অবশ্যই ভ্যাট (১৫%) থেকে অন্তত ১ টাকা বেশি হতে হবে (সর্বনিম্ন: ৳' . number_format($minSellerRate, 2) . ')।']);
+            }
+
             if ($erp > 0 && $erp < ($rate + 10)) {
                 return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে।']);
             }
@@ -130,6 +137,13 @@ class ProductController extends Controller
             $netMargin = max(0, $erp - $rate);
             $maxCombinedLimit = $netMargin * 0.50;
             
+            $vat = $erp * 0.15;
+            $minSellerRate = $vat + 1;
+
+            if ($erp > 0 && $rate < $minSellerRate) {
+                return redirect()->back()->with(['error' => 'সেলার রেট অবশ্যই ভ্যাট (১৫%) থেকে অন্তত ১ টাকা বেশি হতে হবে (সর্বনিম্ন: ৳' . number_format($minSellerRate, 2) . ')।']);
+            }
+
             if ($erp > 0 && $erp < ($rate + 10)) {
                 return redirect()->back()->with(['error' => 'Seller Rate থেকে ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে।']);
             }

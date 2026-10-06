@@ -392,6 +392,9 @@
                                 <input type="text" class="app-input" id="priceEn" name="rate_en" required
                                        placeholder="e.g. 130" value="{{ old('rate_en', $product->rate_en) }}"
                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                                <div id="sellerRateError" style="display: none; color: #dc2626; font-size: 12px; font-weight: 700; margin-top: 5px;">
+                                    <i class="fa fa-exclamation-triangle"></i> সেলার রেট অবশ্যই ভ্যাট (১৫%) থেকে অন্তত ১ টাকা বেশি হতে হবে! (সর্বনিম্ন: <span id="minSellerRateText">৳0.00</span>)
+                                </div>
                             </div>
                         </div>
 
@@ -628,6 +631,17 @@
                 $('#vat').val(vat.toFixed(2));
                 $('#vatText').text('৳ ' + vat.toFixed(2));
 
+                // Rule: Seller Rate must be at least VAT + 1 Tk
+                let minSellerRate = vat + 1;
+                if (erp > 0 && rate < minSellerRate) {
+                    $('#priceEn').addClass('app-input-error');
+                    $('#minSellerRateText').text('৳' + minSellerRate.toFixed(2));
+                    $('#sellerRateError').show();
+                } else {
+                    $('#priceEn').removeClass('app-input-error');
+                    $('#sellerRateError').hide();
+                }
+
                 // Seller Payable calculation
                 let payable = rate - vat;
                 let payableFormatted = (payable > 0 ? payable.toFixed(2) : '0.00');
@@ -708,6 +722,16 @@
                 let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
                 let netMargin = Math.max(0, erp - rate);
                 let totalMaxRewardPool = netMargin * 0.50;
+
+                let vat = erp * 0.15;
+                let minSellerRate = vat + 1;
+
+                if (erp > 0 && rate < minSellerRate) {
+                    e.preventDefault();
+                    alert('সেলার রেট অবশ্যই ভ্যাট (১৫%) থেকে অন্তত ১ টাকা বেশি হতে হবে। সর্বনিম্ন সেলার রেট: ৳' + minSellerRate.toFixed(2));
+                    $('#priceEn').focus();
+                    return false;
+                }
 
                 if (erp > 0 && erp < (rate + 10)) {
                     e.preventDefault();
