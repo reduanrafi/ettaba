@@ -26,13 +26,13 @@ use Illuminate\Support\Facades\Route;
 //});
 
 Route::post('/login',[AuthController::class,"login"]);
-Route::post('/check-otp',['uses'=>'Api\V1\AuthController@VerifyOTP']);
+Route::post('/check-otp',[AuthController::class, 'VerifyOTP']);
 
-Route::post('/forget-password',['uses'=>'Api\V1\AuthController@ForgetPassword']);
-Route::post('/update-password',['uses'=>'Api\V1\AuthController@ForgotPasswordChange']);
+Route::post('/forget-password',[AuthController::class, 'ForgetPassword']);
+Route::post('/update-password',[AuthController::class, 'ForgotPasswordChange']);
 
 Route::post('/register',[AuthController::class,"register"]);
-Route::post('/password-reset-token',['uses'=>'Api\V1\AuthController@CreatePasswordResetToken']);
+Route::post('/password-reset-token',[AuthController::class, 'CreatePasswordResetToken']);
 //Route::post('/logout',['uses'=>'Api\V1\AuthController@Logout']);
 
 Route::group(['prefix'=>'sliders'],function(){
@@ -55,9 +55,9 @@ Route::group(['prefix' => 'products'], function () {
     Route::get('/search/{keywords}', [ ProductController::class,'Search']);
     Route::get('/detail/{id}', [ ProductController::class,'GetProductDetail']);
 
-    Route::get('/by-brand/{id}', ['uses' => 'Api\V1\ProductController@GetProductsByBrand']);
-    Route::get('/{id}/details', ['uses' => 'Api\V1\ProductController@GetProductDetail']);
-    Route::get('/offers', ['uses' => 'Api\V1\ProductController@TodayOffers']);
+    Route::get('/by-brand/{id}', [ProductController::class, 'GetProductsByBrand']);
+    Route::get('/{id}/details', [ProductController::class, 'GetProductDetail']);
+    Route::get('/offers', [ProductController::class, 'TodayOffers']);
 
 });
 Route::group(['prefix' => 'orders'], function () {
@@ -85,8 +85,8 @@ Route::group(['middleware'=>['auth:sanctum']],function () {
         Route::get('/referral', [ProfileController::class,'CreateReferralCode']);
         Route::post('/update', [ProfileController::class,'UpdateProfile']);
 
-        Route::post('/change-email', ['uses' => 'Api\V1\ProfileController@ChangeEmail']);
-        Route::post('/change-phone', ['uses' => 'Api\V1\ProfileController@ChangePhone']);
+        Route::post('/change-email', [ProfileController::class, 'ChangeEmail']);
+        Route::post('/change-phone', [ProfileController::class, 'ChangePhone']);
 
     });
 

@@ -23,6 +23,8 @@ class Profile extends Model
         'father_name',
         'mother_name',
         'address',
+        'union_name',
+        'ward_no',
         'blood_group',
         'profile_image',
         //'nid_image',

@@ -17,9 +17,14 @@ class Profile extends Model
      *****************************/
     protected $fillable = [
         'user_id',
+        'nid',
         'first_name',
         'last_name',
+        'father_name',
+        'mother_name',
         'address',
+        'union_name',
+        'ward_no',
         'blood_group',
         'profile_image',
         'nid_image',

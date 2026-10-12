@@ -30,9 +30,11 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
-Route::get('/register', function () {
-    return view('auth.login');
-});
+Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('/api/geo/districts/{division_id}', [\App\Http\Controllers\Auth\RegisterController::class, 'getDistricts'])->name('geo.districts');
+Route::get('/api/geo/upazilas/{district_id}', [\App\Http\Controllers\Auth\RegisterController::class, 'getUpazilas'])->name('geo.upazilas');
+Route::get('/api/check-username', [\App\Http\Controllers\Auth\RegisterController::class, 'checkUsername'])->name('check.username');
+Route::get('/api/check-eid', [\App\Http\Controllers\Auth\RegisterController::class, 'checkEid'])->name('check.eid');
 
 Route::get('/forgot-password', [\App\Http\Controllers\Website\PasswordController::class, 'forgotPassword'])->name('forgotPassword');
 Route::post('/generate-otp', [\App\Http\Controllers\Website\PasswordController::class, 'GenerateOTP'])->name('generateOtp');
