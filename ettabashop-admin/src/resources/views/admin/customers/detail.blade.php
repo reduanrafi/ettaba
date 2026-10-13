@@ -32,13 +32,31 @@
                         
                         <ul class="list-group list-group-unbordered">
                             <li class="list-group-item">
-                                <b>NID</b> <a class="pull-right">{{ $customer->profile->nid }}</a>
+                                <b>NID / BC</b> <a class="pull-right">{{ $customer->profile->nid ?: 'N/A' }}</a>
                             </li>
                             <li class="list-group-item">
-                                <b>Mobile </b> <a class="pull-right">{{ $customer->phone }}</a>
+                                <b>Father's Name</b> <a class="pull-right">{{ $customer->profile->father_name ?: 'N/A' }}</a>
                             </li>
                             <li class="list-group-item">
-                                <b>Birth Date</b> <a class="pull-right">{{ $customer->profile->date_of_birth }}</a>
+                                <b>Mother's Name</b> <a class="pull-right">{{ $customer->profile->mother_name ?: 'N/A' }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Blood Group</b> <a class="pull-right">
+                                    @if(!empty($customer->profile->blood_group))
+                                        <span class="label label-danger">{{ $customer->profile->blood_group }}</span>
+                                    @else
+                                        N/A
+                                    @endif
+                                </a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Mobile</b> <a class="pull-right">{{ $customer->phone }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Birth Date</b> <a class="pull-right">{{ $customer->profile->date_of_birth ?: 'N/A' }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Address</b> <a class="pull-right">{{ $customer->profile->address ?: 'N/A' }}</a>
                             </li>
                         </ul>
 

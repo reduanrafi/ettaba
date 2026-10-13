@@ -671,7 +671,7 @@
                         <i class="fa fa-address-card"></i>
                     </div>
                     <div class="step-title">পার্টনার/এজেন্ট একাউন্টের জন্য অতিরিক্ত তথ্য দিন</div>
-                    <div class="step-subtitle">সঠিক NID এবং জন্মতারিখ প্রদান করুন</div>
+                    <div class="step-subtitle">সঠিক NID ও জন্মতারিখ প্রদান করুন (পিতা-মাতার নাম ও ব্লাড গ্রুপ ঐচ্ছিক)</div>
 
                     <div class="form-group-custom">
                         <i class="fa fa-id-badge input-icon"></i>
@@ -693,6 +693,42 @@
                     </div>
 
                     <div class="form-group-custom">
+                        <i class="fa fa-user input-icon"></i>
+                        <input type="text"
+                               name="partner_father_name"
+                               id="partner_father_name"
+                               class="form-control-custom"
+                               placeholder="পিতার নাম লিখুন (ঐচ্ছিক)">
+                        <small class="field-hint">পিতার নাম (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-user input-icon"></i>
+                        <input type="text"
+                               name="partner_mother_name"
+                               id="partner_mother_name"
+                               class="form-control-custom"
+                               placeholder="মাতার নাম লিখুন (ঐচ্ছিক)">
+                        <small class="field-hint">মাতার নাম (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-tint input-icon"></i>
+                        <select name="partner_blood_group" id="partner_blood_group" class="form-control-custom">
+                            <option value="" selected>ব্লাড গ্রুপ নির্বাচন করুন (ঐচ্ছিক)</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                        <small class="field-hint">ব্লাড গ্রুপ (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
                         <i class="fa fa-list-ol input-icon"></i>
                         <select name="account_number" id="account_number_select" class="form-control-custom">
                             <option value="" disabled selected>কত নম্বর একাউন্ট নির্বাচন করুন</option>
@@ -702,6 +738,78 @@
                     </div>
 
                     <button type="button" class="btn-step-next" id="btn-next-3-partner" disabled>
+                        <span>পরবর্তী ধাপে যান</span>
+                        <i class="fa fa-arrow-right"></i>
+                    </button>
+                    <button type="button" class="btn-step-back" onclick="goToStep(3)">
+                        <i class="fa fa-arrow-left"></i> আগের ধাপে যান
+                    </button>
+                </div>
+
+                <!-- ================= STEP 3.1: Customer Extra Info (Optional) ================= -->
+                <div class="step-section" id="step-3-customer" style="display: none;">
+                    <div class="step-icon-wrapper">
+                        <i class="fa fa-id-card"></i>
+                    </div>
+                    <div class="step-title">অতিরিক্ত তথ্য (ঐচ্ছিক)</div>
+                    <div class="step-subtitle">প্রোফাইল সমৃদ্ধ করতে নিচের তথ্যগুলো প্রদান করতে পারেন (অথবা স্কিপ করে যেতে পারেন)</div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-user input-icon"></i>
+                        <input type="text"
+                               name="customer_father_name"
+                               id="customer_father_name"
+                               class="form-control-custom"
+                               placeholder="পিতার নাম লিখুন (ঐচ্ছিক)">
+                        <small class="field-hint">পিতার নাম (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-user input-icon"></i>
+                        <input type="text"
+                               name="customer_mother_name"
+                               id="customer_mother_name"
+                               class="form-control-custom"
+                               placeholder="মাতার নাম লিখুন (ঐচ্ছিক)">
+                        <small class="field-hint">মাতার নাম (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-id-badge input-icon"></i>
+                        <input type="text"
+                               name="customer_nid"
+                               id="customer_nid_input"
+                               class="form-control-custom"
+                               placeholder="NID / জন্ম নিবন্ধন (BC) নম্বর (ঐচ্ছিক)">
+                        <small class="field-hint" id="customer_nid_hint">জাতীয় পরিচয়পত্র বা জন্ম নিবন্ধন নম্বর লিখুন (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-calendar-alt input-icon"></i>
+                        <input type="date"
+                               name="customer_date_of_birth"
+                               id="customer_dob_input"
+                               class="form-control-custom">
+                        <small class="field-hint">জন্মতারিখ নির্বাচন করুন (ঐচ্ছিক)</small>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <i class="fa fa-tint input-icon"></i>
+                        <select name="customer_blood_group" id="customer_blood_group" class="form-control-custom">
+                            <option value="" selected>ব্লাড গ্রুপ নির্বাচন করুন (ঐচ্ছিক)</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                        <small class="field-hint">ব্লাড গ্রুপ (ঐচ্ছিক)</small>
+                    </div>
+
+                    <button type="button" class="btn-step-next" id="btn-next-3-customer">
                         <span>পরবর্তী ধাপে যান</span>
                         <i class="fa fa-arrow-right"></i>
                     </button>
@@ -971,6 +1079,7 @@
         2: { num: '২', title: 'মোবাইল নাম্বার লিখুন' },
         3: { num: '৩', title: 'একাউন্ট নির্বাচন করুন' },
         '3-partner': { num: '৩.১', title: 'পার্টনার অতিরিক্ত তথ্য' },
+        '3-customer': { num: '৩.১', title: 'কাস্টমার অতিরিক্ত তথ্য (ঐচ্ছিক)' },
         4: { num: '৪', title: 'রেফার eID লিখুন' },
         5: { num: '৫', title: 'ঠিকানা নির্বাচন করুন' },
         6: { num: '৬', title: 'ছবি আপলোড করুন' },
@@ -990,7 +1099,7 @@
         }
 
         // Update progress bar
-        let stepIdx = (step === '3-partner') ? 3 : step;
+        let stepIdx = (step === '3-partner' || step === '3-customer') ? 3 : step;
         let percentage = (stepIdx / 8) * 100;
         $('#progressFill').css('width', percentage + '%');
 
@@ -1130,9 +1239,22 @@
                 goToStep('3-partner');
                 checkPartnerExtraValidity();
             } else if (selectedAccountType === 'buy_only') {
-                // Customer selected -> Direct to Step 4
-                setupStep4ForCustomer();
-                goToStep(4);
+                // Customer selected -> Show Customer optional fields
+                goToStep('3-customer');
+            }
+        });
+
+        // Step 3.1: Customer Extra Info
+        $('#btn-next-3-customer').on('click', function() {
+            setupStep4ForCustomer();
+            goToStep(4);
+        });
+
+        $('#customer_nid_input').on('input', function() {
+            let val = $(this).val();
+            let sanitized = val.replace(/[^0-9]/g, '');
+            if (val !== sanitized) {
+                $(this).val(sanitized);
             }
         });
 
@@ -1172,7 +1294,7 @@
             $('#customer_referral_box').show();
             $('#partner_referral_box').hide();
             $('#referral_subtitle').text('(যদি থাকে)');
-            $('#btn-back-4').attr('onclick', 'goToStep(3)');
+            $('#btn-back-4').attr('onclick', "goToStep('3-customer')");
 
             // For customer, if left empty it can default to 134, so let button enable on empty or valid eID
             validateCustomerReferral();
@@ -1457,10 +1579,18 @@
             if (selectedAccountType === 'buy_earn') {
                 formData.set('referral_code_2', $('#partner_referral_input').val());
                 formData.set('referral_code', $('#partner_placement_input').val());
+                formData.set('father_name', $('#partner_father_name').val().trim());
+                formData.set('mother_name', $('#partner_mother_name').val().trim());
+                formData.set('blood_group', $('#partner_blood_group').val());
             } else {
                 let custRef = $('#customer_referral_input').val().trim() || '134';
                 formData.set('referral_code', custRef);
                 formData.set('referral_code_2', custRef);
+                formData.set('father_name', $('#customer_father_name').val().trim());
+                formData.set('mother_name', $('#customer_mother_name').val().trim());
+                formData.set('nid', $('#customer_nid_input').val().trim());
+                formData.set('date_of_birth', $('#customer_dob_input').val());
+                formData.set('blood_group', $('#customer_blood_group').val());
             }
 
             $.ajax({

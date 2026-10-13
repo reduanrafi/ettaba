@@ -64,7 +64,13 @@ class ProfileController extends Controller
                     }
                 }
 
-                $this->message = 'profile saved Successfully';
+                if (!empty($request->first_name)) {
+                    Auth::user()->update([
+                        'name' => trim($request->first_name . ' ' . ($request->last_name ?? ''))
+                    ]);
+                }
+
+                $this->message = 'প্রোফাইল তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!';
             }
         } catch (QueryException $ex) {
             $this->message = $ex->getMessage();
