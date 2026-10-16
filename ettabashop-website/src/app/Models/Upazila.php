@@ -11,7 +11,8 @@ class Upazila extends Model
     /****************************
      * Property area
      *****************************/
-    protected $fillable = [];
+    public $timestamps = false;
+    protected $guarded = [];
 
     /****************************
      * Model Relation area

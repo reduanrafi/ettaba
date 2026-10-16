@@ -158,4 +158,17 @@
                         </span>
         </a>
     </li>
+    <hr>
+    <li class="treeview {{ Request::is('private-panel/geo*') ? 'active' : '' }}">
+        <a href="#">
+            <i class="fa fa-map-marker"></i> <span>Geo / ঠিকানা সেটআপ</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="{{ route('geo.upazilas.index') }}"><i class="fa fa-building-o"></i> উপজেলা / সিটি কর্পোরেশন</a></li>
+            <li><a href="{{ route('geo.unions.index') }}"><i class="fa fa-map-signs"></i> পৌরসভা / ইউনিয়ন / ওয়ার্ড</a></li>
+        </ul>
+    </li>
 </ul>

@@ -33,6 +33,7 @@ Route::get('/login', function () {
 Route::get('/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::get('/api/geo/districts/{division_id}', [\App\Http\Controllers\Auth\RegisterController::class, 'getDistricts'])->name('geo.districts');
 Route::get('/api/geo/upazilas/{district_id}', [\App\Http\Controllers\Auth\RegisterController::class, 'getUpazilas'])->name('geo.upazilas');
+Route::get('/api/geo/unions/{upazila_id}', [\App\Http\Controllers\Auth\RegisterController::class, 'getUnions'])->name('geo.unions');
 Route::get('/api/check-username', [\App\Http\Controllers\Auth\RegisterController::class, 'checkUsername'])->name('check.username');
 Route::get('/api/check-eid', [\App\Http\Controllers\Auth\RegisterController::class, 'checkEid'])->name('check.eid');
 

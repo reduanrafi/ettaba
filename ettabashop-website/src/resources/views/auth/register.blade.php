@@ -652,7 +652,8 @@
                         <select name="customer_type" id="customer_type_select" class="form-control-custom">
                             <option value="" disabled selected>একাউন্ট নির্বাচন করুন</option>
                             <option value="buy_only">কাস্টমার একাউন্ট</option>
-                            <option value="buy_earn">পার্টনার একাউন্ট/এজেন্ট</option>
+                            <option value="buy_earn">পার্টনার একাউন্ট/পেইড এজেন্ট</option>
+                            <option value="virtual_agent">ভার্চুয়াল এজেন্ট</option>
                         </select>
                     </div>
 
@@ -665,13 +666,13 @@
                     </button>
                 </div>
 
-                <!-- ================= STEP 3.1: Partner Extra Info (Conditional) ================= -->
+                <!-- ================= STEP 3.1: Partner Extra Info (Mandatory) ================= -->
                 <div class="step-section" id="step-3-partner" style="display: none;">
                     <div class="step-icon-wrapper">
                         <i class="fa fa-address-card"></i>
                     </div>
-                    <div class="step-title">পার্টনার/এজেন্ট একাউন্টের জন্য অতিরিক্ত তথ্য দিন</div>
-                    <div class="step-subtitle">সঠিক NID ও জন্মতারিখ প্রদান করুন (পিতা-মাতার নাম ও ব্লাড গ্রুপ ঐচ্ছিক)</div>
+                    <div class="step-title">পার্টনার একাউন্টের জন্য অতিরিক্ত তথ্য দিন</div>
+                    <div class="step-subtitle">সঠিক NID, জন্মতারিখ ও পিতা-মাতার নাম প্রদান আবশ্যক (ব্লাড গ্রুপ ঐচ্ছিক)</div>
 
                     <div class="form-group-custom">
                         <i class="fa fa-id-badge input-icon"></i>
@@ -679,8 +680,9 @@
                                name="nid"
                                id="nid_input"
                                class="form-control-custom"
-                               placeholder="জাতীয় পরিচয়পত্র (NID) নম্বর">
-                        <small class="field-hint" id="nid_hint">শুধুমাত্র ইংরেজি সংখ্যা লিখুন (ফাঁকা রাখা যাবে না)</small>
+                               placeholder="জাতীয় পরিচয়পত্র (NID) নম্বর * (সর্বনিম্ন ১০ সংখ্যা)"
+                               maxlength="30">
+                        <small class="field-hint" id="nid_hint">শুধুমাত্র ইংরেজি সংখ্যা লিখুন (সর্বনিম্ন ১০ সংখ্যা) <span class="text-danger">*</span></small>
                     </div>
 
                     <div class="form-group-custom">
@@ -689,7 +691,7 @@
                                name="date_of_birth"
                                id="dob_input"
                                class="form-control-custom">
-                        <small class="field-hint">জন্মতারিখ নির্বাচন করুন</small>
+                        <small class="field-hint">জন্মতারিখ নির্বাচন করুন <span class="text-danger">*</span></small>
                     </div>
 
                     <div class="form-group-custom">
@@ -698,8 +700,8 @@
                                name="partner_father_name"
                                id="partner_father_name"
                                class="form-control-custom"
-                               placeholder="পিতার নাম লিখুন (ঐচ্ছিক)">
-                        <small class="field-hint">পিতার নাম (ঐচ্ছিক)</small>
+                               placeholder="পিতার নাম লিখুন *">
+                        <small class="field-hint">পিতার নাম <span class="text-danger">*</span></small>
                     </div>
 
                     <div class="form-group-custom">
@@ -708,8 +710,8 @@
                                name="partner_mother_name"
                                id="partner_mother_name"
                                class="form-control-custom"
-                               placeholder="মাতার নাম লিখুন (ঐচ্ছিক)">
-                        <small class="field-hint">মাতার নাম (ঐচ্ছিক)</small>
+                               placeholder="মাতার নাম লিখুন *">
+                        <small class="field-hint">মাতার নাম <span class="text-danger">*</span></small>
                     </div>
 
                     <div class="form-group-custom">
@@ -731,7 +733,7 @@
                     <div class="form-group-custom">
                         <i class="fa fa-list-ol input-icon"></i>
                         <select name="account_number" id="account_number_select" class="form-control-custom">
-                            <option value="" disabled selected>কত নম্বর একাউন্ট নির্বাচন করুন</option>
+                            <option value="" disabled selected>কত নম্বর একাউন্ট নির্বাচন করুন *</option>
                             <option value="first">প্রথম একাউন্ট</option>
                             <option value="subsequent">দ্বিতীয় বা পরবর্তী একাউন্ট</option>
                         </select>
@@ -746,87 +748,15 @@
                     </button>
                 </div>
 
-                <!-- ================= STEP 3.1: Customer Extra Info (Optional) ================= -->
-                <div class="step-section" id="step-3-customer" style="display: none;">
-                    <div class="step-icon-wrapper">
-                        <i class="fa fa-id-card"></i>
-                    </div>
-                    <div class="step-title">অতিরিক্ত তথ্য (ঐচ্ছিক)</div>
-                    <div class="step-subtitle">প্রোফাইল সমৃদ্ধ করতে নিচের তথ্যগুলো প্রদান করতে পারেন (অথবা স্কিপ করে যেতে পারেন)</div>
-
-                    <div class="form-group-custom">
-                        <i class="fa fa-user input-icon"></i>
-                        <input type="text"
-                               name="customer_father_name"
-                               id="customer_father_name"
-                               class="form-control-custom"
-                               placeholder="পিতার নাম লিখুন (ঐচ্ছিক)">
-                        <small class="field-hint">পিতার নাম (ঐচ্ছিক)</small>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <i class="fa fa-user input-icon"></i>
-                        <input type="text"
-                               name="customer_mother_name"
-                               id="customer_mother_name"
-                               class="form-control-custom"
-                               placeholder="মাতার নাম লিখুন (ঐচ্ছিক)">
-                        <small class="field-hint">মাতার নাম (ঐচ্ছিক)</small>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <i class="fa fa-id-badge input-icon"></i>
-                        <input type="text"
-                               name="customer_nid"
-                               id="customer_nid_input"
-                               class="form-control-custom"
-                               placeholder="NID / জন্ম নিবন্ধন (BC) নম্বর (ঐচ্ছিক)">
-                        <small class="field-hint" id="customer_nid_hint">জাতীয় পরিচয়পত্র বা জন্ম নিবন্ধন নম্বর লিখুন (ঐচ্ছিক)</small>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <i class="fa fa-calendar-alt input-icon"></i>
-                        <input type="date"
-                               name="customer_date_of_birth"
-                               id="customer_dob_input"
-                               class="form-control-custom">
-                        <small class="field-hint">জন্মতারিখ নির্বাচন করুন (ঐচ্ছিক)</small>
-                    </div>
-
-                    <div class="form-group-custom">
-                        <i class="fa fa-tint input-icon"></i>
-                        <select name="customer_blood_group" id="customer_blood_group" class="form-control-custom">
-                            <option value="" selected>ব্লাড গ্রুপ নির্বাচন করুন (ঐচ্ছিক)</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                        </select>
-                        <small class="field-hint">ব্লাড গ্রুপ (ঐচ্ছিক)</small>
-                    </div>
-
-                    <button type="button" class="btn-step-next" id="btn-next-3-customer">
-                        <span>পরবর্তী ধাপে যান</span>
-                        <i class="fa fa-arrow-right"></i>
-                    </button>
-                    <button type="button" class="btn-step-back" onclick="goToStep(3)">
-                        <i class="fa fa-arrow-left"></i> আগের ধাপে যান
-                    </button>
-                </div>
-
                 <!-- ================= STEP 4: Referral eID ================= -->
                 <div class="step-section" id="step-4" style="display: none;">
                     <div class="step-icon-wrapper">
                         <i class="fa fa-user-plus"></i>
                     </div>
                     <div class="step-title">রেফার eID লিখুন</div>
-                    <div class="step-subtitle" id="referral_subtitle">(যদি থাকে)</div>
+                    <div class="step-subtitle" id="referral_subtitle">আপনার রেফারকারী eID লিখুন</div>
 
-                    <!-- Single Box for Customer -->
+                    <!-- Single Box for Customer & Virtual Agent -->
                     <div id="customer_referral_box">
                         <div class="form-group-custom">
                             <i class="fa fa-user-tag input-icon"></i>
@@ -834,7 +764,7 @@
                                    name="referral_code_2"
                                    id="customer_referral_input"
                                    class="form-control-custom"
-                                   placeholder="রেফার eID লিখুন (যদি থাকে)"
+                                   placeholder="রেফার eID লিখুন *"
                                    value="{{ request('ref') ?? '' }}">
                             <small class="field-hint" id="customer_referral_hint">
                                 (কারো রেফার না থাকলে, রেফার eID হিসেবে 134 সংখ্যাটি ব্যবহার করুন)
@@ -850,9 +780,9 @@
                                    name="partner_referral_code_2"
                                    id="partner_referral_input"
                                    class="form-control-custom"
-                                   placeholder="রেফার eID লিখুন"
+                                   placeholder="রেফার eID লিখুন *"
                                    value="{{ request('ref') ?? '' }}">
-                            <small class="field-hint" id="partner_referral_hint">কার পরিচয়ে যুক্ত হচ্ছেন, তার eID লিখুন (13 দিয়ে শুরু)</small>
+                            <small class="field-hint" id="partner_referral_hint">কার পরিচয়ে যুক্ত হচ্ছেন, তার eID লিখুন (13 দিয়ে শুরু) *</small>
                         </div>
 
                         <div class="form-group-custom">
@@ -861,9 +791,9 @@
                                    name="referral_code"
                                    id="partner_placement_input"
                                    class="form-control-custom"
-                                   placeholder="প্লেসমেন্ট eID লিখুন"
+                                   placeholder="প্লেসমেন্ট eID লিখুন *"
                                    value="{{ request('ref') ?? '' }}">
-                            <small class="field-hint" id="partner_placement_hint">যার নিচে একাউন্ট বসবে, তার eID লিখুন (13 দিয়ে শুরু)</small>
+                            <small class="field-hint" id="partner_placement_hint">যার নিচে একাউন্ট বসবে, তার eID লিখুন (13 দিয়ে শুরু) *</small>
                         </div>
                     </div>
 
@@ -903,7 +833,7 @@
                         </select>
                     </div>
 
-                    <!-- 3. Upazila -->
+                    <!-- 3. Upazila / City Corp / Cantonment -->
                     <div class="form-group-custom">
                         <i class="fa fa-building input-icon"></i>
                         <select name="upazila_id" id="upazila_select" class="form-control-custom" disabled>
@@ -911,33 +841,19 @@
                         </select>
                     </div>
 
-                    <!-- 4. Municipality / Union -->
-                    <div class="form-group-custom">
-                        <i class="fa fa-landmark input-icon"></i>
-                        <input type="text"
-                               name="union_name"
-                               id="union_input"
-                               class="form-control-custom"
-                               placeholder="৪. পৌরসভা/ইউনিয়ন লিখুন">
+                    <!-- 4. Municipality / Union / Ward-Zone -->
+                    <div class="form-group-custom" id="union_box">
+                        <i class="fa fa-landmark input-icon" id="union_icon"></i>
+                        <select name="union_name" id="union_select" class="form-control-custom" disabled>
+                            <option value="" disabled selected>৪. পৌরসভা/ইউনিয়ন নির্বাচন করুন</option>
+                        </select>
                     </div>
 
                     <!-- 5. Ward No -->
-                    <div class="form-group-custom">
+                    <div class="form-group-custom" id="ward_box">
                         <i class="fa fa-home input-icon"></i>
-                        <select name="ward_no" id="ward_select" class="form-control-custom">
+                        <select name="ward_no" id="ward_select" class="form-control-custom" disabled>
                             <option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন</option>
-                            <option value="০১">ওয়ার্ড ০১</option>
-                            <option value="০২">ওয়ার্ড ০২</option>
-                            <option value="০৩">ওয়ার্ড ০৩</option>
-                            <option value="০৪">ওয়ার্ড ০৪</option>
-                            <option value="০৫">ওয়ার্ড ০৫</option>
-                            <option value="০৬">ওয়ার্ড ০৬</option>
-                            <option value="০৭">ওয়ার্ড ০৭</option>
-                            <option value="০৮">ওয়ার্ড ০৮</option>
-                            <option value="০৯">ওয়ার্ড ০৯</option>
-                            <option value="১০">ওয়ার্ড ১০</option>
-                            <option value="১১">ওয়ার্ড ১১</option>
-                            <option value="১২">ওয়ার্ড ১২</option>
                         </select>
                     </div>
 
@@ -1224,6 +1140,7 @@
         });
 
         // ==================== STEP 3: Account Selection ====================
+        // ==================== STEP 3: Account Selection ====================
         $('#customer_type_select').on('change', function() {
             selectedAccountType = $(this).val();
             if (selectedAccountType) {
@@ -1235,36 +1152,25 @@
 
         $('#btn-next-3').on('click', function() {
             if (selectedAccountType === 'buy_earn') {
-                // Partner selected -> Show Partner extra fields
+                // Partner selected -> Show Partner mandatory extra fields
                 goToStep('3-partner');
                 checkPartnerExtraValidity();
-            } else if (selectedAccountType === 'buy_only') {
-                // Customer selected -> Show Customer optional fields
-                goToStep('3-customer');
+            } else if (selectedAccountType === 'buy_only' || selectedAccountType === 'virtual_agent') {
+                // Customer & Virtual Agent skip 3.1 directly to Step 4
+                setupStep4ForCustomerOrVirtual();
+                goToStep(4);
             }
         });
 
-        // Step 3.1: Customer Extra Info
-        $('#btn-next-3-customer').on('click', function() {
-            setupStep4ForCustomer();
-            goToStep(4);
-        });
-
-        $('#customer_nid_input').on('input', function() {
-            let val = $(this).val();
-            let sanitized = val.replace(/[^0-9]/g, '');
-            if (val !== sanitized) {
-                $(this).val(sanitized);
-            }
-        });
-
-        // Step 3.1: Partner Extra Info
+        // Step 3.1: Partner Extra Info (Mandatory)
         function checkPartnerExtraValidity() {
             let nid = $('#nid_input').val().trim();
             let dob = $('#dob_input').val();
+            let father = $('#partner_father_name').val().trim();
+            let mother = $('#partner_mother_name').val().trim();
             let accNum = $('#account_number_select').val();
 
-            if (nid.length >= 8 && dob && accNum) {
+            if (nid.length >= 10 && dob && father.length >= 2 && mother.length >= 2 && accNum) {
                 $('#btn-next-3-partner').prop('disabled', false);
             } else {
                 $('#btn-next-3-partner').prop('disabled', true);
@@ -1276,11 +1182,21 @@
             let sanitized = val.replace(/[^0-9]/g, '');
             if (val !== sanitized) {
                 $(this).val(sanitized);
+                val = sanitized;
+            }
+            if (val.length < 10 && val.length > 0) {
+                $('#nid_hint').html('<span class="text-danger">NID নম্বর সর্বনিম্ন ১০ সংখ্যার হতে হবে (বর্তমান দৈর্ঘ্য: ' + val.length + ')</span>');
+            } else {
+                $('#nid_hint').html('শুধুমাত্র ইংরেজি সংখ্যা লিখুন (সর্বনিম্ন ১০ সংখ্যা) <span class="text-danger">*</span>');
             }
             checkPartnerExtraValidity();
         });
 
         $('#dob_input, #account_number_select').on('change', function() {
+            checkPartnerExtraValidity();
+        });
+
+        $('#partner_father_name, #partner_mother_name').on('input', function() {
             checkPartnerExtraValidity();
         });
 
@@ -1290,13 +1206,11 @@
         });
 
         // Setup Step 4 based on Account Type
-        function setupStep4ForCustomer() {
+        function setupStep4ForCustomerOrVirtual() {
             $('#customer_referral_box').show();
             $('#partner_referral_box').hide();
-            $('#referral_subtitle').text('(যদি থাকে)');
-            $('#btn-back-4').attr('onclick', "goToStep('3-customer')");
-
-            // For customer, if left empty it can default to 134, so let button enable on empty or valid eID
+            $('#referral_subtitle').text('আপনার রেফারকারী eID লিখুন');
+            $('#btn-back-4').attr('onclick', "goToStep(3)");
             validateCustomerReferral();
         }
 
@@ -1305,7 +1219,6 @@
             $('#partner_referral_box').show();
             $('#referral_subtitle').text('রেফার eID ও প্লেসমেন্ট eID প্রদান করুন');
             $('#btn-back-4').attr('onclick', "goToStep('3-partner')");
-
             validatePartnerReferral();
         }
 
@@ -1316,9 +1229,8 @@
             let val = $('#customer_referral_input').val().trim();
 
             if (val.length === 0) {
-                // Empty is allowed for customer, defaults to 134
-                $('#customer_referral_hint').text('(কারো রেফার না থাকলে, রেফার eID হিসেবে 134 সংখ্যাটি ব্যবহার করুন)').removeClass('error success');
-                $('#btn-next-4').prop('disabled', false);
+                $('#customer_referral_hint').html('রেফার eID দেওয়া আবশ্যক। কারো রেফার না থাকলে <a href="javascript:void(0)" id="use_default_company_ref" style="color: #10b981; font-weight: 700; text-decoration: underline;">কোম্পানির রেফার 134 ব্যবহার করুন</a>').removeClass('error success');
+                $('#btn-next-4').prop('disabled', true);
                 return;
             }
 
@@ -1336,7 +1248,7 @@
             }
 
             if (!val.startsWith('13')) {
-                $('#customer_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয়। অনুগ্রহ করে একটি সঠিক eID দিয়ে পুনরায় চেষ্টা করুন।').addClass('error').removeClass('success');
+                $('#customer_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
                 $('#btn-next-4').prop('disabled', true);
                 return;
             }
@@ -1348,7 +1260,7 @@
                     $.ajax({
                         url: "{{ route('check.eid') }}",
                         method: 'GET',
-                        data: { eid: val },
+                        data: { eid: val, registering_type: selectedAccountType },
                         success: function(res) {
                             if (res.valid) {
                                 $('#customer_referral_hint').text('যাচাইকৃত রেফারকারী: ' + res.name).removeClass('error').addClass('success');
@@ -1367,6 +1279,10 @@
             }
         }
 
+        $(document).on('click', '#use_default_company_ref', function() {
+            $('#customer_referral_input').val('134').trigger('input');
+        });
+
         $('#customer_referral_input').on('input', function() {
             validateCustomerReferral();
         });
@@ -1380,13 +1296,13 @@
             let placeValid = placeVal.startsWith('13') && placeVal.length >= 3 && /^[0-9]+$/.test(placeVal);
 
             if (refVal.length >= 2 && !refVal.startsWith('13')) {
-                $('#partner_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয়। অনুগ্রহ করে একটি সঠিক eID দিয়ে পুনরায় চেষ্টা করুন।').addClass('error').removeClass('success');
+                $('#partner_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
             } else if (refValid) {
                 $('#partner_referral_hint').text('সঠিক ফরম্যাট').removeClass('error').addClass('success');
             }
 
             if (placeVal.length >= 2 && !placeVal.startsWith('13')) {
-                $('#partner_placement_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয়। অনুগ্রহ করে একটি সঠিক eID দিয়ে পুনরায় চেষ্টা করুন।').addClass('error').removeClass('success');
+                $('#partner_placement_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
             } else if (placeValid) {
                 $('#partner_placement_hint').text('সঠিক ফরম্যাট').removeClass('error').addClass('success');
             }
@@ -1412,10 +1328,19 @@
         });
 
         // ==================== STEP 5: Cascading Address ====================
+        let currentSelectedUpazilaType = 'upazila';
+
+        function resetUnionAndWard() {
+            $('#union_select').html('<option value="" disabled selected>৪. পৌরসভা/ইউনিয়ন নির্বাচন করুন</option>').prop('disabled', true);
+            $('#ward_select').html('<option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন</option>').prop('disabled', true);
+            $('#ward_box').show();
+        }
+
         $('#division_select').on('change', function() {
             let divId = $(this).val();
             $('#district_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
             $('#upazila_select').html('<option value="" disabled selected>৩. উপজেলা/সিটি কর্পোরেশন নির্বাচন করুন</option>').prop('disabled', true);
+            resetUnionAndWard();
 
             $.get("{{ url('/api/geo/districts') }}/" + divId, function(data) {
                 let options = '<option value="" disabled selected>২. জেলা নির্বাচন করুন</option>';
@@ -1430,22 +1355,95 @@
         $('#district_select').on('change', function() {
             let distId = $(this).val();
             $('#upazila_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
+            resetUnionAndWard();
 
             $.get("{{ url('/api/geo/upazilas') }}/" + distId, function(data) {
                 let options = '<option value="" disabled selected>৩. উপজেলা/সিটি কর্পোরেশন নির্বাচন করুন</option>';
                 $.each(data, function(i, upz) {
-                    options += '<option value="' + upz.id + '">' + (upz.bn_name || upz.name) + '</option>';
+                    let type = upz.type || 'upazila';
+                    let typeLabel = '';
+                    if (type === 'city_corporation') typeLabel = ' (সিটি কর্পোরেশন)';
+                    else if (type === 'cantonment') typeLabel = ' (সেনানিবাস)';
+                    options += '<option value="' + upz.id + '" data-type="' + type + '" data-wards="' + (upz.ward_count || 0) + '">' + (upz.bn_name || upz.name) + typeLabel + '</option>';
                 });
                 $('#upazila_select').html(options).prop('disabled', false);
                 checkAddressValidity();
             });
         });
 
-        $('#upazila_select, #ward_select').on('change', function() {
+        $('#upazila_select').on('change', function() {
+            let upzId = $(this).val();
+            let selectedOpt = $(this).find('option:selected');
+            currentSelectedUpazilaType = selectedOpt.data('type') || 'upazila';
+            let wardCount = parseInt(selectedOpt.data('wards')) || 0;
+
+            if (currentSelectedUpazilaType === 'city_corporation') {
+                // City Corporation: 4th dropdown becomes Ward/Zone selector
+                $('#union_icon').attr('class', 'fa fa-city input-icon');
+                $('#union_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
+                $('#ward_box').hide(); // Ward is directly chosen in union_select
+
+                $.get("{{ url('/api/geo/unions') }}/" + upzId, function(data) {
+                    let options = '<option value="" disabled selected>৪. ওয়ার্ড/অঞ্চল নির্বাচন করুন *</option>';
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, u) {
+                            options += '<option value="' + (u.bn_name || u.name) + '">' + (u.bn_name || u.name) + '</option>';
+                        });
+                    } else {
+                        // Generate ward numbers based on ward_count or default
+                        let maxWards = wardCount > 0 ? wardCount : 54;
+                        for (let w = 1; w <= maxWards; w++) {
+                            let wStr = (w < 10 ? '০' : '') + w.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+                            options += '<option value="ওয়ার্ড নং ' + wStr + '">ওয়ার্ড নং ' + wStr + '</option>';
+                        }
+                    }
+                    $('#union_select').html(options).prop('disabled', false);
+                    checkAddressValidity();
+                });
+            } else {
+                // Normal Upazila or Cantonment
+                $('#union_icon').attr('class', 'fa fa-landmark input-icon');
+                $('#union_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
+                $('#ward_select').html('<option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন</option>').prop('disabled', true);
+                $('#ward_box').show();
+
+                $.get("{{ url('/api/geo/unions') }}/" + upzId, function(data) {
+                    let options = '<option value="" disabled selected>৪. পৌরসভা/ইউনিয়ন নির্বাচন করুন *</option>';
+                    if (data && data.length > 0) {
+                        $.each(data, function(i, u) {
+                            let uType = u.type === 'municipality' ? ' (পৌরসভা)' : ' (ইউনিয়ন)';
+                            options += '<option value="' + (u.bn_name || u.name) + '" data-wards="' + (u.ward_count || 9) + '">' + (u.bn_name || u.name) + uType + '</option>';
+                        });
+                    } else {
+                        options += '<option value="সদর ইউনিয়ন/পৌরসভা" data-wards="9">সদর ইউনিয়ন/পৌরসভা</option>';
+                    }
+                    $('#union_select').html(options).prop('disabled', false);
+                    checkAddressValidity();
+                });
+            }
+        });
+
+        $('#union_select').on('change', function() {
+            let selectedOpt = $(this).find('option:selected');
+            let unionVal = $(this).val();
+
+            if (currentSelectedUpazilaType === 'city_corporation') {
+                // For city corporation, ward_no equals the selected union/ward
+                $('#ward_select').html('<option value="' + unionVal + '" selected>' + unionVal + '</option>');
+            } else {
+                // Populate ward dropdown (1 to ward_count, default 9)
+                let wards = parseInt(selectedOpt.data('wards')) || 9;
+                let wardOptions = '<option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন *</option>';
+                for (let w = 1; w <= wards; w++) {
+                    let bnNum = w.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+                    wardOptions += '<option value="' + bnNum + ' নম্বর ওয়ার্ড">' + bnNum + ' নম্বর ওয়ার্ড</option>';
+                }
+                $('#ward_select').html(wardOptions).prop('disabled', false);
+            }
             checkAddressValidity();
         });
 
-        $('#union_input').on('input', function() {
+        $('#ward_select').on('change', function() {
             checkAddressValidity();
         });
 
@@ -1453,10 +1451,10 @@
             let div = $('#division_select').val();
             let dist = $('#district_select').val();
             let upz = $('#upazila_select').val();
-            let union = $('#union_input').val().trim();
+            let union = $('#union_select').val();
             let ward = $('#ward_select').val();
 
-            if (div && dist && upz && union.length > 0 && ward) {
+            if (div && dist && upz && union && (currentSelectedUpazilaType === 'city_corporation' || ward)) {
                 $('#btn-next-5').prop('disabled', false);
             } else {
                 $('#btn-next-5').prop('disabled', true);
@@ -1575,23 +1573,30 @@
             let formElement = document.getElementById('multiStepForm');
             let formData = new FormData(formElement);
 
+            formData.set('customer_type', selectedAccountType);
+
             // If partner account, map partner fields
             if (selectedAccountType === 'buy_earn') {
-                formData.set('referral_code_2', $('#partner_referral_input').val());
-                formData.set('referral_code', $('#partner_placement_input').val());
+                formData.set('referral_code_2', $('#partner_referral_input').val().trim());
+                formData.set('referral_code', $('#partner_placement_input').val().trim());
                 formData.set('father_name', $('#partner_father_name').val().trim());
                 formData.set('mother_name', $('#partner_mother_name').val().trim());
                 formData.set('blood_group', $('#partner_blood_group').val());
+                formData.set('nid', $('#nid_input').val().trim());
+                formData.set('date_of_birth', $('#dob_input').val());
+                formData.set('account_number', $('#account_number_select').val());
             } else {
                 let custRef = $('#customer_referral_input').val().trim() || '134';
                 formData.set('referral_code', custRef);
                 formData.set('referral_code_2', custRef);
-                formData.set('father_name', $('#customer_father_name').val().trim());
-                formData.set('mother_name', $('#customer_mother_name').val().trim());
-                formData.set('nid', $('#customer_nid_input').val().trim());
-                formData.set('date_of_birth', $('#customer_dob_input').val());
-                formData.set('blood_group', $('#customer_blood_group').val());
             }
+
+            formData.set('division_id', $('#division_select').val());
+            formData.set('district_id', $('#district_select').val());
+            formData.set('upazila_id', $('#upazila_select').val());
+            formData.set('union_name', $('#union_select').val());
+            let finalWard = (currentSelectedUpazilaType === 'city_corporation') ? $('#union_select').val() : $('#ward_select').val();
+            formData.set('ward_no', finalWard);
 
             $.ajax({
                 url: "{{ route('register') }}",

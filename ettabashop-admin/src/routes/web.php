@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\TopProductController;
 use App\Http\Controllers\Admin\WithdrawRequestController;
 use App\Http\Controllers\Admin\MerchantController;
 use App\Http\Controllers\Admin\MerchantHistoryController;
+use App\Http\Controllers\Admin\GeoController;
 use App\Http\Controllers\Shopper\WithdrawRequestController as WRController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
@@ -116,6 +117,28 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             Route::post('/gateway-charges/update', [\App\Http\Controllers\Admin\GatewayChargeController::class, 'update'])
                 ->name('admin.gateway-charges.update');
 
+        });
+
+        // Geo / Address Management Routes
+        Route::group(['prefix' => 'geo'], function () {
+            // Upazilas / City Corps
+            Route::get('/upazilas', [GeoController::class, 'upazilasIndex'])->name('geo.upazilas.index');
+            Route::get('/upazilas/create', [GeoController::class, 'upazilaCreate'])->name('geo.upazilas.create');
+            Route::post('/upazilas', [GeoController::class, 'upazilaStore'])->name('geo.upazilas.store');
+            Route::get('/upazilas/{id}/edit', [GeoController::class, 'upazilaEdit'])->name('geo.upazilas.edit');
+            Route::put('/upazilas/{id}', [GeoController::class, 'upazilaUpdate'])->name('geo.upazilas.update');
+            Route::delete('/upazilas/{id}', [GeoController::class, 'upazilaDestroy'])->name('geo.upazilas.destroy');
+
+            // Unions / Municipalities / Wards
+            Route::get('/unions', [GeoController::class, 'unionsIndex'])->name('geo.unions.index');
+            Route::get('/unions/create', [GeoController::class, 'unionCreate'])->name('geo.unions.create');
+            Route::post('/unions', [GeoController::class, 'unionStore'])->name('geo.unions.store');
+            Route::get('/unions/{id}/edit', [GeoController::class, 'unionEdit'])->name('geo.unions.edit');
+            Route::put('/unions/{id}', [GeoController::class, 'unionUpdate'])->name('geo.unions.update');
+            Route::delete('/unions/{id}', [GeoController::class, 'unionDestroy'])->name('geo.unions.destroy');
+
+            // AJAX helper
+            Route::get('/ajax/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('geo.ajax.upazilas');
         });
     });
 

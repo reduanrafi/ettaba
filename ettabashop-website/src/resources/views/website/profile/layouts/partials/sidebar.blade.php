@@ -85,6 +85,8 @@
                     </div>
                 </a>
             </li>
+        @endif
+        @if(\Illuminate\Support\Facades\Auth::user()->customer_type == 'buy_earn' || \Illuminate\Support\Facades\Auth::user()->customer_type == 'virtual_agent')
             <li class="dash-menu-item">
                 <a href="{{ route('profile.referral') }}" class="dash-menu-link {{ Request::is('profile/referral') ? 'active' : '' }}">
                     <div class="link-left">

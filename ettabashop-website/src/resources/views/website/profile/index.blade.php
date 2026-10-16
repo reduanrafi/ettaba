@@ -176,6 +176,8 @@
                     <a href="{{ route('profile.trainings') }}" class="m-nav-pill {{ Request::is('profile/trainings') ? 'active' : '' }}">
                         <i class="fas fa-graduation-cap"></i> <span>ট্রেনিং</span>
                     </a>
+                @endif
+                @if(Auth::user()->customer_type == 'buy_earn' || Auth::user()->customer_type == 'virtual_agent')
                     <a href="{{ route('profile.referral') }}" class="m-nav-pill {{ Request::is('profile/referral') ? 'active' : '' }}">
                         <i class="fas fa-user-plus"></i> <span>রেফারেল</span>
                     </a>
@@ -215,7 +217,7 @@
                             @include('website.profile.pages.trainings')
                         @endif
                 @elseif(Request::is('profile/referral'))
-                    @if(\Illuminate\Support\Facades\Auth::user()->customer_type=='buy_earn')
+                    @if(\Illuminate\Support\Facades\Auth::user()->customer_type=='buy_earn' || \Illuminate\Support\Facades\Auth::user()->customer_type=='virtual_agent')
                         @include('website.profile.pages.referral')
                     @endif
 

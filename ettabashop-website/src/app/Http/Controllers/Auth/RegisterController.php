@@ -8,6 +8,7 @@ use App\Models\District;
 use App\Models\Division;
 use App\Models\Profile;
 use App\Models\Upazila;
+use App\Models\Union;
 use App\Models\User;
 use App\Models\UserGenerationGroup;
 use App\Providers\RouteServiceProvider;
@@ -41,7 +42,7 @@ class RegisterController extends Controller
      */
     public function __construct(UserService $userService)
     {
-        $this->middleware('guest')->except(['getDistricts', 'getUpazilas', 'checkUsername', 'checkEid']);
+        $this->middleware('guest')->except(['getDistricts', 'getUpazilas', 'getUnions', 'checkUsername', 'checkEid']);
         $this->userService = $userService;
     }
 
@@ -72,10 +73,22 @@ class RegisterController extends Controller
     public function getUpazilas($district_id)
     {
         $upazilas = Upazila::where('district_id', $district_id)
-            ->select('id', 'name', 'bn_name')
-            ->orderBy('bn_name')
+            ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+            ->orderBy('id')
             ->get();
         return response()->json($upazilas);
+    }
+
+    /**
+     * Get unions / municipalities for an upazila or city corp.
+     */
+    public function getUnions($upazila_id)
+    {
+        $unions = Union::where('upazila_id', $upazila_id)
+            ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+            ->orderBy('bn_name')
+            ->get();
+        return response()->json($unions);
     }
 
     /**
@@ -112,6 +125,7 @@ class RegisterController extends Controller
     public function checkEid(Request $request)
     {
         $eid = trim($request->get('eid', ''));
+        $registeringType = $request->get('registering_type', 'buy_only');
 
         if (!preg_match('/^13[0-9]+$/', $eid)) {
             return response()->json([
@@ -132,6 +146,22 @@ class RegisterController extends Controller
             return response()->json([
                 'valid' => false,
                 'message' => 'এই রেফারকারী অ্যাকাউন্টটি বর্তমানে নিষ্ক্রিয় রয়েছে।'
+            ]);
+        }
+
+        // Customer account cannot refer anyone
+        if ($user->customer_type === 'buy_only') {
+            return response()->json([
+                'valid' => false,
+                'message' => 'কাস্টমার একাউন্টে কোনো রেফার করার অনুমোদন নেই।'
+            ]);
+        }
+
+        // Virtual agent can only refer customer account
+        if ($user->customer_type === 'virtual_agent' && $registeringType !== 'buy_only') {
+            return response()->json([
+                'valid' => false,
+                'message' => 'ভার্চুয়াল এজেন্ট দিয়ে শুধুমাত্র কাস্টমার একাউন্ট রেফার করা সম্ভব।'
             ]);
         }
 
@@ -163,18 +193,18 @@ class RegisterController extends Controller
                 'max:255',
                 'unique:users,phone'
             ],
-            'customer_type' => ['required', 'in:buy_only,buy_earn'],
+            'customer_type' => ['required', 'in:buy_only,buy_earn,virtual_agent'],
             'account_number' => ['required_if:customer_type,buy_earn', 'nullable', 'string', 'in:first,subsequent'],
-            'nid' => ['required_if:customer_type,buy_earn', 'nullable', 'numeric'],
+            'nid' => ['required_if:customer_type,buy_earn', 'nullable', 'numeric', 'digits_between:10,30'],
             'date_of_birth' => ['required_if:customer_type,buy_earn', 'nullable', 'date'],
-            'father_name' => ['nullable', 'string', 'max:255'],
-            'mother_name' => ['nullable', 'string', 'max:255'],
+            'father_name' => ['required_if:customer_type,buy_earn', 'nullable', 'string', 'max:255'],
+            'mother_name' => ['required_if:customer_type,buy_earn', 'nullable', 'string', 'max:255'],
             'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'],
             'password' => ['required', 'string', 'min:8', 'max:32', 'confirmed'],
             'division_id' => ['required', 'integer'],
             'district_id' => ['required', 'integer'],
             'upazila_id' => ['required', 'integer'],
-            'union_name' => ['required', 'string', 'max:255'],
+            'union_name' => ['nullable', 'string', 'max:255'],
             'ward_no' => ['required', 'string', 'max:50'],
         ], [
             'name.required' => 'আপনার পুরো নাম লিখুন।',
@@ -188,11 +218,13 @@ class RegisterController extends Controller
             'account_number.required_if' => 'পার্টনার একাউন্টের জন্য কত নম্বর একাউন্ট তা নির্বাচন করুন।',
             'nid.required_if' => 'পার্টনার একাউন্টের জন্য জাতীয় পরিচয়পত্র (NID) নম্বর আবশ্যক।',
             'nid.numeric' => 'NID নম্বরে শুধু ইংরেজি সংখ্যা ব্যবহার করুন।',
+            'nid.digits_between' => 'NID নম্বর সর্বনিম্ন ১০ সংখ্যার হতে হবে।',
             'date_of_birth.required_if' => 'পার্টনার একাউন্টের জন্য জন্মতারিখ নির্বাচন করুন।',
+            'father_name.required_if' => 'পার্টনার একাউন্টের জন্য পিতার নাম আবশ্যক।',
+            'mother_name.required_if' => 'পার্টনার একাউন্টের জন্য মাতার নাম আবশ্যক।',
             'division_id.required' => 'বিভাগ নির্বাচন করুন।',
             'district_id.required' => 'জেলা নির্বাচন করুন।',
             'upazila_id.required' => 'উপজেলা/সিটি কর্পোরেশন নির্বাচন করুন।',
-            'union_name.required' => 'পৌরসভা/ইউনিয়ন লিখুন বা নির্বাচন করুন।',
             'ward_no.required' => 'ওয়ার্ড নম্বর নির্বাচন করুন।',
             'password.required' => 'পাসওয়ার্ড প্রদান করুন।',
             'password.min' => 'পাসওয়ার্ড কমপক্ষে ৮ বর্ণ/সংখ্যার হতে হবে।',
@@ -215,8 +247,8 @@ class RegisterController extends Controller
         // 2. Adjust referral codes based on customer_type
         $customerType = $request->input('customer_type', 'buy_only');
 
-        if ($customerType === 'buy_only') {
-            // If Customer account has referral_code_2 filled, use it as referral_code
+        if ($customerType === 'buy_only' || $customerType === 'virtual_agent') {
+            // If Customer or Virtual Agent account has referral_code_2 filled, use it as referral_code
             $referralCode = $request->input('referral_code_2') ?: $request->input('referral_code');
             if (empty($referralCode)) {
                 // Default fallback to company referrer 134 if none provided
@@ -298,7 +330,7 @@ class RegisterController extends Controller
                     }
                     return redirect()->back()->withInput()->with(['error' => $msg]);
                 }
-            } else if ($customerType == 'buy_only') {
+            } else if ($customerType == 'buy_only' || $customerType == 'virtual_agent') {
                 $customerCount = User::where('parent_id', $parent->id)->where('customer_type', 'buy_only')->count();
                 if ($parent->customer_limit > 0 && $parent->customer_limit <= $customerCount) {
                     $msg = 'এই রেফার কোডের কাস্টমার লিমিট পূর্ণ হয়ে গেছে। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।';
@@ -325,6 +357,24 @@ class RegisterController extends Controller
                 return redirect()->back()->withInput()->with(['error' => $msg]);
             } else if ($sponsor->is_active == 0) {
                 $msg = 'রেফার eID নিষ্ক্রিয় রয়েছে।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+
+            // Customer account cannot refer
+            if ($sponsor->customer_type === 'buy_only') {
+                $msg = 'কাস্টমার একাউন্টে কোনো রেফার করার অনুমোদন নেই।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+
+            // Virtual agent can only refer customer account
+            if ($sponsor->customer_type === 'virtual_agent' && $customerType !== 'buy_only') {
+                $msg = 'ভার্চুয়াল এজেন্ট দিয়ে শুধুমাত্র কাস্টমার একাউন্ট রেফার করা সম্ভব।';
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => $msg], 422);
                 }
@@ -381,7 +431,16 @@ class RegisterController extends Controller
      */
     protected function create(array $data, Request $request = null)
     {
-        $referralLimit = ($data['customer_type'] == 'buy_earn') ? 1 : 0;
+        $referralLimit = 0;
+        $customerLimit = 0;
+        $partnerLimit = 0;
+
+        if ($data['customer_type'] == 'buy_earn') {
+            $referralLimit = 1;
+        } elseif ($data['customer_type'] == 'virtual_agent') {
+            $customerLimit = 999999;
+        }
+
         $cleanPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$data['phone']);
         $parentId = $data['parent_id'] ?? null;
 
@@ -391,6 +450,8 @@ class RegisterController extends Controller
             'type' => $data['type'] ?? 'customer',
             'referral_code' => "created",
             'referral_limit' => $referralLimit,
+            'customer_limit' => $customerLimit,
+            'partner_limit' => $partnerLimit,
             'is_active' => 1,
             'is_approved' => 1,
             'customer_type' => $data['customer_type'],
