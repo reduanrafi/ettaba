@@ -24,6 +24,21 @@ Route::get('/clear-cache', function () {
     return redirect()->back();
 });
 
+Route::get('/run-migrate', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'status' => 'success',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
 
 //WEBSITE PUBLIC ROUTES
 Route::get('/login', function () {

@@ -72,10 +72,24 @@ class RegisterController extends Controller
      */
     public function getUpazilas($district_id)
     {
-        $upazilas = Upazila::where('district_id', $district_id)
-            ->select('id', 'name', 'bn_name', 'type', 'ward_count')
-            ->orderBy('id')
-            ->get();
+        try {
+            $upazilas = Upazila::where('district_id', $district_id)
+                ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+                ->orderBy('id')
+                ->get();
+        } catch (\Throwable $e) {
+            // Graceful fallback if type/ward_count columns have not been migrated yet on production
+            $upazilas = Upazila::where('district_id', $district_id)
+                ->select('id', 'name', 'bn_name')
+                ->orderBy('id')
+                ->get()
+                ->map(function ($item) {
+                    $item->type = 'upazila';
+                    $item->ward_count = 0;
+                    return $item;
+                });
+        }
+
         return response()->json($upazilas);
     }
 
@@ -84,10 +98,28 @@ class RegisterController extends Controller
      */
     public function getUnions($upazila_id)
     {
-        $unions = Union::where('upazila_id', $upazila_id)
-            ->select('id', 'name', 'bn_name', 'type', 'ward_count')
-            ->orderBy('bn_name')
-            ->get();
+        try {
+            $unions = Union::where('upazila_id', $upazila_id)
+                ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+                ->orderBy('bn_name')
+                ->get();
+        } catch (\Throwable $e) {
+            try {
+                $unions = Union::where('upazila_id', $upazila_id)
+                    ->select('id', 'name', 'bn_name')
+                    ->orderBy('bn_name')
+                    ->get()
+                    ->map(function ($item) {
+                        $item->type = 'union';
+                        $item->ward_count = 9;
+                        return $item;
+                    });
+            } catch (\Throwable $ex) {
+                // Table doesn't exist yet on production
+                $unions = collect([]);
+            }
+        }
+
         return response()->json($unions);
     }
 

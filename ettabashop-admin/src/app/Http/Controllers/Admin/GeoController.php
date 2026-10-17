@@ -257,10 +257,22 @@ class GeoController extends Controller
      */
     public function getUpazilasAjax($district_id)
     {
-        $upazilas = Upazila::where('district_id', $district_id)
-            ->select('id', 'name', 'bn_name', 'type', 'ward_count')
-            ->orderBy('name')
-            ->get();
+        try {
+            $upazilas = Upazila::where('district_id', $district_id)
+                ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+                ->orderBy('name')
+                ->get();
+        } catch (\Throwable $e) {
+            $upazilas = Upazila::where('district_id', $district_id)
+                ->select('id', 'name', 'bn_name')
+                ->orderBy('name')
+                ->get()
+                ->map(function ($item) {
+                    $item->type = 'upazila';
+                    $item->ward_count = 0;
+                    return $item;
+                });
+        }
 
         return response()->json($upazilas);
     }
