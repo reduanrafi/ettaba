@@ -14,10 +14,10 @@
 
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/animate.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/line-awesome.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/line-awesome-font-awesome.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/all.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/font-awesome.min.css') }}">
+    <!-- Font Awesome (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/v4-shims.min.css">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/jquery.mCustomScrollbar.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/slick.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/auth/css/slick-theme.css') }}">
