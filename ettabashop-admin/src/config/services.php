@@ -30,4 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'eps' => [
+        'url' => env('EPS_URL', 'https://pgapi.eps.com.bd'),
+        'username' => env('EPS_USERNAME', 'ettabashop@gmail.com'),
+        'password' => env('EPS_PASSWORD'),
+        'store_id' => env('EPS_STORE_ID'),
+        'merchant_id' => env('EPS_MERCHANT_ID'),
+        'hash_key' => env('EPS_HASH_KEY'),
+    ],
+
 ];

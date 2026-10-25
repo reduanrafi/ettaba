@@ -16,12 +16,12 @@ class EpsPaymentService
 
     public function __construct()
     {
-        $this->baseUrl = env('EPS_URL', 'https://pgapi.eps.com.bd');
-        $this->username = env('EPS_USERNAME', 'dt_merchant@eps.com.bd');
-        $this->password = env('EPS_PASSWORD', 'your_eps_password');
-        $this->storeId = env('EPS_STORE_ID', '35b518f6-XXXX-XXXX');
-        $this->merchantId = env('EPS_MERCHANT_ID', '094980ee-XXX-XXX-XXX');
-        $this->hashKey = env('EPS_HASH_KEY', 'SFNLQHJlY2lwZXdhbGEjYTc3Zi1mOTQ5NWZhY2M2ZTZuZXQ=');
+        $this->baseUrl = config('services.eps.url') ?: env('EPS_URL', 'https://pgapi.eps.com.bd');
+        $this->username = trim(config('services.eps.username') ?: env('EPS_USERNAME', 'ettabashop@gmail.com'));
+        $this->password = config('services.eps.password') ?: env('EPS_PASSWORD');
+        $this->storeId = config('services.eps.store_id') ?: env('EPS_STORE_ID');
+        $this->merchantId = config('services.eps.merchant_id') ?: env('EPS_MERCHANT_ID');
+        $this->hashKey = config('services.eps.hash_key') ?: env('EPS_HASH_KEY');
     }
 
     /**
