@@ -58,6 +58,18 @@
                             <li class="list-group-item">
                                 <b>Address</b> <a class="pull-right">{{ $customer->profile->address ?: 'N/A' }}</a>
                             </li>
+                            <li class="list-group-item">
+                                <b>Account Type</b>
+                                <span class="pull-right">
+                                    @if($customer->customer_type == 'virtual_agent')
+                                        <span class="label label-info">Virtual Agent</span>
+                                    @elseif($customer->customer_type == 'buy_earn')
+                                        <span class="label label-success">Partner</span>
+                                    @else
+                                        <span class="label label-default">General Customer</span>
+                                    @endif
+                                </span>
+                            </li>
                         </ul>
 
                         <a href="{{ route('blockedUser.checkNID',['nid'=>$customer->profile->nid]) }}" class="btn btn-danger btn-block"><b>Check NID</b></a>
@@ -69,6 +81,21 @@
                         @else
                             <a href="{{ route('customer.changeSearchAccess',['id'=>$customer->id,'status'=>1]) }}" class="btn btn-success btn-block"><b>Enable Merchant Search Access</b></a>
                         @endif
+
+                        <hr style="margin: 15px 0;">
+                        <form action="{{ route('customer.changeCustomerType') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $customer->id }}">
+                            <div class="form-group" style="margin-bottom: 8px;">
+                                <label style="font-size: 12px;">Change Account Type:</label>
+                                <select name="customer_type" class="form-control input-sm">
+                                    <option value="buy_only" {{ $customer->customer_type == 'buy_only' ? 'selected' : '' }}>General Customer</option>
+                                    <option value="buy_earn" {{ $customer->customer_type == 'buy_earn' ? 'selected' : '' }}>Partner Account</option>
+                                    <option value="virtual_agent" {{ $customer->customer_type == 'virtual_agent' ? 'selected' : '' }}>Virtual Agent</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-info btn-block"><b>Update Account Type</b></button>
+                        </form>
 
                     </div>
 

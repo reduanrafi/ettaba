@@ -173,6 +173,7 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             Route::get('/change-customer-search-access', [CustomerController::class,'ChangeSearchAccess'])->name('customer.changeSearchAccess');
             Route::get('/add-referral-bonus', [CustomerController::class,'AddReferralBonus'])->name('customer.addReferralBonus');
             Route::post('/customer-update-referral-limit', [CustomerController::class,'UpdateReferralLimit'])->name('customer.referralLimit');
+            Route::post('/customer-change-customer-type', [CustomerController::class,'changeCustomerType'])->name('customer.changeCustomerType');
 
         });
         Route::group( ['stores'],  function ()

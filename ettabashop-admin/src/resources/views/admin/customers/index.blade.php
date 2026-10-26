@@ -80,7 +80,16 @@
                                         @endif
                                     </td>
 
-                                    <td> {{ ucfirst($customer->type) }}</td>
+                                    <td>
+                                        {{ ucfirst($customer->type) }}
+                                        @if($customer->customer_type == 'virtual_agent')
+                                            <br><span class="label label-info" style="font-size:10px;">Virtual Agent</span>
+                                        @elseif($customer->customer_type == 'buy_earn')
+                                            <br><span class="label label-success" style="font-size:10px;">Partner</span>
+                                        @elseif($customer->customer_type == 'buy_only')
+                                            <br><span class="label label-default" style="font-size:10px;">General Customer</span>
+                                        @endif
+                                    </td>
                                     <td class="text-center">
                                         @php
                                             $referrer = $customer->parent_id ? \App\Models\User::find($customer->parent_id) : null;
@@ -114,6 +123,26 @@
                                                     </div>
                                                     <span class="label label-sm label-danger text-center" style="display:inline-block; padding: 4px; font-weight: bold; background-color: #d9534f;">Blocked</span>
                                                 </div>
+                                            @elseif($customer->customer_type == 'virtual_agent')
+                                                <form action="{{ route('customer.referralLimit') }}" method="post">
+                                                    @csrf
+                                                    <div style="display:flex; flex-direction:column; gap:5px;">
+                                                        <div>
+                                                            <label style="font-size:10px;margin:0;color:#999;">Partner:</label>
+                                                            <input style="width:50px; font-size:12px; background-color:#e9ecef; cursor:not-allowed;" type="number" value="{{ $customer->partner_limit }}" disabled>
+                                                        </div>
+                                                        <div>
+                                                            <label style="font-size:10px;margin:0;color:#28a745;font-weight:bold;">Customer:</label>
+                                                            <input style="width:50px; font-size:12px; border:1px solid #28a745;" type="number" min="0" value="{{ $customer->customer_limit }}" name="customer_limit">
+                                                        </div>
+                                                        <div>
+                                                            <label style="font-size:10px;margin:0;color:#999;">Merchant:</label>
+                                                            <input style="width:50px; font-size:12px; background-color:#e9ecef; cursor:not-allowed;" type="number" value="{{ $customer->merchant_limit }}" disabled>
+                                                        </div>
+                                                        <input type="hidden" name="id" value="{{ $customer->id }}">
+                                                        <input type="submit" value="Save" class="btn btn-xs btn-primary">
+                                                    </div>
+                                                </form>
                                             @elseif($customer->customer_type == 'buy_earn' && $customer->account_number == 'subsequent')
                                                 <form action="{{ route('customer.referralLimit') }}" method="post">
                                                     @csrf

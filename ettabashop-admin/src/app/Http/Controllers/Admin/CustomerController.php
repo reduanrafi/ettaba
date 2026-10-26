@@ -96,6 +96,12 @@ class CustomerController extends Controller
                 'customer_limit' => 0,
                 'merchant_limit' => 0
             ];
+        } elseif ($oldData->customer_type == 'virtual_agent') {
+            $updateData = [
+                'partner_limit' => 0,
+                'customer_limit' => $request->customer_limit,
+                'merchant_limit' => 0
+            ];
         } else {
             $updateData = [
                 'partner_limit' => $request->partner_limit,
@@ -241,8 +247,36 @@ class CustomerController extends Controller
         {
             return redirect()->back()->with(['error'=>$ex->getMessage()]);
         }
-
     }
 
+    public function changeCustomerType(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'customer_type' => 'required|in:buy_only,buy_earn,virtual_agent'
+        ]);
+
+        try {
+            $user = $this->globalObject->findOrFail($request->id);
+            $user->customer_type = $request->customer_type;
+
+            if ($request->customer_type === 'virtual_agent') {
+                $user->partner_limit = 0;
+                $user->merchant_limit = 0;
+                if ($user->customer_limit <= 0) {
+                    $user->customer_limit = 999999;
+                }
+            } elseif ($request->customer_type === 'buy_only') {
+                $user->partner_limit = 0;
+                $user->customer_limit = 0;
+                $user->merchant_limit = 0;
+            }
+
+            $user->save();
+            return redirect()->back()->with(['success' => 'Customer account type updated successfully']);
+        } catch (\Exception $ex) {
+            return redirect()->back()->with(['error' => $ex->getMessage()]);
+        }
+    }
 
 }

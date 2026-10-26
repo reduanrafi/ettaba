@@ -97,6 +97,9 @@ class RegisterController extends Controller
             if ($parent->is_active == 0) {
                 return redirect()->back()->withInput()->withErrors(['referral_code' => 'The referrer is inactive']);
             }
+            if ($parent->customer_type === 'buy_only' || $parent->customer_type === 'virtual_agent') {
+                return redirect()->back()->withInput()->withErrors(['referral_code' => 'কাস্টমার বা ভার্চুয়াল এজেন্ট দিয়ে মার্চেন্ট রেফার করার অনুমোদন নেই।']);
+            }
             $merchantCount = \App\Models\MerchantReferral::where('referrer_id', $parent->id)->count();
             if ($parent->merchant_limit <= $merchantCount) {
                 return redirect()->back()->withInput()->withErrors(['referral_code' => 'This referral code has reached its merchant limit. Try another code.']);

@@ -352,6 +352,24 @@ class RegisterController extends Controller
                 return redirect()->back()->withInput()->with(['error' => $msg]);
             }
 
+            // Customer account cannot refer
+            if ($parent->customer_type === 'buy_only') {
+                $msg = 'কাস্টমার একাউন্টে কোনো রেফার করার অনুমোদন নেই।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+
+            // Virtual agent can only refer customer account
+            if ($parent->customer_type === 'virtual_agent' && $customerType !== 'buy_only') {
+                $msg = 'ভার্চুয়াল এজেন্ট দিয়ে শুধুমাত্র কাস্টমার একাউন্ট রেফার করা সম্ভব।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+
             // Check limits if enforced (> 0)
             if ($customerType == 'buy_earn') {
                 $partnerCount = User::where('parent_id', $parent->id)->where('customer_type', 'buy_earn')->count();
