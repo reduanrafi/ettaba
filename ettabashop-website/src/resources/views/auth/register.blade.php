@@ -1288,39 +1288,126 @@
         });
 
         // Partner Referral & Placement
-        function validatePartnerReferral() {
-            let refVal = $('#partner_referral_input').val().trim();
-            let placeVal = $('#partner_placement_input').val().trim();
+        let partnerRefTimer = null;
+        let partnerPlaceTimer = null;
+        let isPartnerRefVerified = false;
+        let isPartnerPlaceVerified = false;
 
-            let refValid = refVal.startsWith('13') && refVal.length >= 3 && /^[0-9]+$/.test(refVal);
-            let placeValid = placeVal.startsWith('13') && placeVal.length >= 3 && /^[0-9]+$/.test(placeVal);
-
-            if (refVal.length >= 2 && !refVal.startsWith('13')) {
-                $('#partner_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
-            } else if (refValid) {
-                $('#partner_referral_hint').text('সঠিক ফরম্যাট').removeClass('error').addClass('success');
-            }
-
-            if (placeVal.length >= 2 && !placeVal.startsWith('13')) {
-                $('#partner_placement_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
-            } else if (placeValid) {
-                $('#partner_placement_hint').text('সঠিক ফরম্যাট').removeClass('error').addClass('success');
-            }
-
-            if (refValid && placeValid) {
+        function checkPartnerNextBtn() {
+            if (isPartnerRefVerified && isPartnerPlaceVerified) {
                 $('#btn-next-4').prop('disabled', false);
             } else {
                 $('#btn-next-4').prop('disabled', true);
             }
         }
 
-        $('#partner_referral_input, #partner_placement_input').on('input', function() {
+        function validatePartnerReferralField() {
+            let refVal = $('#partner_referral_input').val().trim();
+            isPartnerRefVerified = false;
+            checkPartnerNextBtn();
+
+            if (refVal.length === 0) {
+                $('#partner_referral_hint').text('কার পরিচয়ে যুক্ত হচ্ছেন, তার eID লিখুন (13 দিয়ে শুরু) *').removeClass('error success');
+                return;
+            }
+
+            if (refVal.length >= 2 && !refVal.startsWith('13')) {
+                $('#partner_referral_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
+                return;
+            }
+
+            if (refVal.startsWith('13') && refVal.length >= 3) {
+                $('#partner_referral_hint').text('রেফার eID যাচাই করা হচ্ছে...').removeClass('error success');
+                clearTimeout(partnerRefTimer);
+                partnerRefTimer = setTimeout(function() {
+                    $.ajax({
+                        url: "{{ route('check.eid') }}",
+                        method: 'GET',
+                        data: { eid: refVal, registering_type: 'buy_earn' },
+                        success: function(res) {
+                            if (res.valid) {
+                                $('#partner_referral_hint').text('যাচাইকৃত রেফারকারী: ' + res.name).removeClass('error').addClass('success');
+                                isPartnerRefVerified = true;
+                            } else {
+                                $('#partner_referral_hint').text(res.message).addClass('error').removeClass('success');
+                                isPartnerRefVerified = false;
+                            }
+                            checkPartnerNextBtn();
+                        },
+                        error: function() {
+                            $('#partner_referral_hint').text('eID যাচাই করতে সমস্যা হয়েছে।').addClass('error');
+                            isPartnerRefVerified = false;
+                            checkPartnerNextBtn();
+                        }
+                    });
+                }, 300);
+            }
+        }
+
+        function validatePartnerPlacementField() {
+            let placeVal = $('#partner_placement_input').val().trim();
+            isPartnerPlaceVerified = false;
+            checkPartnerNextBtn();
+
+            if (placeVal.length === 0) {
+                $('#partner_placement_hint').text('যার নিচে একাউন্ট বসবে, তার eID লিখুন (13 দিয়ে শুরু) *').removeClass('error success');
+                return;
+            }
+
+            if (placeVal.length >= 2 && !placeVal.startsWith('13')) {
+                $('#partner_placement_hint').text('আপনি যে eID লিখেছেন, সেটি সঠিক ফরম্যাটের নয় (১৩ দিয়ে শুরু হতে হবে)।').addClass('error').removeClass('success');
+                return;
+            }
+
+            if (placeVal.startsWith('13') && placeVal.length >= 3) {
+                $('#partner_placement_hint').text('প্লেসমেন্ট eID যাচাই করা হচ্ছে...').removeClass('error success');
+                clearTimeout(partnerPlaceTimer);
+                partnerPlaceTimer = setTimeout(function() {
+                    $.ajax({
+                        url: "{{ route('check.eid') }}",
+                        method: 'GET',
+                        data: { eid: placeVal, registering_type: 'buy_earn' },
+                        success: function(res) {
+                            if (res.valid) {
+                                $('#partner_placement_hint').text('যাচাইকৃত প্লেসমেন্ট: ' + res.name).removeClass('error').addClass('success');
+                                isPartnerPlaceVerified = true;
+                            } else {
+                                $('#partner_placement_hint').text(res.message).addClass('error').removeClass('success');
+                                isPartnerPlaceVerified = false;
+                            }
+                            checkPartnerNextBtn();
+                        },
+                        error: function() {
+                            $('#partner_placement_hint').text('eID যাচাই করতে সমস্যা হয়েছে।').addClass('error');
+                            isPartnerPlaceVerified = false;
+                            checkPartnerNextBtn();
+                        }
+                    });
+                }, 300);
+            }
+        }
+
+        function validatePartnerReferral() {
+            validatePartnerReferralField();
+            validatePartnerPlacementField();
+        }
+
+        $('#partner_referral_input').on('input', function() {
             let val = $(this).val();
             let sanitized = val.replace(/[^0-9]/g, '');
             if (val !== sanitized) {
                 $(this).val(sanitized);
             }
-            validatePartnerReferral();
+            validatePartnerReferralField();
+        });
+
+        $('#partner_placement_input').on('input', function() {
+            let val = $(this).val();
+            let sanitized = val.replace(/[^0-9]/g, '');
+            if (val !== sanitized) {
+                $(this).val(sanitized);
+            }
+            validatePartnerPlacementField();
         });
 
         $('#btn-next-4').on('click', function() {

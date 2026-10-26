@@ -197,6 +197,39 @@ class RegisterController extends Controller
             ]);
         }
 
+        // Check referral permission and limits set by admin
+        if ($registeringType === 'buy_earn') {
+            if ($user->partner_limit <= 0) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'এই একাউন্টের রেফার অনুমোদন নেই।'
+                ]);
+            }
+
+            $partnerCount = User::where('parent_id', $user->id)->where('customer_type', 'buy_earn')->count();
+            if ($partnerCount >= $user->partner_limit) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'এই রেফার কোডের লিমিট শেষ। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।'
+                ]);
+            }
+        } else {
+            if ($user->customer_limit <= 0) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'এই একাউন্টের রেফার অনুমোদন নেই।'
+                ]);
+            }
+
+            $customerCount = User::where('parent_id', $user->id)->where('customer_type', 'buy_only')->count();
+            if ($customerCount >= $user->customer_limit) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'এই রেফার কোডের লিমিট শেষ। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।'
+                ]);
+            }
+        }
+
         return response()->json([
             'valid' => true,
             'name' => $user->name,
@@ -370,20 +403,36 @@ class RegisterController extends Controller
                 return redirect()->back()->withInput()->with(['error' => $msg]);
             }
 
-            // Check limits if enforced (> 0)
+            // Check admin referral authorization and limits
             if ($customerType == 'buy_earn') {
+                if ($parent->partner_limit <= 0) {
+                    $msg = 'এই একাউন্টের রেফার অনুমোদন নেই।';
+                    if ($request->wantsJson() || $request->ajax()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
+                    return redirect()->back()->withInput()->with(['error' => $msg]);
+                }
+
                 $partnerCount = User::where('parent_id', $parent->id)->where('customer_type', 'buy_earn')->count();
-                if ($parent->partner_limit > 0 && $parent->partner_limit <= $partnerCount) {
-                    $msg = 'এই রেফার কোডের পার্টনার লিমিট পূর্ণ হয়ে গেছে। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।';
+                if ($parent->partner_limit <= $partnerCount) {
+                    $msg = 'এই রেফার কোডের লিমিট শেষ। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।';
                     if ($request->wantsJson() || $request->ajax()) {
                         return response()->json(['success' => false, 'message' => $msg], 422);
                     }
                     return redirect()->back()->withInput()->with(['error' => $msg]);
                 }
             } else if ($customerType == 'buy_only' || $customerType == 'virtual_agent') {
+                if ($parent->customer_limit <= 0) {
+                    $msg = 'এই একাউন্টের রেফার অনুমোদন নেই।';
+                    if ($request->wantsJson() || $request->ajax()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
+                    return redirect()->back()->withInput()->with(['error' => $msg]);
+                }
+
                 $customerCount = User::where('parent_id', $parent->id)->where('customer_type', 'buy_only')->count();
-                if ($parent->customer_limit > 0 && $parent->customer_limit <= $customerCount) {
-                    $msg = 'এই রেফার কোডের কাস্টমার লিমিট পূর্ণ হয়ে গেছে। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।';
+                if ($parent->customer_limit <= $customerCount) {
+                    $msg = 'এই রেফার কোডের লিমিট শেষ। অনুগ্রহ করে অন্য কোড ব্যবহার করুন।';
                     if ($request->wantsJson() || $request->ajax()) {
                         return response()->json(['success' => false, 'message' => $msg], 422);
                     }
@@ -429,6 +478,17 @@ class RegisterController extends Controller
                     return response()->json(['success' => false, 'message' => $msg], 422);
                 }
                 return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+
+            // Check admin referral authorization for sponsor
+            if ($customerType == 'buy_earn') {
+                if ($sponsor->partner_limit <= 0) {
+                    $msg = 'রেফার eID একাউন্টের রেফার করার অনুমোদন নেই।';
+                    if ($request->wantsJson() || $request->ajax()) {
+                        return response()->json(['success' => false, 'message' => $msg], 422);
+                    }
+                    return redirect()->back()->withInput()->with(['error' => $msg]);
+                }
             }
         }
 
