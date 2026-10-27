@@ -171,4 +171,23 @@
             <li><a href="{{ route('geo.unions.index') }}"><i class="fa fa-map-signs"></i> পৌরসভা / ইউনিয়ন / ওয়ার্ড</a></li>
         </ul>
     </li>
+
+    <hr>
+    <li class="treeview {{ Request::is('private-panel/rewards*') || Request::is('private-panel/reward-applications*') || Request::is('private-panel/online-categories*') ? 'active' : '' }}">
+        <a href="#">
+            <i class="fa fa-trophy" style="color: #f39c12;"></i> <span>Reward Management</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+            <li><a href="{{ route('admin.rewards.index', 'customer') }}"><i class="fa fa-users"></i> 1. Customer Rewards</a></li>
+            <li><a href="{{ route('admin.rewards.index', 'partner') }}"><i class="fa fa-handshake-o"></i> 2. Partner Rewards</a></li>
+            <li><a href="{{ route('admin.rewards.index', 'merchant') }}"><i class="fa fa-shopping-bag"></i> 3. Merchant Rewards</a></li>
+            <li><a href="{{ route('admin.rewardApplications.index') }}"><i class="fa fa-envelope-open-o"></i> 4. Reward Applications</a></li>
+            <li><a href="{{ route('admin.rewardApplications.history') }}"><i class="fa fa-history"></i> 5. Application History</a></li>
+            <li><a href="{{ route('admin.onlineCategories.index') }}"><i class="fa fa-th-large"></i> Online Categories</a></li>
+            <li><a href="{{ route('admin.rewards.settings') }}"><i class="fa fa-cogs"></i> Reward Settings</a></li>
+        </ul>
+    </li>
 </ul>

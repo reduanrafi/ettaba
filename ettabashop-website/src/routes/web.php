@@ -117,6 +117,12 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('/virtual-balance-save', [\App\Http\Controllers\Website\VirtualBalanceController::class, 'Store'])->name('profile.virtualBalanceSave');
         Route::get('/team-tree', [ProfileController::class, 'TeamTree'])->name('profile.teamTree');
 
+        // Reward System Routes
+        Route::get('/rewards', [\App\Http\Controllers\Website\RewardController::class, 'index'])->name('profile.rewards');
+        Route::get('/rewards/{id}', [\App\Http\Controllers\Website\RewardController::class, 'show'])->name('profile.rewards.detail');
+        Route::post('/rewards/apply', [\App\Http\Controllers\Website\RewardController::class, 'apply'])->name('profile.rewards.apply');
+        Route::get('/reward-history', [\App\Http\Controllers\Website\RewardController::class, 'history'])->name('profile.rewardHistory');
+
         Route::group(['middleware' => 'active-users'], function () {
         });
     });

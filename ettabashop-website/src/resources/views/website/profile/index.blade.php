@@ -151,9 +151,66 @@
             </div>
         </div>
 
+        <!-- Unread Notifications Banner -->
+        @if(isset($unreadNotifications) && $unreadNotifications->count() > 0)
+            @foreach($unreadNotifications as $notif)
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-3" role="alert" style="border-radius: 14px; background: #ecfdf5; color: #065f46; border-left: 5px solid #10b981 !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bell mr-3 text-success fa-lg"></i>
+                        <div class="flex-grow-1">
+                            <strong>{{ $notif->title }}</strong>
+                            <div style="font-size: 13px;">{{ $notif->message }}</div>
+                        </div>
+                        @if(!empty($notif->link))
+                            <a href="{{ $notif->link }}" class="btn btn-sm btn-success ml-3 px-3" style="border-radius: 20px;">
+                                দেখুন
+                            </a>
+                        @endif
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endforeach
+        @endif
+
+        @if(Session::has('profile_warning'))
+            <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm mb-3" role="alert" style="border-radius: 14px; background: #fffbeb; color: #92400e; border-left: 5px solid #f59e0b !important;">
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-id-card mr-3 text-warning fa-lg mt-1"></i>
+                    <div class="flex-grow-1">
+                        <strong>{{ Session::get('profile_warning') }}</strong>
+                        @if(Session::has('missing_fields'))
+                            <div class="mt-1" style="font-size: 12.5px;">
+                                অনুগ্রহ করে প্রোফাইল সেটিংসে গিয়ে নিচের তথ্যগুলো পূরণ করুন: 
+                                <span class="font-weight-bold text-danger">{{ implode(', ', Session::get('missing_fields')) }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        <!-- PART A: Reward Section (3. Customer Home Page-এ Reward Section) -->
+        @if(isset($nextReward))
+            @include('website.profile.partials.reward_section')
+        @endif
+
+        <!-- PART C: Online Categories UI (10. Online Categories Section) -->
+        @include('website.profile.partials.online_categories')
+
         <!-- Mobile Horizontal Quick Navigation Bar (Touch Friendly App-like Bar) -->
         <div class="mobile-quick-nav-wrap">
             <div class="mobile-quick-nav-scroll">
+                <a href="{{ route('profile.rewards') }}" class="m-nav-pill {{ Request::is('profile/rewards*') ? 'active' : '' }}" style="background: linear-gradient(135deg, #fef3c7 0%, #fff 100%); border-color: #fde68a;">
+                    <i class="fas fa-trophy text-warning"></i> <span class="text-dark font-weight-bold">পুরস্কার ও পয়েন্ট</span>
+                </a>
+                <a href="{{ route('profile.rewardHistory') }}" class="m-nav-pill {{ Request::is('profile/reward-history') ? 'active' : '' }}">
+                    <i class="fas fa-medal text-primary"></i> <span>পুরস্কার হিস্টোরি</span>
+                </a>
                 <a href="{{ route('user.profile') }}" class="m-nav-pill {{ Request::is('profile/index') ? 'active' : '' }}">
                     <i class="fas fa-user-cog"></i> <span>প্রোফাইল সেটিংস</span>
                 </a>

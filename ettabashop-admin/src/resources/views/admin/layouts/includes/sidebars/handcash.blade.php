@@ -61,4 +61,17 @@
             <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
         </a>
     </li>
+    <hr>
+    <li class="{{ Request::is('my-rewards*') ? 'active' : '' }}">
+        <a href="{{ route('handcash.rewards.index') }}">
+            <i class="fa fa-trophy" style="color: #f39c12;"></i> <span>Merchant Rewards</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+        </a>
+    </li>
+    <li class="{{ Request::is('reward-history*') ? 'active' : '' }}">
+        <a href="{{ route('handcash.rewards.history') }}">
+            <i class="fa fa-medal" style="color: #3c8dbc;"></i> <span>Reward History</span>
+            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+        </a>
+    </li>
 </ul>

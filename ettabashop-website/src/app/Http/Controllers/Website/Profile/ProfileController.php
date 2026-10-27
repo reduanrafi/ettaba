@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Website\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
-use App\Models\User;
+use App\Models\OnlineCategory;
+use App\Models\RewardSetting;
+use App\Models\UserNotification;
+use App\Services\RewardService;
 use App\Services\CustomerGenerationCommissionGroupService;
 use Facades\App\Services\EarningStatisticsService;
 use Carbon\Carbon;
@@ -21,13 +24,15 @@ class ProfileController extends Controller
     private $singularVariableName = 'profile';
     private $pluralVariableName = 'profiles';
     private $globalObject;
+    protected $rewardService;
 
     private $retrievedDataList;
     private $singleData;
 
-    public function __construct()
+    public function __construct(RewardService $rewardService = null)
     {
         $this->globalObject = new Profile();
+        $this->rewardService = $rewardService ?: new RewardService();
     }
 
     public function SaveProfile(Request $request)
@@ -87,19 +92,34 @@ class ProfileController extends Controller
 
     public function GetProfile()
     {
-        $message='';
-        $profile  = $this->globalObject->GetProfile();
-        $earnings = EarningStatisticsService::EarningStatistics(Auth::user()->id);
+        $message = '';
+        $profile = $this->globalObject->GetProfile();
+        $user = Auth::user();
+        $earnings = EarningStatisticsService::EarningStatistics($user->id);
 
-        if(!$profile) {
-            $message =  'You do not have a profile, please create a profile to activate you account !';
+        if (!$profile) {
+            $message = 'You do not have a profile, please create a profile to activate you account !';
         }
 
-       return view('website.profile.index',[
-           'profile'=>$profile,
-           'message'=>$message,
-           'earnings'=>$earnings
-       ]);
+        // Reward system & Online Categories data
+        $nextReward = $this->rewardService->getNextRewardForUser($user);
+        $userPoints = $this->rewardService->getUserPoints($user);
+        $accountType = $this->rewardService->getUserAccountType($user);
+        $onlineCategories = OnlineCategory::where('is_visible', 1)->orderBy('sort_order', 'asc')->get();
+        $motivationalMsg = RewardSetting::getVal('motivational_message', 'আপনি তো প্রতিদিনই কেনাকাটা করছেন বা খরচ করছেন। এবার সেই খরচ থেকেই পুরস্কারের পথে এগিয়ে যান! ইত্তেবা অ্যাপ বা ইত্তেবা’র লোকাল মার্চেন্ট থেকে নিয়মিত কেনাকাটা ও সার্ভিস গ্রহণ করুন, ক্যাশব্যাকের পাশাপাশি পয়েন্ট সংগ্রহ করুন এবং একে এক আনলক করুন তালিকায় উল্লেখিত দারুণসব পুরস্কার।');
+        $unreadNotifications = UserNotification::where('user_id', $user->id)->where('is_read', 0)->orderBy('id', 'desc')->get();
+
+        return view('website.profile.index', [
+            'profile' => $profile,
+            'message' => $message,
+            'earnings' => $earnings,
+            'nextReward' => $nextReward,
+            'userPoints' => $userPoints,
+            'accountType' => $accountType,
+            'onlineCategories' => $onlineCategories,
+            'motivationalMsg' => $motivationalMsg,
+            'unreadNotifications' => $unreadNotifications,
+        ]);
     }
     public function Orders()
     {

@@ -76,6 +76,25 @@
                 </div>
             </a>
         </li>
+        <li class="dash-menu-item">
+            <a href="{{ route('profile.rewards') }}" class="dash-menu-link {{ Request::is('profile/rewards*') ? 'active' : '' }}">
+                <div class="link-left">
+                    <span class="menu-icon" style="color: #f59e0b; background: #fffbeb;"><i class="fas fa-trophy"></i></span>
+                    <span>পুরস্কার ও পয়েন্ট</span>
+                </div>
+                <span class="badge badge-warning" style="font-size: 11px; background: #fef3c7; color: #b45309;">
+                    <i class="fas fa-gem"></i>
+                </span>
+            </a>
+        </li>
+        <li class="dash-menu-item">
+            <a href="{{ route('profile.rewardHistory') }}" class="dash-menu-link {{ Request::is('profile/reward-history') ? 'active' : '' }}">
+                <div class="link-left">
+                    <span class="menu-icon" style="color: #6366f1; background: #eef2ff;"><i class="fas fa-medal"></i></span>
+                    <span>পুরস্কার হিস্টোরি</span>
+                </div>
+            </a>
+        </li>
         @if(\Illuminate\Support\Facades\Auth::user()->customer_type == 'buy_earn')
             <li class="dash-menu-item">
                 <a href="{{ route('profile.trainings') }}" class="dash-menu-link {{ Request::is('profile/trainings') ? 'active' : '' }}">

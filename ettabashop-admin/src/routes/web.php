@@ -140,6 +140,40 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             // AJAX helper
             Route::get('/ajax/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('geo.ajax.upazilas');
         });
+
+        // Reward Management Routes
+        Route::group(['prefix' => 'rewards'], function () {
+            Route::get('/list/{type?}', [\App\Http\Controllers\Admin\RewardController::class, 'index'])->name('admin.rewards.index');
+            Route::get('/create/{type?}', [\App\Http\Controllers\Admin\RewardController::class, 'create'])->name('admin.rewards.create');
+            Route::post('/store', [\App\Http\Controllers\Admin\RewardController::class, 'store'])->name('admin.rewards.store');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\RewardController::class, 'edit'])->name('admin.rewards.edit');
+            Route::post('/update/{id}', [\App\Http\Controllers\Admin\RewardController::class, 'update'])->name('admin.rewards.update');
+            Route::get('/toggle-hide/{id}', [\App\Http\Controllers\Admin\RewardController::class, 'toggleHide'])->name('admin.rewards.toggleHide');
+            Route::get('/delete/{id}', [\App\Http\Controllers\Admin\RewardController::class, 'destroy'])->name('admin.rewards.destroy');
+
+            Route::get('/settings', [\App\Http\Controllers\Admin\RewardSettingController::class, 'index'])->name('admin.rewards.settings');
+            Route::post('/settings/update', [\App\Http\Controllers\Admin\RewardSettingController::class, 'update'])->name('admin.rewards.settings.update');
+        });
+
+        // Reward Applications Management
+        Route::group(['prefix' => 'reward-applications'], function () {
+            Route::get('/', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'index'])->name('admin.rewardApplications.index');
+            Route::get('/history', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'history'])->name('admin.rewardApplications.history');
+            Route::get('/show/{id}', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'show'])->name('admin.rewardApplications.show');
+            Route::post('/accept/{id}', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'accept'])->name('admin.rewardApplications.accept');
+            Route::post('/reject/{id}', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'reject'])->name('admin.rewardApplications.reject');
+            Route::post('/update-details/{id}', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'updateDetails'])->name('admin.rewardApplications.updateDetails');
+            Route::post('/mark-received/{id}', [\App\Http\Controllers\Admin\RewardApplicationController::class, 'markReceived'])->name('admin.rewardApplications.markReceived');
+        });
+
+        // Online Categories Management
+        Route::group(['prefix' => 'online-categories'], function () {
+            Route::get('/', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'index'])->name('admin.onlineCategories.index');
+            Route::post('/store', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'store'])->name('admin.onlineCategories.store');
+            Route::post('/update/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'update'])->name('admin.onlineCategories.update');
+            Route::get('/toggle-hide/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'toggleHide'])->name('admin.onlineCategories.toggleHide');
+            Route::get('/delete/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'destroy'])->name('admin.onlineCategories.destroy');
+        });
     });
 
 
@@ -301,6 +335,12 @@ Route::group(['middleware' => ['handcash']], function () {
     Route::post('/hand-cash-order-save/',   [\App\Http\Controllers\Api\V1\HandCashOrderController::class,'SaveOrder'])->name('handcash.order.save');
     Route::post('/hand-cash-direct-pay/',   [\App\Http\Controllers\Api\V1\HandCashOrderController::class,'DirectPay'])->name('handcash.direct.pay');
     Route::get('/get-price', [TestController::class, 'getPrice']);
+
+    // Merchant Rewards routes
+    Route::get('/my-rewards', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'index'])->name('handcash.rewards.index');
+    Route::get('/my-rewards/{id}', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'show'])->name('handcash.rewards.show');
+    Route::post('/my-rewards/apply', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'apply'])->name('handcash.rewards.apply');
+    Route::get('/reward-history', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'history'])->name('handcash.rewards.history');
 });
 
 
