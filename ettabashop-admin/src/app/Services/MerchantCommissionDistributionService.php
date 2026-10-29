@@ -61,14 +61,18 @@ class MerchantCommissionDistributionService{
     public function SaveMerchantData($orderItems, $childId = null)
     {
         $pointService = new PointService();
-        if ($orderItems!=null)
-        {
-            foreach ($orderItems as $item)
-            {
+        if ($orderItems != null) {
+            foreach ($orderItems as $item) {
+                $ownerId = $item->owner_id ?: ($item->product ? $item->product->owner_id : null);
+                if (!$ownerId) {
+                    continue;
+                }
+                $qty = max(1, (int) ($item->quantity ?? 1));
+                $rateAmount = ($item->product ? (float) $item->product->rate_en : 0) * $qty;
+                $trpAmount = ((float) ($item->trp ?: ($item->product ? $item->product->trp_en : 0))) * $qty;
 
-                $this->SaveUserPendingFund($item->owner_id, $item->order_id, $item->product->rate_en, 'merchant', $childId);
-
-                $pointService->SavePendingPoint($item->owner_id,$item->order_id,$item->trp);
+                $this->SaveUserPendingFund($ownerId, $item->order_id, $rateAmount, 'merchant', $childId);
+                $pointService->SavePendingPoint($ownerId, $item->order_id, $trpAmount);
             }
         }
     }

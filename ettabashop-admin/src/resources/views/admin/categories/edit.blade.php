@@ -1,145 +1,143 @@
 @extends('admin.layouts.layout')
-
 @section('content')
+    <section class="content-header">
+        <h1>ক্যাটাগরি সম্পাদনা (Edit Category)</h1>
+    </section>
 
-<!-- BEGIN Portlet PORTLET-->
-<section class="content">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Create new Category</h3>
-                    <div class="pull-right box-tools">
-                        <a href="{{ route('category.index') }} "
-                           class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i class="fa fa-mail-forward"></i> View All</a>
+    <section class="content">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-edit text-primary"></i> ক্যাটাগরি আপডেট করুন: {{ $category->name_bn ?: $category->name_en }}</h3>
+                        <div class="pull-right box-tools">
+                            <a href="{{ route('category.index') }}" class="btn btn-primary btn-flat btn-sm">
+                                <i class="fa fa-list"></i> সকল ক্যাটাগরি দেখুন
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <!-- /.box-header -->
-                <!-- form start -->
 
+                    <form class="form-horizontal" action="{{ route('category.update', ['category' => $category->id]) }}" method="post" enctype="multipart/form-data">
+                        @csrf
+                        {!! method_field('PUT') !!}
+                        <input type="hidden" name="sync_sections" value="1">
 
-                <form class="form-horizontal" action="{{ route('category.update',['category'=>$category->id]) }}" method="post" enctype="multipart/form-data">
-                    @csrf
-                    {!! method_field('PUT') !!}
-                    <div class="box-body">
-                        <div class="row">
+                        <div class="box-body">
+                            @if(Session::has('success'))
+                                @include('admin.layouts.message.success')
+                            @elseif(Session::has('error'))
+                                @include('admin.layouts.message.error')
+                            @endif
 
-                            <div class="col-md-8 col-md-offset-2" id="messageDiv">
-                                @if(Session::has('success'))
-                                    @include('admin.layouts.message.success')
-                                @elseif(Session::has('error'))
-                                    @include('admin.layouts.message.error')
-                                @endif
-                            </div>
-
-
-                            <div class="col-md-8">
-
-                                <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Category Name English</label>
-                                    <div class="col-sm-9">
-                                        <input type="text"   class="form-control" id="name_en" name="name_en" value="{{$category->name_en}}" placeholder="Name">
-                                        @error('name_en')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">ক্যাটাগরির নাম (বাংলা) <span class="text-danger">*</span></label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="name_bn" value="{{ $category->name_bn ?: $category->name_en }}" required>
                                 </div>
                             </div>
 
-                            <div class="col-md-8">
-
-                                <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Category Name Bangla</label>
-                                    <div class="col-sm-9">
-                                        <input type="text"   class="form-control" id="name_bn" name="name_bn" value="{{$category->name_bn}}" placeholder="Name">
-                                        @error('name_bn')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">ক্যাটাগরির নাম (ইংরেজি)</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="name_en" value="{{ $category->name_en }}">
                                 </div>
                             </div>
-                            <div class="col-md-8">
 
-                                <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Slug</label>
-                                    <div class="col-sm-9">
-                                        <input type="text"   class="form-control" id="slug" name="slug" value="{{$category->slug}}" placeholder="this-is-slug-format">
-                                        @error('slug')
-                                        <div class="alert alert-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">স্লাগ (Slug)</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="slug" value="{{ $category->slug }}">
                                 </div>
                             </div>
-                            <div class="col-md-8">
 
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">প্রদর্শন ক্রম (Serial / Priority)</label>
+                                <div class="col-sm-4">
+                                    <input type="number" class="form-control" name="priority" value="{{ $category->priority ?? 0 }}">
+                                    <small class="text-muted">ছোট সংখ্যা আগে দেখাবে</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">FontAwesome আইকন ক্লাস ও রঙ</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" name="icon_class" value="{{ $category->icon_class }}" placeholder="যেমন: fas fa-shopping-cart, fas fa-tshirt">
+                                </div>
+                                <div class="col-sm-3">
+                                    <input type="color" class="form-control" name="icon_color" value="{{ $category->icon_color ?: '#16a34a' }}" style="height: 34px; padding: 2px;">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">আইকন / ছবি আপলোড (ঐচ্ছিক)</label>
+                                <div class="col-sm-8">
+                                    <input type="file" class="form-control" onchange="loadFile(event)" name="image" accept="image/*">
+                                    @if(!empty($category->image))
+                                        <p style="margin-top: 8px;"><img id="output" src="{{ asset($category->image) }}" width="80" style="border-radius: 8px;"/></p>
+                                    @else
+                                        <p style="margin-top: 8px;"><img id="output" width="80" style="border-radius: 8px;"/></p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">প্যারেন্ট ক্যাটাগরি (ঐচ্ছিক)</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" name="parent_id">
+                                        <option value="">-- মূল ক্যাটাগরি (Main Category) --</option>
+                                        @foreach($categories as $parent)
+                                            @if($parent->id != $category->id)
+                                                <option @if($category->parent_id == $parent->id) selected @endif value="{{ $parent->id }}">
+                                                    {{ $parent->name_bn ?: $parent->name_en }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            @if(isset($homeSections) && count($homeSections) > 0)
                                 <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Parent Categories</label>
-                                    <div class="col-sm-9">
-                                        <select class="form-control" name="parent_id">
-                                            <option></option>
-                                            @foreach($categories as $parent)
-                                                <option @if($category->parent_id==$parent->id) selected @endif value="{{$parent->id}}">{{$parent->name_en}}</option>
+                                    <label class="col-sm-3 control-label">হোমপেজের কোন সেকশনে এই ক্যাটাগরির পণ্য দেখানো হবে?</label>
+                                    <div class="col-sm-8">
+                                        <div class="well well-sm" style="background: #f8fafc; margin-bottom: 0;">
+                                            @foreach($homeSections as $sec)
+                                                <label class="checkbox-inline" style="margin-left: 0; margin-right: 18px; margin-bottom: 6px;">
+                                                    <input type="checkbox" name="home_section_ids[]" value="{{ $sec->id }}"
+                                                        {{ in_array((int)$category->id, $sec->category_ids_array) ? 'checked' : '' }}>
+                                                    <strong>{{ $sec->title_bn }}</strong>
+                                                </label>
                                             @endforeach
-                                        </select>
-                                                                                    <input type="hidden" value="1" name="category_id">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="advance_payment_required" class="col-sm-3 control-label">Advance Payment Required</label>
-                                    <div class="col-sm-9">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" id="advance_payment_required" name="advance_payment_required" value="1" {{ $category->advance_payment_required ? 'checked' : '' }}>
-                                                ON (COD disabled)
-                                            </label>
                                         </div>
+                                        <small class="text-muted">একাধিক সেকশন নির্বাচন করা যাবে।</small>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">সেটিংস</label>
+                                <div class="col-sm-8">
+                                    <div class="checkbox">
+                                        <label style="margin-right: 20px;">
+                                            <input type="checkbox" name="is_active" value="1" {{ (!isset($category->is_active) || $category->is_active) ? 'checked' : '' }}>
+                                            <strong>ক্যাটাগরি সক্রিয় (Active)</strong>
+                                        </label>
+                                        <label>
+                                            <input type="checkbox" name="advance_payment_required" value="1" {{ $category->advance_payment_required ? 'checked' : '' }}>
+                                            <strong>অগ্রিম পেমেন্ট বাধ্যতামূলক (COD বন্ধ)</strong>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-8">
-
-                                <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Featured image</label>
-                                    <div class="col-sm-9">
-                                        <input type="file" class="form-control" onchange="loadFile(event)"
-                                               id="image" name="image" placeholder="Post image">
-                                        <p><img id="output" src="{{ asset($category->image) }}" width="200"/></p>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-md-8">
-
-                                <div class="form-group">
-                                    <label for="subject-name" class="col-sm-3 control-label">Action</label>
-                                    <div class="col-sm-9">
-                                        <input type="submit" value="Save" class="btn btn-success">
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
 
-
-                    </div>
-                </form>
-
-
+                        <div class="box-footer text-right">
+                            <a href="{{ route('category.index') }}" class="btn btn-default">বাতিল</a>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> আপডেট করুন</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- /.row -->
-    {{--        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>--}}
-    {{--        <script>tinymce.init({ selector:'textarea' });</script>--}}
-    <script src="https://cdn.ckeditor.com/4.11.1/standard/ckeditor.js"></script>
-    <script>
-        CKEDITOR.replace( 'editor' );
-    </script>
-</section>
-<!-- END Portlet PORTLET-->
-
+    </section>
 @endsection

@@ -1,22 +1,124 @@
 @extends('website.layouts.layout')
+
 @section('content')
-    @include('website.layouts.includes.header')
-
-    <div class="container-fluid mb-5">
-
-        <div class="row border-top px-xl-5">
-            <div class="col-lg-3">
-                @include('website.layouts.includes.sidebar')
+<div class="ettaba-page-shell py-3">
+    <div class="bg-white rounded-lg shadow-sm border p-3 mb-3 d-flex align-items-center justify-content-between flex-wrap">
+        <div>
+            <div class="small text-muted mb-1">
+                <a href="{{ route('website.index') }}" class="text-success font-weight-bold text-decoration-none">
+                    <i class="fas fa-home mr-1"></i> হোম
+                </a>
+                <i class="fas fa-chevron-right mx-1 small"></i>
+                <span>{{ $pageTitle ?? 'সকল পণ্য' }}</span>
             </div>
-
-            <div class="col-lg-9">
-                @include('website.layouts.includes.navigation')
-                @include('website.layouts.home_sections.products')
-
-            </div>
-
+            <h4 class="font-weight-bold mb-0 text-dark">
+                @if(isset($section) && !empty($section->icon_class))
+                    <i class="{{ $section->icon_class }} mr-1" style="color: {{ $section->icon_color ?? '#15803d' }}"></i>
+                @else
+                    <i class="fas fa-th-large text-success mr-1"></i>
+                @endif
+                {{ $pageTitle ?? 'সকল পণ্য' }}
+            </h4>
         </div>
+        @if(method_exists($products, 'total'))
+            <span class="badge badge-success px-3 py-2 mt-2 mt-sm-0" style="font-size: 13px; border-radius: 20px;">
+                মোট পণ্য: {{ $products->total() }}টি
+            </span>
+        @endif
     </div>
 
-@endsection()
+    @if(count($products) > 0)
+        <div class="row mx-n1" id="infinite-product-grid">
+            @foreach($products as $product)
+                <div class="col-6 col-md-4 col-lg-3 px-1 mb-2">
+                    @include('website.layouts.home_sections.modern_product_item', ['product' => $product])
+                </div>
+            @endforeach
+        </div>
 
+        <div id="infinite-scroll-loader" class="text-center py-4" style="display: none;">
+            <div class="spinner-border text-success" role="status"></div>
+            <div class="small font-weight-bold text-muted mt-1">আরও পণ্য লোড হচ্ছে...</div>
+        </div>
+
+        @if(method_exists($products, 'hasMorePages') && $products->hasMorePages())
+            <div class="text-center py-3" id="infinite-scroll-trigger"
+                 data-next-page="{{ $products->currentPage() + 1 }}"
+                 data-has-more="1">
+                <button type="button" id="load-more-btn" class="btn btn-outline-success rounded-pill px-4 font-weight-bold">
+                    আরও পণ্য দেখুন <i class="fas fa-arrow-down ml-1"></i>
+                </button>
+            </div>
+        @endif
+    @else
+        <div class="bg-white rounded-lg shadow-sm border p-5 text-center my-3">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <h5 class="font-weight-bold text-dark">এই তালিকায় বর্তমানে কোনো পণ্য নেই</h5>
+            <a href="{{ route('website.index') }}" class="btn btn-success rounded-pill px-4 mt-2 font-weight-bold">
+                <i class="fas fa-arrow-left mr-1"></i> হোমপেজে ফিরে যান
+            </a>
+        </div>
+    @endif
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var trigger = document.getElementById('infinite-scroll-trigger');
+    if (!trigger) return;
+
+    var grid = document.getElementById('infinite-product-grid');
+    var loader = document.getElementById('infinite-scroll-loader');
+    var loadMoreBtn = document.getElementById('load-more-btn');
+    var loading = false;
+
+    function loadNextPage() {
+        if (loading || trigger.getAttribute('data-has-more') !== '1') return;
+        loading = true;
+        loader.style.display = 'block';
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
+        var nextPage = trigger.getAttribute('data-next-page');
+        var url = new URL(window.location.href);
+        url.searchParams.set('page', nextPage);
+        url.searchParams.set('ajax', '1');
+
+        fetch(url.toString(), {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.html) {
+                grid.insertAdjacentHTML('beforeend', data.html);
+            }
+            if (data.hasMore) {
+                trigger.setAttribute('data-next-page', data.nextPage);
+                trigger.setAttribute('data-has-more', '1');
+                if (loadMoreBtn) loadMoreBtn.style.display = 'inline-block';
+            } else {
+                trigger.setAttribute('data-has-more', '0');
+                trigger.style.display = 'none';
+            }
+        })
+        .catch(function () {
+            if (loadMoreBtn) loadMoreBtn.style.display = 'inline-block';
+        })
+        .finally(function () {
+            loading = false;
+            loader.style.display = 'none';
+        });
+    }
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', loadNextPage);
+    }
+
+    window.addEventListener('scroll', function () {
+        if (trigger.getAttribute('data-has-more') !== '1') return;
+        var rect = trigger.getBoundingClientRect();
+        if (rect.top <= window.innerHeight + 350) {
+            loadNextPage();
+        }
+    });
+});
+</script>
+@endsection

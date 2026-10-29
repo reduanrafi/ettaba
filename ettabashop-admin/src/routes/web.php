@@ -25,6 +25,8 @@ use App\Http\Controllers\Shopper\WithdrawRequestController as WRController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\website\IndexController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 
@@ -76,8 +78,9 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
 
     Route::group(['middleware' => 'admin'], function () {
 
-//        single routes
         Route::get('/toggle-hide-categories', [CategoryController::class,'toggleHide'])->name('category.toggleHide');
+        Route::get('/toggle-active-category/{id}', [CategoryController::class,'toggleActive'])->name('category.toggleActive');
+        Route::get('/move-category-order/{id}', [CategoryController::class,'moveOrder'])->name('category.moveOrder');
         Route::get('/toggle-featured-product', [ProductController::class,'MarkUnMarkFeatured'])->name('product.toggleFeature');
 
 
@@ -86,7 +89,24 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
 
         Route::resource('/category', CategoryController::class);
 
+        // Homepage Product Sections Management
+        Route::group(['prefix' => 'home-sections'], function () {
+            Route::get('/', [\App\Http\Controllers\Admin\HomeSectionController::class, 'index'])->name('admin.homeSections.index');
+            Route::post('/store', [\App\Http\Controllers\Admin\HomeSectionController::class, 'store'])->name('admin.homeSections.store');
+            Route::post('/update/{id}', [\App\Http\Controllers\Admin\HomeSectionController::class, 'update'])->name('admin.homeSections.update');
+            Route::get('/toggle-visibility/{id}', [\App\Http\Controllers\Admin\HomeSectionController::class, 'toggleVisibility'])->name('admin.homeSections.toggleVisibility');
+            Route::get('/move-order/{id}', [\App\Http\Controllers\Admin\HomeSectionController::class, 'moveOrder'])->name('admin.homeSections.moveOrder');
+            Route::get('/delete/{id}', [\App\Http\Controllers\Admin\HomeSectionController::class, 'destroy'])->name('admin.homeSections.destroy');
+        });
 
+        // Public Notices / Notifications Management
+        Route::group(['prefix' => 'notices'], function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PublicNoticeController::class, 'index'])->name('admin.notices.index');
+            Route::post('/store', [\App\Http\Controllers\Admin\PublicNoticeController::class, 'store'])->name('admin.notices.store');
+            Route::post('/update/{id}', [\App\Http\Controllers\Admin\PublicNoticeController::class, 'update'])->name('admin.notices.update');
+            Route::get('/toggle-publish/{id}', [\App\Http\Controllers\Admin\PublicNoticeController::class, 'togglePublish'])->name('admin.notices.togglePublish');
+            Route::get('/delete/{id}', [\App\Http\Controllers\Admin\PublicNoticeController::class, 'destroy'])->name('admin.notices.destroy');
+        });
 
         Route::group( ['blocked-user'],  function ()
         {
@@ -240,6 +260,10 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
 
         Route::resource('/shop',  ShopController::class);
 
+        Route::get('/seller-orders', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'index'])->name('seller.orders.index');
+        Route::get('/seller-orders/{orderId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'show'])->name('seller.orders.show');
+        Route::post('/seller-orders/update-status/{orderId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'updateStatus'])->name('seller.orders.updateStatus');
+
         Route::get('/my-withdraws/',   [WRController::class,'index'])->name('mywithdraws');
         Route::get('/create-withdraw-request',   [WRController::class,'create'])->name('withdraw.create');
         Route::post('/save-withdraw-request',   [WRController::class,'Store'])->name('withdraw.save');
@@ -248,7 +272,6 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
     });
 
 
-   // Route::get('/invoice', 'Admin\InvoiceController@inv')->name('invoice');
     Route::get('/order/show', function () {
         return view('admin.Orders.show');
     });
@@ -257,6 +280,7 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
     Route::group(['prefix' => 'orders'], function () {
         Route::get('/', [OrderController::class,'Index'])->name('order.index');
         Route::get('/detail/{id}', [OrderController::class,'Detail'])->name('order.detail');
+        Route::post('/update-delivery-charge/{id}', [OrderController::class,'updateDeliveryCharge'])->name('order.updateDeliveryCharge');
         Route::get('/remove-item/', [\App\Http\Controllers\Admin\OrderItemController::class,'RemoveItem'])->name('item.remove');
         Route::get('/invoice/{id}', [OrderController::class,'invoice'])->name('order.invoice');
         Route::get('/shop', [OrderController::class,'Shop'])->name('order.shop');
@@ -265,20 +289,6 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
         Route::get('/verify-eps/{id}', [OrderController::class,'verifyEpsPayment'])->name('order.verifyEps');
         Route::get('/pending-eps', [OrderController::class,'pendingEpsOrders'])->name('order.pendingEps');
         Route::post('/bulk-verify-eps', [OrderController::class,'bulkVerifyEps'])->name('order.bulkVerifyEps');
-
-//        Route::get('/refund', ['uses' => 'Admin\OrderItemController@Refund', 'as' => 'order.refund']);
-//        Route::get('remove-items/{id}', ['uses' => 'Admin\OrderItemController@RemoveItem', 'as' => 'order.removeItem']);
-//        Route::get('delete/{id}', ['uses' => 'Admin\OrderController@destroy', 'as' => 'order.delete']);
-//        Route::get('invoice/{id}', ['uses' => 'Admin\OrderController@invoice', 'as' => 'order.invoice']);
-//        Route::post('add-items/{id}', ['uses' => 'Admin\OrderItemController@AddItem', 'as' => 'order.addItem']);
-//
-//        Route::get('monthly-order-graph', 'Admin\OrderReportController@MonthlyOrderReportGraph')->name('monthlyOrderGraph');
-//        Route::get('yearly-order-graph', 'Admin\OrderReportController@YearlyOrderReportGraph')->name('yearlyOrderGraph');
-//        Route::get('daily-order-graph', 'Admin\OrderReportController@DailyOrderReportGraph')->name('dailyOrderGraph');
-//        Route::get('delivered_orders', 'Admin\OrderController@GetDeliveredOrders')->name('deliveredOrdersIndex');
-//        Route::get('undelivered_orders', 'Admin\OrderController@GetUnDeliveredOrders')->name('unDeliveredOrdersIndex');
-//        Route::get('list-ssl-ipn-response', 'Admin\OrderController@SSLResponseIndex')->name('sslIpnResposne');
-
     });
     Route::group(['prefix' => 'anonymous-orders'], function () {
         Route::get('/', [AnonymousOrderController::class,'Index'])->name('anonymousOrder.index');
@@ -342,8 +352,3 @@ Route::group(['middleware' => ['handcash']], function () {
     Route::post('/my-rewards/apply', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'apply'])->name('handcash.rewards.apply');
     Route::get('/reward-history', [\App\Http\Controllers\HandCash\MerchantRewardController::class, 'history'])->name('handcash.rewards.history');
 });
-
-
-
-
-//URL::forceScheme('https');

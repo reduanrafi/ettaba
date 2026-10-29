@@ -320,4 +320,15 @@ class OrderController extends Controller
         return redirect()->route('order.pendingEps')->with(['success' => $message]);
     }
 
+    public function updateDeliveryCharge(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+        $charge = max(0, (float) $request->input('delivery_charge', 0));
+
+        $order->delivery_charge = $charge;
+        $order->save();
+
+        return redirect()->back()->with(['success' => 'ডেলিভারি চার্জ সফলভাবে আপডেট করা হয়েছে (৳' . number_format($charge, 2) . ')।']);
+    }
+
 }

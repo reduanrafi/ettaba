@@ -13,7 +13,18 @@ class Slider extends Model
     /****************************
      * Property area
      *****************************/
-    protected $fillable = ['title','description','image'];
+    protected $fillable = [
+        'title_en',
+        'title_bn',
+        'description_en',
+        'description_bn',
+        'button_text',
+        'button_link',
+        'offer_details',
+        'sort_order',
+        'is_active',
+        'image'
+    ];
 
     /****************************
      * Model Relation area

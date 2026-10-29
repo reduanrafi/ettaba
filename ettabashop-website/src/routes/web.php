@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Website\CheckoutController;
 use App\Http\Controllers\Website\DirectOrderController;
 use App\Http\Controllers\Website\IndexController;
+use App\Http\Controllers\Website\NoticeController;
 use App\Http\Controllers\Website\ProductController;
 use App\Http\Controllers\Website\Profile\ProfileController;
 use App\Http\Controllers\Website\Profile\OrderController as order;
@@ -62,6 +63,10 @@ Route::view('/design-v2', 'website.home_new')->name('website.design-v2');
 
 
 Route::get('/', [IndexController::class, 'index'])->name('website.index');
+Route::get('/notices', [NoticeController::class, 'index'])->name('website.notices.index');
+Route::get('/notices/{id}', [NoticeController::class, 'show'])->name('website.notices.show');
+Route::get('/offer/{id}', [NoticeController::class, 'offerDetail'])->name('website.offer.detail');
+Route::get('/section/{slug}', [ProductController::class, 'sectionProducts'])->name('website.sectionProducts');
 Route::get('/products/{slug}', [IndexController::class, 'products'])->name('products');
 Route::get('/category-products/{slug}', [ProductController::class, 'CategoryProducts'])->name('categoryProducts');
 Route::get('/all-products/', [ProductController::class, 'AllProducts'])->name('allProducts');
@@ -235,3 +240,12 @@ Route::match(['get', 'post'], '/payment/cancel', [\App\Http\Controllers\Website\
 
 
 require __DIR__ . '/new.php';
+
+// Custom Seller Shop URL Routes (e.g., ettabashop.com/Gadgets_Bro)
+Route::get('/{shop_slug}/section/{section_type}', [ShopController::class, 'sellerSectionProducts'])
+    ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads).*$')
+    ->name('seller.shop.section');
+
+Route::get('/{shop_slug}', [ShopController::class, 'showBySlug'])
+    ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads).*$')
+    ->name('seller.shop.slug');
