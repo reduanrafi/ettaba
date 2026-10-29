@@ -160,36 +160,62 @@
         $displayHomeCats = (isset($homeCategories) && count($homeCategories) > 0) ? $homeCategories : $defaultRefCategories;
     @endphp
     <div class="ettaba-category-strip mb-3">
-        <div class="ettaba-cat-grid">
-            @foreach($displayHomeCats as $cat)
+        <div class="ettaba-cat-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;">
+            @foreach(collect($displayHomeCats)->take(6) as $cat)
                 @php
                     $catTitle = data_get($cat, 'name_bn') ?: data_get($cat, 'name_en') ?: data_get($cat, 'name', '');
                     $catSlug = data_get($cat, 'slug', '');
                     $catColor = data_get($cat, 'icon_color') ?: data_get($cat, 'color', '#15803d');
-                    $catIcon = data_get($cat, 'icon_class', 'fas fa-shopping-basket');
+                    $catIcon = data_get($cat, 'icon_class');
+                    if (empty($catIcon)) {
+                        if (str_contains($catTitle, 'ফ্যাশন') || str_contains(strtolower($catSlug), 'fashion')) {
+                            $catIcon = 'fas fa-tshirt';
+                            $catColor = '#16a34a';
+                        } elseif (str_contains($catTitle, 'জুয়েলারি') || str_contains($catTitle, 'কসমেটিক') || str_contains(strtolower($catSlug), 'jewel')) {
+                            $catIcon = 'fas fa-gem';
+                            $catColor = '#2563eb';
+                        } elseif (str_contains($catTitle, 'রেস্টুরেন্ট') || str_contains($catTitle, 'ফুড') || str_contains(strtolower($catSlug), 'food')) {
+                            $catIcon = 'fas fa-utensils';
+                            $catColor = '#ea580c';
+                        } elseif (str_contains($catTitle, 'ক্লিনিক') || str_contains($catTitle, 'হাসপাতাল') || str_contains(strtolower($catSlug), 'hospital')) {
+                            $catIcon = 'fas fa-stethoscope';
+                            $catColor = '#9333ea';
+                        } elseif (str_contains($catTitle, 'ইলেকট্রনিক') || str_contains($catTitle, 'গ্যাজেট') || str_contains(strtolower($catSlug), 'electronic')) {
+                            $catIcon = 'fas fa-desktop';
+                            $catColor = '#0284c7';
+                        } elseif (str_contains($catTitle, 'কার্ড') || str_contains($catTitle, 'সাবস্ক্রিপশন')) {
+                            $catIcon = 'fas fa-id-card';
+                            $catColor = '#dc2626';
+                        } else {
+                            $catIcon = 'fas fa-shopping-cart';
+                        }
+                    }
                     $catImg = data_get($cat, 'image');
                     $catUrl = !empty($catSlug) ? route('categoryProducts', ['slug' => $catSlug]) : route('allProducts');
                 @endphp
-                <a href="{{ $catUrl }}" class="ettaba-cat-card text-decoration-none">
-                    <div class="ettaba-cat-icon-box" style="color: {{ $catColor }};">
+                <a href="{{ $catUrl }}" class="ettaba-cat-card text-decoration-none"
+                   style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 3px 6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center;">
+                    <div class="ettaba-cat-icon-box" style="color: {{ $catColor }}; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:4px;">
                         @if(!empty($catImg))
                             <img src="{{ config('app.image_url') . $catImg }}"
                                  onerror="this.src='{{ asset($catImg) }}'"
+                                 style="max-width:30px; max-height:30px; object-fit:contain;"
                                  alt="{{ $catTitle }}">
                         @else
                             <i class="{{ $catIcon }}"></i>
                         @endif
                     </div>
-                    <div class="ettaba-cat-title">{{ $catTitle }}</div>
+                    <div class="ettaba-cat-title" style="font-size:10.5px; font-weight:700; color:#0f172a; line-height:1.15;">{{ $catTitle }}</div>
                 </a>
             @endforeach
 
             <!-- "সব ক্যাটাগরি" Button -->
-            <a href="javascript:void(0)" onclick="$('#allCategoriesModal').modal('show')" class="ettaba-cat-card text-decoration-none">
-                <div class="ettaba-cat-icon-box" style="color: #475569;">
+            <a href="javascript:void(0)" onclick="$('#allCategoriesModal').modal('show')" class="ettaba-cat-card text-decoration-none"
+               style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 3px 6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center;">
+                <div class="ettaba-cat-icon-box" style="color: #475569; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:4px;">
                     <i class="fas fa-th-large"></i>
                 </div>
-                <div class="ettaba-cat-title">সব<br>ক্যাটাগরি</div>
+                <div class="ettaba-cat-title" style="font-size:10.5px; font-weight:700; color:#0f172a; line-height:1.15;">সব<br>ক্যাটাগরি</div>
             </a>
         </div>
     </div>
@@ -271,268 +297,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    /* Guest Registration Card (Section 3.2) */
-    .ettaba-guest-icon-wrap {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        border-radius: 50%;
-        background: #dcfce7;
-        color: #15803d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-    }
-
-    .ettaba-guest-card-icon {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        border-radius: 8px;
-        background: #dcfce7;
-        color: #15803d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-    }
-
-    .ettaba-guest-heading {
-        font-size: 12.5px;
-        font-weight: 800;
-        color: #b91c1c;
-        line-height: 1.2;
-    }
-
-    .ettaba-guest-subtext {
-        font-size: 11px;
-        font-weight: 600;
-        color: #1e293b;
-        line-height: 1.25;
-    }
-
-    .ettaba-guest-bullets li {
-        font-size: 10.5px;
-        font-weight: 700;
-        color: #1e293b;
-        line-height: 1.3;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .ettaba-guest-login-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #15803d;
-        color: #ffffff !important;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 6px 8px;
-        box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
-    }
-
-    .ettaba-guest-reg-btn {
-        display: block;
-        background: #ffffff;
-        border: 1.5px solid #15803d;
-        border-radius: 8px;
-        padding: 4px 6px;
-        color: #0f172a !important;
-    }
-
-    .ettaba-guest-reg-btn .reg-main-txt {
-        font-size: 11px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .ettaba-guest-reg-btn .reg-sub-txt {
-        font-size: 9.5px;
-        font-weight: 700;
-        color: #15803d;
-    }
-
-    @media (max-width: 575.98px) {
-        .ettaba-guest-heading { font-size: 10.5px; }
-        .ettaba-guest-subtext { font-size: 9.5px; }
-        .ettaba-guest-bullets li { font-size: 9px; }
-        .ettaba-guest-login-btn { font-size: 10.5px; padding: 5px 4px; }
-        .ettaba-guest-reg-btn .reg-main-txt { font-size: 9.5px; }
-        .ettaba-guest-reg-btn .reg-sub-txt { font-size: 8.5px; }
-    }
-
-    /* Logged-in Next Reward Card (Section 5) */
-    .ettaba-reward-card-heading {
-        font-size: 15px;
-        font-weight: 800;
-        color: #991b1b;
-    }
-
-    .ettaba-reward-all-btn {
-        background: #f0fdf4;
-        border: 1px solid #86efac;
-        color: #15803d !important;
-        border-radius: 50px;
-        padding: 3px 12px;
-        font-size: 11.5px;
-        font-weight: 700;
-    }
-
-    .ettaba-reward-gift-thumb {
-        width: 58px;
-        height: 58px;
-        min-width: 58px;
-        border-radius: 12px;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #fff1f2;
-        border: 1px solid #fecdd3;
-    }
-
-    .ettaba-reward-gift-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .ettaba-reward-gift-fallback {
-        font-size: 28px;
-        color: #dc2626;
-    }
-
-    .ettaba-rw-lbl {
-        font-size: 10.5px;
-        font-weight: 700;
-        color: #475569;
-    }
-
-    .ettaba-rw-val-red {
-        font-size: 15px;
-        font-weight: 800;
-        color: #dc2626;
-    }
-
-    .ettaba-rw-val-dark {
-        font-size: 13.5px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .ettaba-rw-val-green {
-        font-size: 13.5px;
-        font-weight: 800;
-        color: #15803d;
-        line-height: 1.1;
-    }
-
-    .ettaba-rw-subname {
-        font-size: 10px;
-        color: #64748b;
-        font-weight: 600;
-    }
-
-    /* Categories Grid (Section 6) */
-    .ettaba-cat-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 6px;
-    }
-
-    .ettaba-cat-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        padding: 8px 3px 6px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        text-align: center;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-        transition: transform 0.2s, border-color 0.2s;
-    }
-
-    .ettaba-cat-card:hover {
-        transform: translateY(-2px);
-        border-color: #86efac;
-    }
-
-    .ettaba-cat-icon-box {
-        width: 34px;
-        height: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        margin-bottom: 4px;
-    }
-
-    .ettaba-cat-icon-box img {
-        max-width: 30px;
-        max-height: 30px;
-        object-fit: contain;
-    }
-
-    .ettaba-cat-title {
-        font-size: 10.5px;
-        font-weight: 700;
-        color: #0f172a;
-        line-height: 1.15;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    @media (max-width: 480px) {
-        .ettaba-cat-grid {
-            gap: 4px;
-        }
-        .ettaba-cat-card {
-            padding: 6px 2px 5px;
-            border-radius: 8px;
-        }
-        .ettaba-cat-icon-box {
-            width: 26px;
-            height: 26px;
-            font-size: 17px;
-            margin-bottom: 3px;
-        }
-        .ettaba-cat-title {
-            font-size: 8.8px;
-        }
-    }
-
-    /* Section Header & "সব দেখুন" Button (Section 7) */
-    .ettaba-section-heading {
-        font-size: 19px;
-        font-weight: 800;
-        color: #0f172a;
-    }
-
-    .ettaba-see-all-btn {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        color: #15803d !important;
-        border-radius: 50px;
-        padding: 4px 14px;
-        font-size: 12.5px;
-        font-weight: 700;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        transition: all 0.2s;
-    }
-
-    .ettaba-see-all-btn:hover {
-        background: #f0fdf4;
-        border-color: #15803d;
-    }
-</style>
 @endsection

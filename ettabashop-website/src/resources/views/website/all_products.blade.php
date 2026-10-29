@@ -61,6 +61,7 @@
     @endif
 </div>
 
+@section('extra-script')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var trigger = document.getElementById('infinite-scroll-trigger');
@@ -121,4 +122,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+@endsection
 @endsection

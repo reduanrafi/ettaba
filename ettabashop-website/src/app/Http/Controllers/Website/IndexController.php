@@ -63,7 +63,7 @@ class IndexController extends Controller
             $allCategoriesList = (clone $catQuery)->orderBy('id', 'asc')->get();
 
             if (Schema::hasColumn('categories', 'show_on_home')) {
-                $homeCategories = (clone $catQuery)->where('show_on_home', 1)->orderBy('id', 'asc')->take(12)->get();
+                $homeCategories = (clone $catQuery)->where('show_on_home', 1)->orderBy('id', 'asc')->take(6)->get();
                 if ($homeCategories->isEmpty()) {
                     $homeCategories = $allCategoriesList->where('parent_id', 0)->take(6);
                 }

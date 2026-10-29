@@ -64,6 +64,7 @@
         : asset('assets/images/logo/logo.png');
 @endphp
 
+@section('extra-style')
 <style>
     .pdetail-breadcrumb {
         font-size: 12.5px;
@@ -320,6 +321,7 @@
         margin-bottom: 12px;
     }
 </style>
+@endsection
 
 <div class="ettaba-page-shell py-3">
     {{-- Breadcrumb --}}
@@ -568,6 +570,7 @@
     </div>
 </div>
 
+@section('extra-script')
 <script>
     function changeDetailQty(delta) {
         var input = document.getElementById('detailQtyInput');
@@ -584,4 +587,5 @@
         el.classList.add('active');
     }
 </script>
+@endsection
 @endsection

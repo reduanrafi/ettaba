@@ -29,7 +29,7 @@
     <!-- Libraries -->
     <link href="{{ asset('assets/website/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/website/css/style.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/ettaba-modern-v2.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/ettaba-modern-v2.css') }}?v={{ time() }}" rel="stylesheet">
 
     <style>
         :root {
@@ -45,12 +45,532 @@
             --background: #f4f7f5;
         }
 
-        body {
-            font-family: 'Hind Siliguri', 'Poppins', sans-serif !important;
-            background-color: #f4f7f5 !important;
-            color: #0f172a;
-            padding-bottom: 82px !important;
-        }
+         body {
+             font-family: 'Hind Siliguri', 'Poppins', sans-serif !important;
+             background-color: #f4f7f5 !important;
+             color: #0f172a;
+             padding-bottom: 82px !important;
+         }
+
+         .ettaba-page-shell {
+             max-width: 1180px;
+             margin: 0 auto;
+             padding-left: 10px;
+             padding-right: 10px;
+         }
+
+         .ettaba-sec-header {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             margin-bottom: 10px;
+             padding-bottom: 4px;
+         }
+
+         .ettaba-sec-title {
+             font-size: 18px;
+             font-weight: 800;
+             color: #0f172a;
+             margin: 0;
+             display: flex;
+             align-items: center;
+             gap: 8px;
+         }
+
+         .ettaba-see-all-btn {
+             display: inline-flex;
+             align-items: center;
+             gap: 5px;
+             background: #ffffff;
+             border: 1px solid #cbd5e1;
+             color: #15803d !important;
+             border-radius: 50px;
+             padding: 4px 14px;
+             font-size: 12.5px;
+             font-weight: 700;
+             text-decoration: none !important;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+             transition: all 0.2s;
+             white-space: nowrap;
+         }
+
+         .ettaba-see-all-btn:hover {
+             background: #f0fdf4;
+             border-color: #15803d;
+         }
+
+         /* ================= HOMEPAGE & GLOBAL COMPONENTS ================= */
+         /* Guest Registration Card (Section 3.2) */
+         .ettaba-guest-icon-wrap {
+             width: 34px;
+             height: 34px;
+             min-width: 34px;
+             border-radius: 50%;
+             background: #dcfce7;
+             color: #15803d;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 16px;
+         }
+
+         .ettaba-guest-card-icon {
+             width: 34px;
+             height: 34px;
+             min-width: 34px;
+             border-radius: 8px;
+             background: #dcfce7;
+             color: #15803d;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 16px;
+         }
+
+         .ettaba-guest-heading {
+             font-size: 12.5px;
+             font-weight: 800;
+             color: #b91c1c;
+             line-height: 1.2;
+         }
+
+         .ettaba-guest-subtext {
+             font-size: 11px;
+             font-weight: 600;
+             color: #1e293b;
+             line-height: 1.25;
+         }
+
+         .ettaba-guest-bullets li {
+             font-size: 10.5px;
+             font-weight: 700;
+             color: #1e293b;
+             line-height: 1.3;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+         }
+
+         .ettaba-guest-login-btn {
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background: #15803d;
+             color: #ffffff !important;
+             border-radius: 8px;
+             font-size: 12px;
+             font-weight: 700;
+             padding: 6px 8px;
+             box-shadow: 0 2px 6px rgba(21, 128, 61, 0.25);
+         }
+
+         .ettaba-guest-reg-btn {
+             display: block;
+             background: #ffffff;
+             border: 1.5px solid #15803d;
+             border-radius: 8px;
+             padding: 4px 6px;
+             color: #0f172a !important;
+         }
+
+         .ettaba-guest-reg-btn .reg-main-txt {
+             font-size: 11px;
+             font-weight: 800;
+             color: #0f172a;
+         }
+
+         .ettaba-guest-reg-btn .reg-sub-txt {
+             font-size: 9.5px;
+             font-weight: 700;
+             color: #15803d;
+         }
+
+         @media (max-width: 575.98px) {
+             .ettaba-guest-heading { font-size: 10.5px; }
+             .ettaba-guest-subtext { font-size: 9.5px; }
+             .ettaba-guest-bullets li { font-size: 9px; }
+             .ettaba-guest-login-btn { font-size: 10.5px; padding: 5px 4px; }
+             .ettaba-guest-reg-btn .reg-main-txt { font-size: 9.5px; }
+             .ettaba-guest-reg-btn .reg-sub-txt { font-size: 8.5px; }
+         }
+
+         /* Logged-in Next Reward Card (Section 5) */
+         .ettaba-reward-card-heading {
+             font-size: 15px;
+             font-weight: 800;
+             color: #991b1b;
+         }
+
+         .ettaba-reward-all-btn {
+             background: #f0fdf4;
+             border: 1px solid #86efac;
+             color: #15803d !important;
+             border-radius: 50px;
+             padding: 3px 12px;
+             font-size: 11.5px;
+             font-weight: 700;
+         }
+
+         .ettaba-reward-gift-thumb {
+             width: 58px;
+             height: 58px;
+             min-width: 58px;
+             border-radius: 12px;
+             overflow: hidden;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background: #fff1f2;
+             border: 1px solid #fecdd3;
+         }
+
+         .ettaba-reward-gift-thumb img {
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
+
+         .ettaba-reward-gift-fallback {
+             font-size: 28px;
+             color: #dc2626;
+         }
+
+         .ettaba-rw-lbl {
+             font-size: 10.5px;
+             font-weight: 700;
+             color: #475569;
+         }
+
+         .ettaba-rw-val-red {
+             font-size: 15px;
+             font-weight: 800;
+             color: #dc2626;
+         }
+
+         .ettaba-rw-val-dark {
+             font-size: 13.5px;
+             font-weight: 800;
+             color: #0f172a;
+         }
+
+         .ettaba-rw-val-green {
+             font-size: 13.5px;
+             font-weight: 800;
+             color: #15803d;
+             line-height: 1.1;
+         }
+
+         .ettaba-rw-subname {
+             font-size: 10px;
+             color: #64748b;
+             font-weight: 600;
+         }
+
+         /* Categories Grid (Section 6) */
+         .ettaba-cat-grid {
+             display: grid;
+             grid-template-columns: repeat(7, 1fr);
+             gap: 6px;
+         }
+
+         .ettaba-cat-card {
+             background: #ffffff;
+             border: 1px solid #e2e8f0;
+             border-radius: 10px;
+             padding: 8px 3px 6px;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: flex-start;
+             text-align: center;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+             transition: transform 0.2s, border-color 0.2s;
+         }
+
+         .ettaba-cat-card:hover {
+             transform: translateY(-2px);
+             border-color: #86efac;
+         }
+
+         .ettaba-cat-icon-box {
+             width: 34px;
+             height: 34px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 22px;
+             margin-bottom: 4px;
+         }
+
+         .ettaba-cat-icon-box img {
+             max-width: 30px;
+             max-height: 30px;
+             object-fit: contain;
+         }
+
+         .ettaba-cat-title {
+             font-size: 10.5px;
+             font-weight: 700;
+             color: #0f172a;
+             line-height: 1.15;
+             display: -webkit-box;
+             -webkit-line-clamp: 2;
+             -webkit-box-orient: vertical;
+             overflow: hidden;
+         }
+
+         @media (max-width: 480px) {
+             .ettaba-cat-grid {
+                 gap: 4px;
+             }
+             .ettaba-cat-card {
+                 padding: 6px 2px 5px;
+                 border-radius: 8px;
+             }
+             .ettaba-cat-icon-box {
+                 width: 26px;
+                 height: 26px;
+                 font-size: 17px;
+                 margin-bottom: 3px;
+             }
+             .ettaba-cat-title {
+                 font-size: 8.8px;
+             }
+         }
+
+         /* Section Header & "সব দেখুন" Button (Section 7) */
+         .ettaba-section-heading {
+             font-size: 19px;
+             font-weight: 800;
+             color: #0f172a;
+         }
+
+         /* Promotional Banner Slider (Section 3.1) */
+         .ettaba-hero-slider {
+             box-shadow: 0 4px 14px rgba(21, 128, 61, 0.12);
+             border-radius: 14px;
+         }
+
+         .ettaba-banner-img {
+             width: 100%;
+             height: 240px;
+             object-fit: cover;
+         }
+
+         @media (max-width: 767.98px) {
+             .ettaba-banner-img {
+                 height: 155px;
+             }
+         }
+
+         .ettaba-banner-caption {
+             position: absolute;
+             top: 0;
+             left: 0;
+             bottom: 0;
+             right: 0;
+             padding: 16px 22px;
+             background: linear-gradient(90deg, rgba(240, 253, 244, 0.92) 0%, rgba(240, 253, 244, 0.65) 55%, rgba(255, 255, 255, 0) 100%);
+         }
+
+         .ettaba-banner-heading {
+             font-size: 22px;
+             font-weight: 800;
+             color: #14532d;
+             margin-bottom: 4px;
+             line-height: 1.25;
+         }
+
+         .ettaba-banner-sub {
+             font-size: 13px;
+             font-weight: 700;
+             color: #1e293b;
+             margin-bottom: 10px;
+         }
+
+         .ettaba-banner-cta {
+             display: inline-flex;
+             align-items: center;
+             background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+             color: #ffffff !important;
+             padding: 6px 18px;
+             border-radius: 50px;
+             font-size: 13px;
+             font-weight: 700;
+             box-shadow: 0 4px 10px rgba(21, 128, 61, 0.3);
+         }
+
+         .ettaba-carousel-dots {
+             bottom: 6px;
+             margin-bottom: 0;
+         }
+
+         .ettaba-carousel-dots li {
+             width: 8px;
+             height: 8px;
+             border-radius: 50%;
+             background-color: #15803d;
+             opacity: 0.4;
+         }
+
+         .ettaba-carousel-dots li.active {
+             opacity: 1;
+             transform: scale(1.2);
+         }
+
+         .ettaba-default-promo-banner {
+             background: linear-gradient(135deg, #dcfce7 0%, #fef9c3 55%, #bbf7d0 100%);
+             border: 1px solid #86efac;
+         }
+
+         .ettaba-promo-title-green {
+             font-size: 20px;
+             font-weight: 800;
+             color: #14532d;
+             line-height: 1.2;
+         }
+
+         .ettaba-promo-title-red {
+             font-size: 21px;
+             font-weight: 800;
+             color: #dc2626;
+             line-height: 1.25;
+             margin-bottom: 4px;
+         }
+
+         .ettaba-promo-bullets {
+             font-size: 11.5px;
+             font-weight: 700;
+             color: #0f172a;
+         }
+
+         .ettaba-promo-badge-circle {
+             width: 92px;
+             height: 92px;
+             border-radius: 50%;
+             background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+             border: 3px solid #15803d;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             text-align: center;
+             font-size: 11px;
+             font-weight: 800;
+             color: #0f172a;
+             line-height: 1.25;
+             transform: rotate(-8deg);
+             box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+         }
+
+         @media (max-width: 575.98px) {
+             .ettaba-promo-title-green { font-size: 16px; }
+             .ettaba-promo-title-red { font-size: 17px; }
+             .ettaba-banner-heading { font-size: 16px; }
+             .ettaba-banner-sub { font-size: 11px; margin-bottom: 6px; }
+             .ettaba-banner-cta { font-size: 11.5px; padding: 5px 14px; }
+         }
+
+         /* Logged-in Customer 6-Card Account Stats (Section 4) */
+         .ettaba-stat-card {
+             display: flex;
+             align-items: center;
+             border-radius: 10px;
+             padding: 8px 8px;
+             height: 100%;
+             border: 1px solid #e2e8f0;
+             transition: transform 0.2s, box-shadow 0.2s;
+         }
+
+         .ettaba-stat-card:hover {
+             transform: translateY(-1px);
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+         }
+
+         .stat-green { background: #f0fdf4; border-color: #dcfce7; }
+         .stat-red { background: #fff1f2; border-color: #ffe4e6; }
+         .stat-amber { background: #fffbeb; border-color: #fef3c7; }
+         .stat-purple { background: #faf5ff; border-color: #f3e8ff; }
+         .stat-orange { background: #fff7ed; border-color: #ffedd5; }
+
+         .ettaba-stat-icon {
+             width: 30px;
+             height: 30px;
+             min-width: 30px;
+             border-radius: 8px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 16px;
+             margin-right: 6px;
+         }
+
+         .icon-green { color: #15803d; }
+         .icon-red { color: #dc2626; }
+         .icon-purple { color: #7e22ce; }
+         .icon-orange { color: #ea580c; }
+
+         .ettaba-stat-body {
+             flex-grow: 1;
+             min-width: 0;
+             line-height: 1.15;
+         }
+
+         .ettaba-stat-lbl {
+             font-size: 11px;
+             font-weight: 700;
+             color: #1e293b;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             margin-bottom: 2px;
+         }
+
+         .ettaba-stat-val {
+             font-size: 13px;
+             font-weight: 800;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+         }
+
+         .ettaba-stat-val small {
+             font-size: 10px;
+             font-weight: 600;
+         }
+
+         .val-green { color: #15803d; }
+         .val-red { color: #b91c1c; }
+
+         .ettaba-stat-arrow {
+             font-size: 10px;
+             color: #64748b;
+             margin-left: 3px;
+         }
+
+         @media (max-width: 480px) {
+             .ettaba-stat-card {
+                 padding: 6px 5px;
+             }
+             .ettaba-stat-icon {
+                 width: 22px;
+                 height: 22px;
+                 min-width: 22px;
+                 font-size: 13px;
+                 margin-right: 4px;
+             }
+             .ettaba-stat-lbl {
+                 font-size: 9.5px;
+             }
+             .ettaba-stat-val {
+                 font-size: 11px;
+             }
+             .ettaba-stat-val small {
+                 font-size: 8.5px;
+             }
+             .ettaba-stat-arrow {
+                 font-size: 8px;
+             }
+         }
 
         [v-cloak] {
             display: none !important;

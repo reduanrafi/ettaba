@@ -1,5 +1,5 @@
 <!-- Footer Start -->
-<footer class="bg-white border-top mt-5 pt-5 pb-4 animate-fade-in" style="padding-bottom: 100px !important;">
+<footer class="bg-white border-top mt-5 pt-5 pb-4 animate-fade-in" style="padding-bottom: 100px !important; position: relative; z-index: 10;">
     <div class="container-fluid px-xl-5">
         <div class="row px-xl-5">
             <div class="col-lg-4 col-md-12 mb-5">
@@ -85,37 +85,14 @@
                 </div>
                 <div class="col-md-6 text-center text-md-right mt-3 mt-md-0">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" height="20"
-                        class="mr-3 grayscale" alt="PayPal">
+                        class="mr-3" style="filter: grayscale(100%); opacity: 0.5;" alt="PayPal">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" height="15"
-                        class="mr-3 grayscale" alt="Visa">
+                        class="mr-3" style="filter: grayscale(100%); opacity: 0.5;" alt="Visa">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" height="20"
-                        class="grayscale" alt="Mastercard">
+                        style="filter: grayscale(100%); opacity: 0.5;" alt="Mastercard">
                 </div>
             </div>
         </div>
     </div>
 </footer>
-
-<style>
-    .grayscale {
-        filter: grayscale(100%);
-        opacity: 0.5;
-        transition: var(--transition);
-    }
-
-    .grayscale:hover {
-        filter: grayscale(0%);
-        opacity: 1;
-    }
-
-    .hover-text-primary:hover {
-        color: var(--primary) !important;
-        padding-left: 5px;
-    }
-
-    footer {
-        position: relative;
-        z-index: 10;
-    }
-</style>
 <!-- Footer End -->

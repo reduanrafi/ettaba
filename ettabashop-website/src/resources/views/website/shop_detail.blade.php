@@ -7,17 +7,7 @@
     <meta property="og:description" content="{{ $shop->description_bn ?: $shop->description_en }}" />
 @endsection
 
-@section('content')
-@php
-    $shopLogo = !empty($shop->logo_image)
-        ? (str_starts_with($shop->logo_image, 'http') ? $shop->logo_image : rtrim(config('app.image_url'), '/') . '/' . ltrim($shop->logo_image, '/'))
-        : asset('assets/images/logo/logo.png');
-    $sellerIdDisplay = $shop->unique_id ?: $shop->user_id;
-    $sellerLocationDisplay = $shop->address_en ?: $shop->address_bn ?: 'Bangladesh';
-    $deliveryAreaDisplay = $shop->delivery_area_display;
-    $shopBaseUrl = url('/' . $shop->url_slug);
-@endphp
-
+@section('extra-style')
 <style>
     .seller-info-card {
         background: #ffffff;
@@ -212,6 +202,18 @@
         }
     }
 </style>
+@endsection
+
+@section('content')
+@php
+    $shopLogo = !empty($shop->logo_image)
+        ? (str_starts_with($shop->logo_image, 'http') ? $shop->logo_image : rtrim(config('app.image_url'), '/') . '/' . ltrim($shop->logo_image, '/'))
+        : asset('assets/images/logo/logo.png');
+    $sellerIdDisplay = $shop->unique_id ?: $shop->user_id;
+    $sellerLocationDisplay = $shop->address_en ?: $shop->address_bn ?: 'Bangladesh';
+    $deliveryAreaDisplay = $shop->delivery_area_display;
+    $shopBaseUrl = url('/' . $shop->url_slug);
+@endphp
 
 <div class="ettaba-page-shell pt-2 pb-4">
     {{-- 1. Seller Information Card (Section 2 of Seller Doc) --}}
@@ -277,68 +279,8 @@
 
     {{-- 3. Logged-in Customer Account Info (6 Cards — shown ONLY when logged in, matching 'লগইন সেলার পেজ') --}}
     @auth
-        @php
-            $eBalance = isset($statistics['currentBalance']) ? (float) $statistics['currentBalance'] : 0;
-            $pendingBalance = isset($statistics['pendingBalance']) ? (float) $statistics['pendingBalance'] : 0;
-            $totalPoints = isset($statistics['totalPoint']) ? (float) $statistics['totalPoint'] : 0;
-            $pendingPoints = isset($statistics['pendingPoints']) ? (float) $statistics['pendingPoints'] : 0;
-            $totalIncome = isset($statistics['totalEarnings']) ? (float) $statistics['totalEarnings'] : 0;
-            $totalWithdraw = isset($statistics['totalWithdraw']) ? (float) $statistics['totalWithdraw'] : 0;
-        @endphp
-        <div class="user-stat-grid mb-3">
-            <a href="{{ route('user.profile') }}" class="user-stat-card stat-green">
-                <div class="user-stat-icon"><i class="fas fa-wallet"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">ই-ওয়ালেট ব্যালেন্স</div>
-                    <div class="user-stat-val text-green">{{ number_format($eBalance, 2) }} <small>টাকা</small></div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
-
-            <a href="{{ route('user.profile') }}" class="user-stat-card stat-red">
-                <div class="user-stat-icon"><i class="far fa-clock"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">পেন্ডিং ব্যালেন্স</div>
-                    <div class="user-stat-val text-red">{{ number_format($pendingBalance, 2) }} <small>টাকা</small></div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
-
-            <a href="{{ route('profile.rewards') }}" class="user-stat-card stat-gold">
-                <div class="user-stat-icon"><i class="fas fa-coins"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">মোট পয়েন্ট</div>
-                    <div class="user-stat-val text-green">{{ number_format($totalPoints, 2) }}</div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
-
-            <a href="{{ route('profile.rewards') }}" class="user-stat-card stat-purple">
-                <div class="user-stat-icon"><i class="fas fa-hourglass-half"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">পেন্ডিং পয়েন্ট</div>
-                    <div class="user-stat-val text-red">{{ number_format($pendingPoints, 2) }}</div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
-
-            <a href="{{ route('user.profile') }}" class="user-stat-card stat-teal">
-                <div class="user-stat-icon"><i class="fas fa-chart-line"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">মোট আয়</div>
-                    <div class="user-stat-val text-green">{{ number_format($totalIncome, 2) }} <small>টাকা</small></div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
-
-            <a href="{{ route('profile.withdrawHistories') }}" class="user-stat-card stat-orange">
-                <div class="user-stat-icon"><i class="fas fa-hand-holding-usd"></i></div>
-                <div class="user-stat-meta">
-                    <div class="user-stat-label">মোট উত্তোলন</div>
-                    <div class="user-stat-val text-red">{{ number_format($totalWithdraw, 2) }} <small>টাকা</small></div>
-                </div>
-                <i class="fas fa-chevron-right user-stat-arrow"></i>
-            </a>
+        <div class="mb-3">
+            @include('website.layouts.home_sections.points')
         </div>
     @endauth
 
@@ -431,6 +373,7 @@
 </div>
 
 @if(!empty($isFilteredView))
+@section('extra-script')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var trigger = document.getElementById('infinite-scroll-trigger');
@@ -491,5 +434,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+@endsection
 @endif
 @endsection
