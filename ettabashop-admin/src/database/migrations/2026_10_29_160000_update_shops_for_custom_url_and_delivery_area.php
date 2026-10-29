@@ -12,10 +12,10 @@ class UpdateShopsForCustomUrlAndDeliveryArea extends Migration
         if (Schema::hasTable('shops')) {
             Schema::table('shops', function (Blueprint $table) {
                 if (!Schema::hasColumn('shops', 'delivery_area_bn')) {
-                    $table->text('delivery_area_bn')->nullable()->after('address_bn');
+                    $table->text('delivery_area_bn')->nullable();
                 }
                 if (!Schema::hasColumn('shops', 'delivery_area_en')) {
-                    $table->text('delivery_area_en')->nullable()->after('address_en');
+                    $table->text('delivery_area_en')->nullable();
                 }
             });
 

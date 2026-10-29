@@ -127,17 +127,20 @@ class IndexController extends Controller
             $categories = collect([]);
         }
 
-        $product = Product::with(['category', 'productImages', 'productReviews'])
-            ->withCount('productReviews')
-            ->withAvg('productReviews', 'rating')
-            ->where('slug', $request->slug)
-            ->first();
+        $productService = new ProductService();
+        $canReviews = $productService->canLoadProductReviews();
+
+        $detailQuery = Product::with(['category', 'productImages']);
+        if ($canReviews) {
+            $detailQuery->with('productReviews')
+                ->withCount('productReviews')
+                ->withAvg('productReviews', 'rating');
+        }
+
+        $product = (clone $detailQuery)->where('slug', $request->slug)->first();
 
         if (!$product && is_numeric($request->slug)) {
-            $product = Product::with(['category', 'productImages', 'productReviews'])
-                ->withCount('productReviews')
-                ->withAvg('productReviews', 'rating')
-                ->find((int) $request->slug);
+            $product = (clone $detailQuery)->find((int) $request->slug);
         }
 
         if (!$product) {
@@ -207,10 +210,12 @@ class IndexController extends Controller
             }
         }
 
-        $productQuery = Product::query()
-            ->where('is_deleted', 0)
-            ->withCount('productReviews')
-            ->withAvg('productReviews', 'rating');
+        $productService = new ProductService();
+        $productQuery = Product::query()->where('is_deleted', 0);
+        if ($productService->canLoadProductReviews()) {
+            $productQuery->withCount('productReviews')
+                         ->withAvg('productReviews', 'rating');
+        }
 
         if ($keywords !== '') {
             $productQuery->where(function ($q) use ($keywords, $matchedOwnerIds) {

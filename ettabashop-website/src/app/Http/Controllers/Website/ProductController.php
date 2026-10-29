@@ -21,15 +21,16 @@ class ProductController extends Controller
             $parentCategory = Category::find((int) $request->slug);
         }
 
+        $productService = new ProductService();
+        $canReviews = $productService->canLoadProductReviews();
+
         if ($parentCategory) {
-            $productService = new ProductService();
             $categoryIds = $productService->getCategoryAndChildrenIds($parentCategory->id);
-            $products = Product::whereIn('category_id', $categoryIds)
-                ->where('is_deleted', 0)
-                ->withCount('productReviews')
-                ->withAvg('productReviews', 'rating')
-                ->orderByDesc('id')
-                ->paginate(16);
+            $prodQuery = Product::whereIn('category_id', $categoryIds)->where('is_deleted', 0);
+            if ($canReviews) {
+                $prodQuery->withCount('productReviews')->withAvg('productReviews', 'rating');
+            }
+            $products = $prodQuery->orderByDesc('id')->paginate(16);
             $categoryBySlug = $category->ChildCategories($parentCategory->id);
         } else {
             $parentCategory = (object) [
@@ -38,11 +39,11 @@ class ProductController extends Controller
                 'name_en' => ucwords(str_replace('-', ' ', $request->slug)),
                 'slug' => $request->slug,
             ];
-            $products = Product::where('is_deleted', 0)
-                ->withCount('productReviews')
-                ->withAvg('productReviews', 'rating')
-                ->orderByDesc('id')
-                ->paginate(16);
+            $prodQuery = Product::where('is_deleted', 0);
+            if ($canReviews) {
+                $prodQuery->withCount('productReviews')->withAvg('productReviews', 'rating');
+            }
+            $products = $prodQuery->orderByDesc('id')->paginate(16);
             $categoryBySlug = collect([]);
         }
 
@@ -109,17 +110,17 @@ class ProductController extends Controller
             $products = $productService->buildSectionProductQuery($section)->paginate(16);
         } elseif ($type === 'new') {
             $pageTitle = 'নতুন পণ্য';
-            $products = Product::where('is_deleted', 0)
-                ->withCount('productReviews')
-                ->withAvg('productReviews', 'rating')
-                ->orderByDesc('id')
-                ->paginate(16);
+            $prodQuery = Product::where('is_deleted', 0);
+            if ($productService->canLoadProductReviews()) {
+                $prodQuery->withCount('productReviews')->withAvg('productReviews', 'rating');
+            }
+            $products = $prodQuery->orderByDesc('id')->paginate(16);
         } else {
-            $products = Product::where('is_deleted', 0)
-                ->withCount('productReviews')
-                ->withAvg('productReviews', 'rating')
-                ->orderByDesc('id')
-                ->paginate(16);
+            $prodQuery = Product::where('is_deleted', 0);
+            if ($productService->canLoadProductReviews()) {
+                $prodQuery->withCount('productReviews')->withAvg('productReviews', 'rating');
+            }
+            $products = $prodQuery->orderByDesc('id')->paginate(16);
         }
 
         if ($request->ajax() || $request->boolean('ajax')) {

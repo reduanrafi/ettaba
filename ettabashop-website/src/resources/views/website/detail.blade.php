@@ -34,10 +34,10 @@
 
     $reviewCount = isset($product->product_reviews_count)
         ? (int) $product->product_reviews_count
-        : ($product->productReviews ? $product->productReviews->count() : 0);
+        : ($product->relationLoaded('productReviews') && $product->productReviews ? $product->productReviews->count() : 0);
     $avgRating = isset($product->product_reviews_avg_rating) && $product->product_reviews_avg_rating > 0
         ? round((float) $product->product_reviews_avg_rating, 1)
-        : ($reviewCount > 0 ? round((float) $product->productReviews->avg('rating'), 1) : 4.5);
+        : ($reviewCount > 0 && $product->relationLoaded('productReviews') && $product->productReviews ? round((float) $product->productReviews->avg('rating'), 1) : 4.5);
     $displayReviewCount = $reviewCount > 0 ? $reviewCount : 0;
 
     // Seller & Delivery Area

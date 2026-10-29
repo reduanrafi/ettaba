@@ -148,22 +148,36 @@
     @endauth
 
     <!-- 6. Category Section (Both Logged-in & Logged-out Homepages) -->
+    @php
+        $defaultRefCategories = [
+            ['name_bn' => 'মুদি ও নিত্যপ্রয়োজনীয়', 'slug' => 'daily-needs', 'icon_class' => 'fas fa-shopping-cart', 'icon_color' => '#dc2626', 'image' => null],
+            ['name_bn' => 'ফ্যাশন ও লাইফস্টাইল', 'slug' => 'fashion-and-lifestyle', 'icon_class' => 'fas fa-tshirt', 'icon_color' => '#16a34a', 'image' => null],
+            ['name_bn' => 'জুয়েলারি ও কসমেটিকস', 'slug' => 'jewelry-and-cosmetics', 'icon_class' => 'fas fa-gem', 'icon_color' => '#2563eb', 'image' => null],
+            ['name_bn' => 'রেস্টুরেন্ট ও ফুড', 'slug' => 'restaurant-and-food', 'icon_class' => 'fas fa-utensils', 'icon_color' => '#ea580c', 'image' => null],
+            ['name_bn' => 'ক্লিনিক ও হাসপাতাল', 'slug' => 'clinic-and-hospital', 'icon_class' => 'fas fa-stethoscope', 'icon_color' => '#9333ea', 'image' => null],
+            ['name_bn' => 'ইলেকট্রনিক্স ও গ্যাজেট', 'slug' => 'electronics-and-gadget', 'icon_class' => 'fas fa-desktop', 'icon_color' => '#0284c7', 'image' => null],
+        ];
+        $displayHomeCats = (isset($homeCategories) && count($homeCategories) > 0) ? $homeCategories : $defaultRefCategories;
+    @endphp
     <div class="ettaba-category-strip mb-3">
         <div class="ettaba-cat-grid">
-            @foreach($homeCategories as $cat)
+            @foreach($displayHomeCats as $cat)
                 @php
-                    $catTitle = $cat['name_bn'] ?? $cat['name_en'] ?? $cat['name'] ?? '';
-                    $catSlug = $cat['slug'] ?? '';
+                    $catTitle = data_get($cat, 'name_bn') ?: data_get($cat, 'name_en') ?: data_get($cat, 'name', '');
+                    $catSlug = data_get($cat, 'slug', '');
+                    $catColor = data_get($cat, 'icon_color') ?: data_get($cat, 'color', '#15803d');
+                    $catIcon = data_get($cat, 'icon_class', 'fas fa-shopping-basket');
+                    $catImg = data_get($cat, 'image');
                     $catUrl = !empty($catSlug) ? route('categoryProducts', ['slug' => $catSlug]) : route('allProducts');
                 @endphp
                 <a href="{{ $catUrl }}" class="ettaba-cat-card text-decoration-none">
-                    <div class="ettaba-cat-icon-box" style="color: {{ $cat['color'] ?? '#15803d' }};">
-                        @if(!empty($cat['image']))
-                            <img src="{{ config('app.image_url') . $cat['image'] }}"
-                                 onerror="this.src='{{ asset($cat['image']) }}'"
+                    <div class="ettaba-cat-icon-box" style="color: {{ $catColor }};">
+                        @if(!empty($catImg))
+                            <img src="{{ config('app.image_url') . $catImg }}"
+                                 onerror="this.src='{{ asset($catImg) }}'"
                                  alt="{{ $catTitle }}">
                         @else
-                            <i class="{{ $cat['icon_class'] ?? 'fas fa-shopping-basket' }}"></i>
+                            <i class="{{ $catIcon }}"></i>
                         @endif
                     </div>
                     <div class="ettaba-cat-title">{{ $catTitle }}</div>
@@ -186,13 +200,15 @@
             @php
                 $sec = $secData['section'];
                 $secProducts = $secData['products'];
+                $secIcon = data_get($sec, 'icon') ?: data_get($sec, 'icon_class') ?: 'fas fa-bolt';
+                $secIconColor = data_get($sec, 'icon_color') ?: '#f59e0b';
             @endphp
             <section class="ettaba-product-section mb-4">
                 <!-- Section Header -->
                 <div class="d-flex align-items-center justify-content-between mb-2 pb-1">
                     <div class="d-flex align-items-center">
-                        <span class="mr-2" style="color: {{ $sec->icon_color ?: '#f59e0b' }}; font-size: 20px;">
-                            <i class="{{ $sec->icon ?: 'fas fa-bolt' }}"></i>
+                        <span class="mr-2" style="color: {{ $secIconColor }}; font-size: 20px;">
+                            <i class="{{ $secIcon }}"></i>
                         </span>
                         <h4 class="ettaba-section-heading mb-0">{{ $sec->title_bn }}</h4>
                     </div>

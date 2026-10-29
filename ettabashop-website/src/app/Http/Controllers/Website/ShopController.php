@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Website;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Shop;
+use App\Services\ProductService;
 use Facades\App\Services\EarningStatisticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -118,10 +119,13 @@ class ShopController extends Controller
 
     protected function buildSellerProductQuery($ownerId, $sectionType = 'all_products', $searchQuery = '')
     {
+        $productService = new ProductService();
         $query = Product::where('owner_id', $ownerId)
-            ->where('is_deleted', 0)
-            ->withCount('productReviews')
-            ->withAvg('productReviews', 'rating');
+            ->where('is_deleted', 0);
+        if ($productService->canLoadProductReviews()) {
+            $query->withCount('productReviews')
+                  ->withAvg('productReviews', 'rating');
+        }
 
         if ($searchQuery !== '') {
             $query->where(function ($q) use ($searchQuery) {

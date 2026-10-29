@@ -209,6 +209,24 @@ class UpdateHomepageAndAdminControlsTables extends Migration
                 $table->index(['is_published', 'published_at']);
             });
         }
+
+        // 5. Ensure product_reviews table has required columns
+        if (Schema::hasTable('product_reviews')) {
+            Schema::table('product_reviews', function (Blueprint $table) {
+                if (!Schema::hasColumn('product_reviews', 'product_id')) {
+                    $table->unsignedBigInteger('product_id')->nullable();
+                }
+                if (!Schema::hasColumn('product_reviews', 'user_id')) {
+                    $table->unsignedBigInteger('user_id')->nullable();
+                }
+                if (!Schema::hasColumn('product_reviews', 'rating')) {
+                    $table->double('rating')->default(5);
+                }
+                if (!Schema::hasColumn('product_reviews', 'review_message')) {
+                    $table->text('review_message')->nullable();
+                }
+            });
+        }
     }
 
     /**

@@ -206,20 +206,33 @@ class ProductService
         return $this->getDefaultHomeSections()->firstWhere('slug', $slug);
     }
 
+    public function canLoadProductReviews()
+    {
+        try {
+            return Schema::hasTable('product_reviews')
+                && Schema::hasColumn('product_reviews', 'product_id')
+                && Schema::hasColumn('product_reviews', 'rating');
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
     public function buildSectionProductQuery($section)
     {
-        $query = Product::where('is_deleted', 0)
-            ->withCount('productReviews')
-            ->withAvg('productReviews', 'rating');
+        $query = Product::where('is_deleted', 0);
+        if ($this->canLoadProductReviews()) {
+            $query->withCount('productReviews')
+                  ->withAvg('productReviews', 'rating');
+        }
 
         $type = $section->section_type ?? 'all_products';
         $slug = $section->slug ?? '';
 
-        if ($type === 'high_cashback' || $slug === 'high-cashback') {
+        if ($type === 'high_cashback' || $type === 'auto_cashback' || $slug === 'high-cashback') {
             return $query->orderByRaw('CAST(REPLACE(COALESCE(tcb_en, "0"), ",", "") AS DECIMAL(10,2)) DESC, COALESCE(sold_amount, 0) DESC, id DESC');
         }
 
-        if ($type === 'high_point' || $slug === 'high-point') {
+        if ($type === 'high_point' || $type === 'auto_point' || $slug === 'high-point') {
             return $query->orderByRaw('CAST(REPLACE(COALESCE(trp_en, "0"), ",", "") AS DECIMAL(10,2)) DESC, COALESCE(sold_amount, 0) DESC, id DESC');
         }
 
@@ -231,24 +244,37 @@ class ProductService
             return $query->orderByDesc('sold_amount')->orderByDesc('id');
         }
 
+        // Gather category IDs from either category_ids (JSON array) or category_id
+        $sectionCatIds = [];
+        if (isset($section->category_ids_array) && is_array($section->category_ids_array) && !empty($section->category_ids_array)) {
+            foreach ($section->category_ids_array as $cid) {
+                $sectionCatIds = array_merge($sectionCatIds, $this->getCategoryAndChildrenIds($cid));
+            }
+        } elseif (!empty($section->category_ids)) {
+            $decoded = is_array($section->category_ids) ? $section->category_ids : json_decode($section->category_ids, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $cid) {
+                    $sectionCatIds = array_merge($sectionCatIds, $this->getCategoryAndChildrenIds($cid));
+                }
+            }
+        } elseif (!empty($section->category_id)) {
+            $sectionCatIds = $this->getCategoryAndChildrenIds($section->category_id);
+        }
+        $sectionCatIds = array_values(array_unique(array_filter($sectionCatIds)));
+
         if ($type === 'local_products' || $slug === 'local-products') {
-            if (!empty($section->category_id)) {
-                $catIds = $this->getCategoryAndChildrenIds($section->category_id);
-                if (!empty($catIds)) {
-                    $catCount = (clone $query)->whereIn('category_id', $catIds)->count();
-                    if ($catCount > 0) {
-                        return $query->whereIn('category_id', $catIds)->orderByDesc('id');
-                    }
+            if (!empty($sectionCatIds)) {
+                $catCount = (clone $query)->whereIn('category_id', $sectionCatIds)->count();
+                if ($catCount > 0) {
+                    return $query->whereIn('category_id', $sectionCatIds)->orderByDesc('id');
                 }
             }
             return $query->orderByDesc('sold_amount')->orderByDesc('id');
         }
 
-        if ($type === 'category' || !empty($section->category_id)) {
-            $catIds = [];
-            if (!empty($section->category_id)) {
-                $catIds = $this->getCategoryAndChildrenIds($section->category_id);
-            } else {
+        if ($type === 'category' || !empty($sectionCatIds)) {
+            $catIds = $sectionCatIds;
+            if (empty($catIds)) {
                 $keywords = [];
                 if (str_contains($slug, 'organic')) {
                     $keywords = ['organic', 'daily', 'grocery', 'food', 'মুদি', 'অর্গানিক', 'নিত্যপ্রয়োজনীয়'];
