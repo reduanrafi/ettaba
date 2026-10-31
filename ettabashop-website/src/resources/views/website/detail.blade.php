@@ -107,22 +107,124 @@
         box-shadow: 0 3px 14px rgba(15, 23, 42, 0.05);
         margin-bottom: 16px;
     }
-    .pdetail-gallery-main {
+    .pdetail-gallery-box {
         position: relative;
         width: 100%;
         aspect-ratio: 1 / 1;
-        background: #f8fafc;
+        background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 14px;
         overflow: hidden;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+    @supports not (aspect-ratio: 1 / 1) {
+        .pdetail-gallery-box {
+            height: 400px;
+        }
+    }
+    .pdetail-gallery-box #product-carousel,
+    .pdetail-gallery-box .carousel-inner,
+    .pdetail-gallery-box .carousel-item {
+        width: 100%;
+        height: 100%;
+    }
+    .pdetail-zoom-pane {
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        position: relative;
+        cursor: zoom-in;
+        background: #ffffff;
     }
-    .pdetail-gallery-main img {
-        width: 100%;
-        height: 100%;
+    .pdetail-main-img {
+        max-width: 94%;
+        max-height: 94%;
+        width: auto;
+        height: auto;
         object-fit: contain;
+        display: block;
+        margin: auto;
+        transition: transform 0.08s ease-out;
+        transform-origin: center center;
+        user-select: none;
+        pointer-events: none;
+    }
+    .pdetail-zoom-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 5;
+        background: rgba(15, 23, 42, 0.75);
+        color: #ffffff;
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    .pdetail-gallery-box:hover .pdetail-zoom-badge {
+        opacity: 0.25;
+    }
+    .pdetail-fullscreen-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 6;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition: all 0.2s;
+        padding: 0;
+    }
+    .pdetail-fullscreen-btn:hover {
+        background: #15803d;
+        color: #ffffff;
+        border-color: #15803d;
+        transform: scale(1.08);
+    }
+    .pdetail-arrow-btn {
+        width: 34px !important;
+        height: 34px !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        border: 1px solid #e2e8f0;
+        border-radius: 50% !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+        opacity: 0.9 !important;
+        color: #0f172a !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none !important;
+        z-index: 6;
+        transition: all 0.2s;
+    }
+    .pdetail-arrow-btn:hover {
+        background: #ffffff !important;
+        opacity: 1 !important;
+        transform: translateY(-50%) scale(1.08) !important;
+        color: #15803d !important;
+    }
+    .carousel-control-prev.pdetail-arrow-btn {
+        left: 10px !important;
+    }
+    .carousel-control-next.pdetail-arrow-btn {
+        right: 10px !important;
     }
     .pdetail-thumb-row {
         display: flex;
@@ -363,36 +465,47 @@
         <div class="row">
             {{-- Left Column: Image Gallery + Thumbnails --}}
             <div class="col-lg-5 mb-4 mb-lg-0">
-                <div id="product-carousel" class="carousel slide" data-ride="carousel">
-                    <div class="carousel-inner pdetail-gallery-main">
-                        <div class="carousel-item active">
-                            <img id="mainProductDetailImg" src="{{ $mainImage }}" alt="{{ $fullTitle }}"
-                                 onerror="this.src='{{ asset('assets/images/logo/logo.png') }}'">
-                        </div>
-                        @if($product->productImages && count($product->productImages) > 0)
-                            @foreach($product->productImages as $image)
-                                @php
-                                    $subImgUrl = str_starts_with($image->image, 'http')
-                                        ? $image->image
-                                        : rtrim(config('app.image_url'), '/') . '/' . ltrim($image->image, '/');
-                                @endphp
-                                <div class="carousel-item">
-                                    <img src="{{ $subImgUrl }}" alt="{{ $fullTitle }}"
+                <div class="pdetail-gallery-box">
+                    <div class="pdetail-zoom-badge">
+                        <i class="fas fa-search-plus mr-1"></i> জুম করুন
+                    </div>
+                    <button type="button" class="pdetail-fullscreen-btn" onclick="openPdetailFullscreen()" title="পূর্ণ স্ক্রিনে দেখুন">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </button>
+
+                    <div id="product-carousel" class="carousel slide carousel-fade" data-interval="false">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="pdetail-zoom-pane" onmousemove="zoomPdetailImage(event, this)" onmouseleave="resetPdetailZoom(this)" onclick="openPdetailFullscreen()">
+                                    <img id="mainProductDetailImg" class="pdetail-main-img" src="{{ $mainImage }}" alt="{{ $fullTitle }}"
                                          onerror="this.src='{{ asset('assets/images/logo/logo.png') }}'">
                                 </div>
-                            @endforeach
+                            </div>
+                            @if($product->productImages && count($product->productImages) > 0)
+                                @foreach($product->productImages as $image)
+                                    @php
+                                        $subImgUrl = str_starts_with($image->image, 'http')
+                                            ? $image->image
+                                            : rtrim(config('app.image_url'), '/') . '/' . ltrim($image->image, '/');
+                                    @endphp
+                                    <div class="carousel-item">
+                                        <div class="pdetail-zoom-pane" onmousemove="zoomPdetailImage(event, this)" onmouseleave="resetPdetailZoom(this)" onclick="openPdetailFullscreen()">
+                                            <img class="pdetail-main-img" src="{{ $subImgUrl }}" alt="{{ $fullTitle }}"
+                                                 onerror="this.src='{{ asset('assets/images/logo/logo.png') }}'">
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                        @if($product->productImages && count($product->productImages) > 0)
+                            <a class="carousel-control-prev pdetail-arrow-btn" href="#product-carousel" data-slide="prev">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a class="carousel-control-next pdetail-arrow-btn" href="#product-carousel" data-slide="next">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         @endif
                     </div>
-                    @if($product->productImages && count($product->productImages) > 0)
-                        <a class="carousel-control-prev" href="#product-carousel" data-slide="prev"
-                           style="width: 34px; height: 34px; background: rgba(255,255,255,0.9); border-radius: 50%; top: 50%; transform: translateY(-50%); left: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                            <i class="fa fa-angle-left text-dark"></i>
-                        </a>
-                        <a class="carousel-control-next" href="#product-carousel" data-slide="next"
-                           style="width: 34px; height: 34px; background: rgba(255,255,255,0.9); border-radius: 50%; top: 50%; transform: translateY(-50%); right: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                            <i class="fa fa-angle-right text-dark"></i>
-                        </a>
-                    @endif
                 </div>
 
                 {{-- Thumbnails --}}
@@ -696,8 +809,75 @@
     </div>
 </div>
 
+{{-- Fullscreen Image Lightbox Modal --}}
+<div class="modal fade" id="pdetailImageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content" style="background: rgba(15, 23, 42, 0.96); border: none; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+            <div class="modal-header border-0 py-2 px-3" style="justify-content: space-between; align-items: center;">
+                <span class="text-white small font-weight-bold"><i class="fas fa-search-plus mr-1"></i> পণ্যের পূর্ণ ছবি</span>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="font-size: 26px; outline: none; opacity: 0.85;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center p-3 d-flex align-items-center justify-content-center" style="min-height: 380px; max-height: 80vh;">
+                <img id="pdetailModalImg" src="{{ $mainImage }}" alt="{{ $fullTitle }}" style="max-width: 100%; max-height: 75vh; object-fit: contain; border-radius: 8px;">
+            </div>
+        </div>
+    </div>
+</div>
+
 @section('extra-script')
 <script>
+    function zoomPdetailImage(e, pane) {
+        var rect = pane.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var xPercent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+        var yPercent = Math.max(0, Math.min(100, (y / rect.height) * 100));
+        var img = pane.querySelector('.pdetail-main-img');
+        if (img) {
+            img.style.transformOrigin = xPercent + '% ' + yPercent + '%';
+            img.style.transform = 'scale(2.2)';
+        }
+    }
+
+    function resetPdetailZoom(pane) {
+        if (!pane) return;
+        var img = pane.querySelector('.pdetail-main-img');
+        if (img) {
+            img.style.transform = 'scale(1)';
+            img.style.transformOrigin = 'center center';
+        }
+    }
+
+    function openPdetailFullscreen() {
+        var activeItem = document.querySelector('#product-carousel .carousel-item.active .pdetail-main-img');
+        var modalImg = document.getElementById('pdetailModalImg');
+        if (activeItem && modalImg) {
+            modalImg.src = activeItem.src;
+            $('#pdetailImageModal').modal('show');
+        }
+    }
+
+    $(document).ready(function() {
+        $('#product-carousel').on('slid.bs.carousel', function (e) {
+            var idx = $(e.relatedTarget).index();
+            var thumbs = document.querySelectorAll('.pdetail-thumb-item');
+            thumbs.forEach(function (t, i) {
+                if (i === idx) {
+                    t.classList.add('active');
+                    if (t.scrollIntoView) {
+                        t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                } else {
+                    t.classList.remove('active');
+                }
+            });
+            var panes = document.querySelectorAll('#product-carousel .pdetail-zoom-pane');
+            panes.forEach(function(p) { resetPdetailZoom(p); });
+        });
+    });
+
     function changeDetailQty(delta) {
         var input = document.getElementById('detailQtyInput');
         if (!input) return;
