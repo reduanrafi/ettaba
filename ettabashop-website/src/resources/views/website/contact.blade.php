@@ -2,35 +2,31 @@
 @section('extra-style')
     <style>
         .map-responsive{
-
             overflow:hidden;
-
             padding-bottom:56.25%;
-
             position:relative;
-
             height:0;
-
         }
-
         .map-responsive iframe{
-
             left:0;
-
             top:0;
-
             height:100%;
-
             width:100%;
-
             position:absolute;
-
+        }
+        .ettaba-contact-info-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+            height: 100%;
         }
     </style>
 @endsection()
 @section('content')
-    <div class="container-fluid bg-secondary mb-5">
-        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+    <div class="container-fluid bg-secondary mb-4">
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px">
             <h1 class="font-weight-semi-bold text-uppercase mb-3">Contact Us</h1>
             <div class="d-inline-flex">
                 <p class="m-0"><a href="{{ route('website.index') }}">Home</a></p>
@@ -40,18 +36,42 @@
         </div>
     </div>
 
-
+    <!-- Contact Info Cards -->
+    <div class="container py-3">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="ettaba-contact-info-card text-center">
+                    <div class="mb-2 text-primary" style="font-size: 28px;"><i class="fa fa-map-marker-alt"></i></div>
+                    <h6 class="font-weight-bold text-dark mb-1">Address</h6>
+                    <p class="text-muted mb-0">Mohammadpur-1207, Dhaka, Bangladesh.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="ettaba-contact-info-card text-center">
+                    <div class="mb-2 text-primary" style="font-size: 28px;"><i class="fa fa-envelope"></i></div>
+                    <h6 class="font-weight-bold text-dark mb-1">Email</h6>
+                    <p class="text-muted mb-0"><a href="mailto:ettabashop.crm@gmail.com" class="text-dark">ettabashop.crm@gmail.com</a></p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="ettaba-contact-info-card text-center">
+                    <div class="mb-2 text-primary" style="font-size: 28px;"><i class="fa fa-phone-alt"></i></div>
+                    <h6 class="font-weight-bold text-dark mb-1">Phone</h6>
+                    <p class="text-muted mb-0"><a href="tel:01911122252" class="text-dark">019 111 222 52</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Start Map -->
     <div class="map-responsive">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3639.0830321806197!2d90.9354240153952!3d24.20387138436781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3756a1a4d2ee4ac9%3A0xa90b613906f9cf38!2sEkjog!5e0!3m2!1sen!2sbd!4v1634170604411!5m2!1sen!2sbd" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3639.0830321806197!2d90.9354240153952!3d24.20387138436781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3756a1a4d2ee4ac9%3A0xa90b613906f9cf38!2sEkjog!5e0!3m2!1sen!2sbd!4v1634170604411!5m2!1sen!2sbd" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
     </div>
-    <!-- Ena Map -->
+    <!-- End Map -->
 
     <!-- Start Contact -->
     <div class="container py-5">
-        <div class="row py-5">
+        <div class="row py-3">
             <form class="col-md-9 m-auto" method="post" role="form">
                 <div class="row">
                     <div class="form-group col-md-6 mb-3">
@@ -81,4 +101,3 @@
     </div>
     <!-- End Contact -->
 @endsection()
-

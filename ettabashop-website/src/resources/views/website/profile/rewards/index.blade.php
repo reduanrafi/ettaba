@@ -107,8 +107,8 @@
                     <div class="next-reward-preview-pill d-inline-flex align-items-center text-left">
                         <div class="preview-thumb mr-3">
                             @if(!empty($nextReward->image))
-                                <img src="{{ config('app.image_url') . $nextReward->image }}" 
-                                     onerror="this.src='{{ asset($nextReward->image) }}'" 
+                                <img src="{{ $nextReward->image_url ?? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($nextReward->image, '/')) }}" 
+                                     onerror="this.onerror=null; this.src='{{ asset($nextReward->image) }}';" 
                                      alt="{{ $nextReward->reward_name }}">
                             @else
                                 <div class="preview-thumb-placeholder">
@@ -165,8 +165,8 @@
                         <div class="col-lg-2 col-md-2 col-3 text-center">
                             <div class="reward-card-img-wrap">
                                 @if(!empty($reward->image))
-                                    <img src="{{ config('app.image_url') . $reward->image }}" 
-                                         onerror="this.src='{{ asset($reward->image) }}'" 
+                                    <img src="{{ $reward->image_url ?? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($reward->image, '/')) }}" 
+                                         onerror="this.onerror=null; this.src='{{ asset($reward->image) }}';" 
                                          alt="{{ $reward->reward_name }}">
                                 @else
                                     <div class="reward-img-fallback">

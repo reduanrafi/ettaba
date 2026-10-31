@@ -54,8 +54,8 @@
                         <div class="d-flex align-items-center my-3">
                             <div class="reward-thumb-box mr-3">
                                 @if(!empty($nextReward->image))
-                                    <img src="{{ config('app.image_url') . $nextReward->image }}" 
-                                         onerror="this.src='{{ asset($nextReward->image) }}'" 
+                                    <img src="{{ $nextReward->image_url ?? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($nextReward->image, '/')) }}" 
+                                         onerror="this.onerror=null; this.src='{{ asset($nextReward->image) }}';" 
                                          alt="{{ $nextReward->reward_name ?? 'Reward' }}">
                                 @else
                                     <div class="reward-thumb-placeholder">

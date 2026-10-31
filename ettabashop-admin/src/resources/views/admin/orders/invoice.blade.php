@@ -25,20 +25,19 @@
             <div class="col-sm-4 invoice-col">
                 To
                 <address>
-                    <strong>{{ $order->user->profile->first_name }} {{ $order->user->profile->last_name }}</strong><br>
-                    {{ $order->user->profile->address }}<br>
+                    <strong>{{ optional($order->user->profile)->first_name }} {{ optional($order->user->profile)->last_name }}</strong><br>
+                    {{ optional($order->user->profile)->address }}<br>
 
-                    Phone: {{ $order->user->phone }}<br>
+                    Phone: {{ optional($order->user)->phone }}<br>
 
                 </address>
             </div>
             <!-- /.col -->
             <div class="col-sm-4 invoice-col">
-                {{--                <b>Invoice #007612</b><br>--}}
                 <br>
                 <b>Order ID:</b> {{ $order->unique_order_id }}<br>
-                <b>Payment status:</b> DUE ({{ $order->paymentMethod->short_code }} )<br>
-                <b>eID:</b> {{$order->user->unique_id}}
+                <b>Payment status:</b> DUE ({{ optional($order->paymentMethod)->short_code }} )<br>
+                <b>eID:</b> {{ optional($order->user)->unique_id }}
             </div>
             <!-- /.col -->
         </div>
@@ -67,7 +66,7 @@
 
                             <td>{{ $item->product_name ?? ($item->product ? $item->product->name_en : 'Product') }}{{ ($item->product_unit ?? ($item->product ? $item->product->unit : '')) ? ' (' . ($item->product_unit ?? $item->product->unit) . ')' : '' }}</td>
                             <td>{{ $item->product ? $item->product->unique_id : 'N/A' }}</td>
-                            <td>{{ ($item->product->owner->shop!=null?$item->product->owner->shop->name_en:$item->product->owner->name) }}</td>
+                            <td>{{ ($item->product && $item->product->owner ? ($item->product->owner->shop!=null?$item->product->owner->shop->name_en:$item->product->owner->name) : 'N/A') }}</td>
 
                             <td class="text-center">{{ $item->price }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
@@ -85,7 +84,7 @@
         <div class="row">
             <!-- accepted payments column -->
             <div class="col-xs-6">
-                <p class="lead">Payment Methods: {{ $order->paymentMethod->short_code }} (<span style="font-size: 15px">{{ $order->paymentMethod->name }}</span>)  </p>
+                <p class="lead">Payment Methods: {{ optional($order->paymentMethod)->short_code }} (<span style="font-size: 15px">{{ optional($order->paymentMethod)->name }}</span>)  </p>
 
                 <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
                     সম্মানীত গ্রাহক, সাইটের বর্ণনার সাথে পণ্যের মিল থাকার পরেও যদি আপনি অর্ডারকৃত পণ্য গ্রহণ না করেন, তবে পরবর্তী অর্ডার থেকে আপনার জন্য ক্যাশ অন ডেলিভারি সুবিধা বন্ধ হয়ে যাবে। ধন্যবাদ।
@@ -94,28 +93,24 @@
             </div>
             <!-- /.col -->
             <div class="col-xs-6">
-{{--                <p class="lead">Amount Due 2/22/2014</p>--}}
-
+                @php
+                    $invoiceDeliveryCharge = (float) ($order->delivery_charge ?? 0);
+                    $invoiceGrandTotal = (float) $order->erp_total + $invoiceDeliveryCharge;
+                @endphp
                 <div class="table-responsive">
                     <table class="table">
                         <tbody>
-{{--                        <tr>--}}
-{{--                            <th style="width:50%">Subtotal:</th>--}}
-{{--                            <td>$250.30</td>--}}
-{{--                        </tr>--}}
-{{--                        <tr>--}}
-{{--                            <th>Tax (9.3%)</th>--}}
-{{--                            <td>$10.34</td>--}}
-{{--                        </tr>--}}
                         <tr>
-                            <th>Shipping:</th>
-                            @if($order->created_at > "")
-                            <td>5 Taka</td>
-                            @endif
+                            <th>Products Total (ERP):</th>
+                            <td>{{ number_format((float) $order->erp_total, 2) }} Taka</td>
+                        </tr>
+                        <tr>
+                            <th>Shipping / ডেলিভারি চার্জ:</th>
+                            <td>{{ number_format($invoiceDeliveryCharge, 2) }} Taka</td>
                         </tr>
                         <tr>
                             <th>Total bill:</th>
-                            <td>{{ $order->erp_total }} Taka</td>
+                            <td><strong>{{ number_format($invoiceGrandTotal, 2) }} Taka</strong></td>
                         </tr>
                         </tbody>
                     </table>
@@ -135,5 +130,4 @@
     </section>
 @endsection
 @section('extra-script')
-{{--    <script src="https://adminlte.io/themes/AdminLTE/bower_components/fastclick/lib/fastclick.js"></script>--}}
 @endsection

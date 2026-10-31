@@ -161,7 +161,7 @@
         @php
             $currentDeliveryCharge = isset($order->delivery_charge) && $order->delivery_charge !== null
                 ? (float) $order->delivery_charge
-                : ($order->created_at > "2022-10-04 03:33:15" ? 5 : 10);
+                : 0;
             $grandTotal = (float) $order->erp_total + $currentDeliveryCharge;
         @endphp
 

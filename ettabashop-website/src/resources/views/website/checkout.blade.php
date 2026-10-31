@@ -62,9 +62,35 @@
                             <p>@{{ item.price * item.quantity }}৳</p>
                         </div>
                         <hr class="mt-0">
-                        <div class="d-flex justify-content-between mb-3 pt-1">
-                            <h6 class="font-weight-medium">Delivery charge</h6>
-                            <h6 class="font-weight-medium">@{{ deliveryCharge }}৳</h6>
+                        <div class="ettaba-delivery-info-card mt-2 mb-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="font-weight-bold mb-0" style="color: #15803d; font-size: 16px;">ডেলিভারি চার্জ সংক্রান্ত তথ্য</h6>
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 24px; height: 24px; background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700;">i</span>
+                            </div>
+                            <p class="text-muted mb-2" style="font-size: 13px;">সেলার ও আপনার অবস্থান অনুযায়ী সম্ভাব্য ডেলিভারি চার্জ:</p>
+                            <div class="ettaba-delivery-row">
+                                <span>একই পৌরসভার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৩০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>একই উপজেলার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৫০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>একই জেলার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৮০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>সমগ্র বাংলাদেশে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>১৫০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-note mt-3">
+                                <strong>বি: দ্র:</strong> অর্ডারটি লোকাল অফিস থেকে কনফার্ম করার সময় আপনার প্রযোজ্য ডেলিভারি চার্জ জানিয়ে দেওয়া হবে। চূড়ান্ত ডেলিভারি চার্জ সেলার কর্তৃক নির্ধারিত হবে।
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
@@ -148,9 +174,35 @@
                             <p>@{{ item.price * item.quantity }}৳</p>
                         </div>
                         <hr class="mt-0">
-                        <div class="d-flex justify-content-between mb-3 pt-1">
-                            <h6 class="font-weight-medium">Delivery charge</h6>
-                            <h6 class="font-weight-medium">@{{ deliveryCharge }}৳</h6>
+                        <div class="ettaba-delivery-info-card mt-2 mb-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="font-weight-bold mb-0" style="color: #15803d; font-size: 16px;">ডেলিভারি চার্জ সংক্রান্ত তথ্য</h6>
+                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 24px; height: 24px; background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700;">i</span>
+                            </div>
+                            <p class="text-muted mb-2" style="font-size: 13px;">সেলার ও আপনার অবস্থান অনুযায়ী সম্ভাব্য ডেলিভারি চার্জ:</p>
+                            <div class="ettaba-delivery-row">
+                                <span>একই পৌরসভার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৩০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>একই উপজেলার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৫০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>একই জেলার ক্ষেত্রে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>৮০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-row">
+                                <span>সমগ্র বাংলাদেশে</span>
+                                <span class="ettaba-dots"></span>
+                                <strong>১৫০ টাকা</strong>
+                            </div>
+                            <div class="ettaba-delivery-note mt-3">
+                                <strong>বি: দ্র:</strong> অর্ডারটি লোকাল অফিস থেকে কনফার্ম করার সময় আপনার প্রযোজ্য ডেলিভারি চার্জ জানিয়ে দেওয়া হবে। চূড়ান্ত ডেলিভারি চার্জ সেলার কর্তৃক নির্ধারিত হবে।
+                            </div>
                         </div>
                     </div>
                     <div class="card-footer border-secondary bg-transparent">
@@ -259,6 +311,38 @@
     .disabled-payment {
         opacity: 0.55;
         cursor: not-allowed;
+    }
+    .ettaba-delivery-info-card {
+        background: #f0fdf4;
+        border: 1.5px solid #bbf7d0;
+        border-radius: 14px;
+        padding: 14px 16px;
+    }
+    .ettaba-delivery-row {
+        display: flex;
+        align-items: baseline;
+        font-size: 13.5px;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+    .ettaba-delivery-row strong {
+        color: #0f172a;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .ettaba-dots {
+        flex: 1;
+        border-bottom: 1.5px dotted #cbd5e1;
+        margin: 0 8px;
+    }
+    .ettaba-delivery-note {
+        background: #dcfce7;
+        border-left: 3.5px solid #16a34a;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        color: #14532d;
+        line-height: 1.55;
     }
 </style>
 @endsection()

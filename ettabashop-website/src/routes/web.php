@@ -18,6 +18,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/.well-known/assetlinks.json', function () {
+    return response()->json([
+        [
+            'relation' => ['delegate_permission/common.handle_all_urls'],
+            'target' => [
+                'namespace' => 'android_app',
+                'package_name' => 'com.ettabashop.customer',
+                'sha256_cert_fingerprints' => [
+                    '0D:66:27:F4:DD:98:50:3F:82:1C:5E:DF:C2:44:A9:A1:13:3B:E7:91:87:64:A6:D2:10:26:0C:BD:65:0C:C6:F2',
+                ],
+            ],
+        ],
+    ], 200, ['Content-Type' => 'application/json']);
+});
+
 Route::get('/clear-cache', function () {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('route:clear');
@@ -71,7 +86,8 @@ Route::get('/products/{slug}', [IndexController::class, 'products'])->name('prod
 Route::get('/category-products/{slug}', [ProductController::class, 'CategoryProducts'])->name('categoryProducts');
 Route::get('/all-products/', [ProductController::class, 'AllProducts'])->name('allProducts');
 Route::get('/search', [IndexController::class, 'search'])->name('search');
-Route::get('/detail/{slug}', [IndexController::class, 'detail'])->name('product.detail');
+Route::get('/detail/{slug}', [IndexController::class, 'detail'])->where('slug', '.*')->name('product.detail');
+Route::post('/product-review/save', [IndexController::class, 'saveProductReview'])->name('product.review.save');
 
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('website.checkout');
 Route::post('/api/check-cart-payment-rules', [CheckoutController::class, 'checkCartPaymentRules']);
@@ -241,10 +257,15 @@ Route::match(['get', 'post'], '/payment/cancel', [\App\Http\Controllers\Website\
 
 require __DIR__ . '/new.php';
 
-// Custom Seller Shop URL Routes (e.g., ettabashop.com/Gadgets_Bro)
+// Custom Seller Shop & Product URL Routes (e.g., ettabashop.com/Gadgets_Bro and ettabashop.com/Gadgets_Bro/141234)
 Route::get('/{shop_slug}/section/{section_type}', [ShopController::class, 'sellerSectionProducts'])
-    ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads).*$')
+    ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads|detail|products|category-products|section|notices|offer).*$')
     ->name('seller.shop.section');
+
+Route::get('/{shop_slug}/{product_code}', [IndexController::class, 'sellerProductDetail'])
+    ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads|detail|products|category-products|section|notices|offer).*$')
+    ->where('product_code', '[0-9A-Za-z_\-]+')
+    ->name('seller.product.detail');
 
 Route::get('/{shop_slug}', [ShopController::class, 'showBySlug'])
     ->where('shop_slug', '^(?!api|admin|profile|orders|payment|new|assets|images|css|js|storage|uploads).*$')

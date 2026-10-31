@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ettabashop.customer",
+      "sha256_cert_fingerprints": [
+        "0D:66:27:F4:DD:98:50:3F:82:1C:5E:DF:C2:44:A9:A1:13:3B:E7:91:87:64:A6:D2:10:26:0C:BD:65:0C:C6:F2"
+      ]
+    }
+  }
+]
+

@@ -1,44 +1,52 @@
 <?php
 
-
 namespace App\Services;
 
-
 use App\Models\Product;
-use Carbon\Carbon;
 
 class ProductService
 {
-    function CheckSlug($slug)
+    function CheckSlug($slug, $ignoreId = null)
     {
-        $product =  Product::where('slug',$slug)->first();
-
-        if($product!=null)
-        {
-            return 1;
+        $query = Product::where('slug', $slug);
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
         }
-        return 0;
+        $product = $query->first();
+
+        return $product != null ? 1 : 0;
     }
 
-    public function GenerateSlug($productTitle)
+    public function GenerateSlug($productTitle, $fallbackId = null)
     {
-        return str_replace(' ', '-', $productTitle);
+        $title = trim((string) $productTitle);
+        // Remove URL-breaking characters like /, ?, #, %, &, quotes, backslashes
+        $clean = preg_replace('#[/\?\#%&\'"\\\\]+#u', '-', $title);
+        $clean = preg_replace('/\s+/u', '-', $clean);
+        $clean = preg_replace('/-+/u', '-', trim($clean, '-'));
+
+        if ($clean === '') {
+            $clean = 'product-' . ($fallbackId ?: time());
+        }
+
+        return $clean;
     }
 
     public function UpdateSlug(Product $product)
     {
-        $slug = $this->GenerateSlug($product->name_en);
+        $baseTitle = !empty(trim((string) $product->name_en)) ? $product->name_en : $product->name_bn;
+        $slug = $this->GenerateSlug($baseTitle, $product->id);
 
-        if ($this->CheckSlug($slug)!=0)
-        {
-            $slug = $slug.$product->id;
+        if ($this->CheckSlug($slug, $product->id) != 0) {
+            $slug = $slug . '-' . $product->id;
         }
 
-        return $product->update(['slug'=>$slug]);
+        return $product->update(['slug' => $slug]);
     }
+
     public function UpdateUniqueID($product)
     {
-        $uniqueId = '14'.$product->id;
-        return $product->update(['unique_id'=>$uniqueId]);
+        $uniqueId = '14' . $product->id;
+        return $product->update(['unique_id' => $uniqueId]);
     }
 }

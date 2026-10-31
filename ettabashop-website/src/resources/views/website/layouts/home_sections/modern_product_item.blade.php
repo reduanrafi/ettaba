@@ -15,12 +15,11 @@
     }
     $discountBn = str_replace($enDigits, $bnDigits, (string)$discountPercent);
 
-    $qty = isset($product->quantity) && $product->quantity !== null ? (int)$product->quantity : 100;
-    $sold = isset($product->sold_amount) && $product->sold_amount !== null ? (int)$product->sold_amount : 0;
+    $qty = isset($product->quantity) && $product->quantity !== null ? max(0, (int)$product->quantity) : 100;
+    $sold = isset($product->sold_amount) && $product->sold_amount !== null ? max(0, (int)$product->sold_amount) : 0;
     $isSoldOut = (!empty($product->is_sold_out) && $product->is_sold_out == 1) || (isset($product->quantity) && $product->quantity !== null && (int)$product->quantity <= 0);
-    $totalStock = max($qty, $sold + $qty);
     $soldBn = str_replace($enDigits, $bnDigits, (string)$sold);
-    $totalStockBn = str_replace($enDigits, $bnDigits, (string)$totalStock);
+    $totalStockBn = str_replace($enDigits, $bnDigits, (string)$qty);
 
     // Reviews rating & count from real relation or aggregates
     $reviewCount = 0;
@@ -38,7 +37,8 @@
 
     $trpFormatted = ($trp == (int)$trp) ? number_format($trp, 0) : number_format($trp, 2);
     $productTitle = $product->name_bn ?: $product->name_en;
-    $detailUrl = !empty($product->slug) ? route('product.detail', ['slug' => $product->slug]) : url('/detail/' . $product->id);
+    $safeJsTitle = str_replace(["\\", "'", "\"", "\r", "\n"], ["\\\\", "\\'", "", " ", " "], (string)$productTitle);
+    $detailUrl = $product->detail_url ?? (!empty($product->slug) ? route('product.detail', ['slug' => $product->slug]) : url('/detail/' . $product->id));
 @endphp
 
 <div class="ettaba-product-card h-100 d-flex flex-column bg-white">
@@ -121,7 +121,7 @@
                     </div>
                     <div class="ettaba-rp-info">
                         <div class="ettaba-rp-val">{{ $trpFormatted }}</div>
-                        <div class="ettaba-rp-lbl">রিওয়ার্ড পয়েন্ট</div>
+                        <div class="ettaba-rp-lbl">রিওয়ার্ড</div>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                 @else
                     <button type="button"
                             class="ettaba-btn-cart w-100"
-                            @click="addToCart('{{ $product->id }}', '{{ addslashes($productTitle) }}', '{{ $erp }}', '{{ $trp }}', '{{ $product->owner_id }}', '{{ $tcb }}', '{{ $product->rate_en }}')">
+                            @click="addToCart('{{ $product->id }}', '{{ $safeJsTitle }}', '{{ $erp }}', '{{ $trp }}', '{{ $product->owner_id }}', '{{ $tcb }}', '{{ $product->rate_en }}')">
                         <i class="fas fa-shopping-cart mr-1"></i> কার্টে যোগ করুন
                     </button>
                 @endif

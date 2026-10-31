@@ -8,50 +8,52 @@
         @include('website.layouts.includes.slider')
     </div>
 
-    <!-- 3.2 Logged-Out Compact Registration & Trial Card Benefits Section -->
+    <!-- 3.2 Logged-Out Compact Registration & Trial Card Benefits Section (2-Column Layout) -->
     @guest
-        <div class="ettaba-guest-cta-card bg-white border shadow-sm mb-3 p-2 p-md-3" style="border-radius: 14px;">
+        <div class="ettaba-guest-cta-card bg-white border shadow-sm mb-3 py-2 px-2 p-md-3" style="border-radius: 14px;">
             <div class="row no-gutters align-items-center">
-                <!-- Left Column: Free Registration Online Benefits -->
-                <div class="col-4 pr-2 border-right">
-                    <div class="d-flex align-items-center">
-                        <div class="ettaba-guest-icon-wrap mr-2 d-none d-sm-flex">
+                <!-- Left Column: Stacked Free Registration + Trial Card Benefits -->
+                <div class="col-7 col-md-8 pr-2 border-right">
+                    <!-- Top Block: Free Registration -->
+                    <div class="d-flex align-items-start mb-1 pb-1" style="border-bottom: 1px dashed #e2e8f0;">
+                        <div class="ettaba-guest-icon-wrap mr-2">
                             <i class="fas fa-user-plus"></i>
                         </div>
-                        <div>
-                            <div class="d-flex align-items-center mb-1">
-                                <i class="fas fa-user-plus text-success mr-1 d-sm-none" style="font-size: 13px;"></i>
-                                <span class="ettaba-guest-heading">ফ্রি রেজিস্ট্রেশন করে</span>
-                            </div>
+                        <div class="flex-grow-1">
+                            <div class="ettaba-guest-heading">ফ্রি রেজিস্ট্রেশন করে</div>
                             <div class="ettaba-guest-subtext">
                                 প্রতি অর্ডারে নিন ক্যাশব্যাক, রিওয়ার্ড ও পুরস্কার সুবিধা।
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Middle Column: Free Trial Card Local Benefits -->
-                <div class="col-4 px-2 border-right">
-                    <div class="d-flex align-items-start">
-                        <div class="ettaba-guest-card-icon mr-2 d-none d-sm-flex">
+                    <!-- Bottom Block: Free Trial Card -->
+                    <div class="d-flex align-items-start pt-1">
+                        <div class="ettaba-guest-card-icon mr-2">
                             <i class="fas fa-id-card"></i>
                         </div>
-                        <div>
+                        <div class="flex-grow-1">
                             <div class="ettaba-guest-heading mb-1">
                                 ফ্রি ট্রায়াল কার্ড সংগ্রহ করে উপভোগ করুন
                             </div>
                             <ul class="list-unstyled mb-0 ettaba-guest-bullets">
-                                <li><i class="fas fa-check-circle text-success mr-1"></i>লোকাল মার্চেন্ট সুবিধা</li>
-                                <li><i class="fas fa-check-circle text-success mr-1"></i>লোকাল হাসপাতাল ও ক্লিনিক সুবিধা</li>
+                                <li><i class="fas fa-check-circle text-success mr-1"></i>লোকাল মার্চেন্ট কেনাকাটা সুবিধা</li>
+                                <li><i class="fas fa-check-circle text-success mr-1"></i>লোকাল হাসপাতাল, ক্লিনিক ও সার্ভিসের সুবিধা</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Column: Login & Free Registration Buttons -->
-                <div class="col-4 pl-2">
-                    <a href="{{ route('login') }}" class="ettaba-guest-login-btn w-100 mb-1 text-decoration-none">
-                        <i class="fas fa-user mr-1"></i> লগইন করুন
+                <div class="col-5 col-md-4 pl-2 d-flex flex-column justify-content-center">
+                    <a href="{{ route('login') }}" class="ettaba-guest-login-btn w-100 mb-2 text-decoration-none">
+                        <div class="d-flex align-items-center justify-content-center">
+                            <i class="fas fa-user mr-1"></i>
+                            <div class="text-center lh-1">
+                                <div class="login-main-txt">লগইন করুন</div>
+                                <div class="login-sub-txt">(একাউন্ট আছে)</div>
+                            </div>
+                        </div>
                     </a>
                     <a href="{{ route('register') }}" class="ettaba-guest-reg-btn w-100 text-decoration-none">
                         <div class="d-flex align-items-center justify-content-center">
@@ -82,37 +84,40 @@
             $progressPercent = $targetPoints > 0 ? min(100, round(($currentPoints / $targetPoints) * 100, 1)) : 0;
             $rewardName = isset($nextReward) && !empty($nextReward->reward_name) ? $nextReward->reward_name : 'Ettaba Smart Customer';
             $rewardImg = isset($nextReward) && !empty($nextReward->image) ? $nextReward->image : null;
+            $rewardImgUrl = isset($nextReward) && !empty($nextReward->image_url)
+                ? $nextReward->image_url
+                : (!empty($rewardImg) ? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($rewardImg, '/')) : null);
             $rewardDetailUrl = isset($nextReward) && !empty($nextReward->id) ? route('profile.rewards.detail', $nextReward->id) : route('profile.rewards');
         @endphp
         <div class="ettaba-reward-home-card bg-white border shadow-sm mb-3 p-2 p-md-3" style="border-radius: 14px;">
             <!-- Top Header Row -->
             <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
-                <a href="{{ $rewardDetailUrl }}" class="d-flex align-items-center text-decoration-none">
-                    <i class="fas fa-gift text-danger mr-2" style="font-size: 18px;"></i>
+                <a href="{{ $rewardDetailUrl }}" class="d-flex align-items-center text-decoration-none" style="min-width: 0;">
+                    <i class="fas fa-gift text-danger mr-1 mr-sm-2" style="font-size: 18px;"></i>
                     <span class="ettaba-reward-card-heading">আপনার পরবর্তী পুরস্কার</span>
                 </a>
-                <a href="{{ route('profile.rewards') }}" class="ettaba-reward-all-btn text-decoration-none">
-                    সকল পুরস্কারের তালিকা দেখুন <i class="fas fa-arrow-right ml-1"></i>
+                <a href="{{ route('profile.rewards') }}" class="ettaba-see-all-btn text-decoration-none">
+                    সকল পুরস্কার দেখুন <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
 
-            <!-- Reward Body Row -->
-            <div class="d-flex align-items-center">
+            <!-- Reward Body Row (Entire area clickable to go to reward details) -->
+            <a href="{{ $rewardDetailUrl }}" class="d-flex align-items-center text-decoration-none text-reset ettaba-reward-body-link">
                 <!-- Left: Specific Reward Image -->
-                <a href="{{ $rewardDetailUrl }}" class="ettaba-reward-gift-thumb mr-2 mr-md-3 text-decoration-none">
+                <div class="ettaba-reward-gift-thumb mr-2 mr-md-3">
                     @if(!empty($rewardImg))
-                        <img src="{{ config('app.image_url') . $rewardImg }}"
-                             onerror="this.src='{{ asset($rewardImg) }}'"
+                        <img src="{{ $rewardImgUrl }}"
+                             onerror="this.onerror=null; this.src='{{ asset($rewardImg) }}';"
                              alt="{{ $rewardName }}">
                     @else
                         <div class="ettaba-reward-gift-fallback">
                             <i class="fas fa-gift"></i>
                         </div>
                     @endif
-                </a>
+                </div>
 
                 <!-- Right: Stats + Progress Bar -->
-                <div class="flex-grow-1">
+                <div class="flex-grow-1" style="min-width: 0;">
                     <div class="row no-gutters text-center align-items-center mb-2">
                         <div class="col-3 border-right px-1 text-left">
                             <div class="ettaba-rw-lbl">মোট পয়েন্ট</div>
@@ -143,80 +148,142 @@
                         <span class="text-muted">{{ number_format($targetPoints, 0) }}</span>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     @endauth
 
-    <!-- 6. Category Section (Both Logged-in & Logged-out Homepages) -->
+    <!-- 6. Category Section (Both Logged-in & Logged-out Homepages - 7 Categories + 1 All Button in 2 Rows) -->
     @php
         $defaultRefCategories = [
-            ['name_bn' => 'মুদি ও নিত্যপ্রয়োজনীয়', 'slug' => 'daily-needs', 'icon_class' => 'fas fa-shopping-cart', 'icon_color' => '#dc2626', 'image' => null],
-            ['name_bn' => 'ফ্যাশন ও লাইফস্টাইল', 'slug' => 'fashion-and-lifestyle', 'icon_class' => 'fas fa-tshirt', 'icon_color' => '#16a34a', 'image' => null],
-            ['name_bn' => 'জুয়েলারি ও কসমেটিকস', 'slug' => 'jewelry-and-cosmetics', 'icon_class' => 'fas fa-gem', 'icon_color' => '#2563eb', 'image' => null],
-            ['name_bn' => 'রেস্টুরেন্ট ও ফুড', 'slug' => 'restaurant-and-food', 'icon_class' => 'fas fa-utensils', 'icon_color' => '#ea580c', 'image' => null],
-            ['name_bn' => 'ক্লিনিক ও হাসপাতাল', 'slug' => 'clinic-and-hospital', 'icon_class' => 'fas fa-stethoscope', 'icon_color' => '#9333ea', 'image' => null],
-            ['name_bn' => 'ইলেকট্রনিক্স ও গ্যাজেট', 'slug' => 'electronics-and-gadget', 'icon_class' => 'fas fa-desktop', 'icon_color' => '#0284c7', 'image' => null],
+            ['name_bn' => 'গ্রোসারি', 'slug' => 'daily-needs', 'icon_class' => 'fas fa-shopping-basket', 'icon_color' => '#059669', 'icon_bg' => '#ecfdf5', 'image' => null],
+            ['name_bn' => 'কাঁচা বাজার', 'slug' => 'fresh-market', 'icon_class' => 'fas fa-carrot', 'icon_color' => '#ea580c', 'icon_bg' => '#fff7ed', 'image' => null],
+            ['name_bn' => 'মাছ-মাংস', 'slug' => 'fish-and-meat', 'icon_class' => 'fas fa-fish', 'icon_color' => '#2563eb', 'icon_bg' => '#eff6ff', 'image' => null],
+            ['name_bn' => 'খাবার ও রেস্টুরেন্ট', 'slug' => 'restaurant-and-food', 'icon_class' => 'fas fa-utensils', 'icon_color' => '#dc2626', 'icon_bg' => '#fef2f2', 'image' => null],
+            ['name_bn' => 'রিচার্জ, ডাটা ও মিনিট', 'slug' => 'recharge-and-data', 'icon_class' => 'fas fa-mobile-alt', 'icon_color' => '#7c3aed', 'icon_bg' => '#f5f3ff', 'image' => null],
+            ['name_bn' => 'ঔষধ ও ফার্মেসী', 'slug' => 'clinic-and-hospital', 'icon_class' => 'fas fa-pills', 'icon_color' => '#16a34a', 'icon_bg' => '#f0fdf4', 'image' => null],
+            ['name_bn' => 'ফ্যাশন ও লাইফস্টাইল', 'slug' => 'fashion-and-lifestyle', 'icon_class' => 'fas fa-tshirt', 'icon_color' => '#db2777', 'icon_bg' => '#fdf2f8', 'image' => null],
         ];
         $displayHomeCats = (isset($homeCategories) && count($homeCategories) > 0) ? $homeCategories : $defaultRefCategories;
+
+        $resolveCatVisuals = function ($cat, $idx = 0) {
+            $catTitle = data_get($cat, 'name_bn') ?: data_get($cat, 'name_en') ?: data_get($cat, 'name', '');
+            $catSlug = strtolower((string) data_get($cat, 'slug', ''));
+            $catIcon = data_get($cat, 'icon_class') ?: data_get($cat, 'icon');
+            $catColor = data_get($cat, 'icon_color');
+            $catBg = data_get($cat, 'icon_bg');
+
+            $palettes = [
+                ['bg' => '#ecfdf5', 'color' => '#059669', 'icon' => 'fas fa-shopping-basket'],
+                ['bg' => '#fff7ed', 'color' => '#ea580c', 'icon' => 'fas fa-carrot'],
+                ['bg' => '#eff6ff', 'color' => '#2563eb', 'icon' => 'fas fa-fish'],
+                ['bg' => '#fef2f2', 'color' => '#dc2626', 'icon' => 'fas fa-utensils'],
+                ['bg' => '#f5f3ff', 'color' => '#7c3aed', 'icon' => 'fas fa-mobile-alt'],
+                ['bg' => '#f0fdf4', 'color' => '#16a34a', 'icon' => 'fas fa-pills'],
+                ['bg' => '#fdf2f8', 'color' => '#db2777', 'icon' => 'fas fa-tshirt'],
+                ['bg' => '#eef2ff', 'color' => '#4f46e5', 'icon' => 'fas fa-tv'],
+                ['bg' => '#f0f9ff', 'color' => '#0284c7', 'icon' => 'fas fa-mobile'],
+                ['bg' => '#fffbeb', 'color' => '#d97706', 'icon' => 'fas fa-paint-brush'],
+            ];
+            $defaultPalette = $palettes[$idx % count($palettes)];
+
+            if (str_contains($catTitle, 'গ্রোসারি') || str_contains($catTitle, 'মুদি') || str_contains($catSlug, 'daily') || str_contains($catSlug, 'grocery')) {
+                $catIcon = $catIcon ?: 'fas fa-shopping-basket';
+                $catColor = $catColor ?: '#059669';
+                $catBg = $catBg ?: '#ecfdf5';
+            } elseif (str_contains($catTitle, 'কাঁচা') || str_contains($catTitle, 'সবজি')) {
+                $catIcon = $catIcon ?: 'fas fa-carrot';
+                $catColor = $catColor ?: '#ea580c';
+                $catBg = $catBg ?: '#fff7ed';
+            } elseif (str_contains($catTitle, 'মাছ') || str_contains($catTitle, 'মাংস')) {
+                $catIcon = $catIcon ?: 'fas fa-fish';
+                $catColor = $catColor ?: '#2563eb';
+                $catBg = $catBg ?: '#eff6ff';
+            } elseif (str_contains($catTitle, 'রেস্টুরেন্ট') || str_contains($catTitle, 'খাবার') || str_contains($catTitle, 'ফুড') || str_contains($catSlug, 'food')) {
+                $catIcon = $catIcon ?: 'fas fa-utensils';
+                $catColor = $catColor ?: '#dc2626';
+                $catBg = $catBg ?: '#fef2f2';
+            } elseif (str_contains($catTitle, 'রিচার্জ') || str_contains($catTitle, 'ডাটা') || str_contains($catTitle, 'মোবাইল')) {
+                $catIcon = $catIcon ?: 'fas fa-mobile-alt';
+                $catColor = $catColor ?: '#7c3aed';
+                $catBg = $catBg ?: '#f5f3ff';
+            } elseif (str_contains($catTitle, 'ঔষধ') || str_contains($catTitle, 'ফার্মেসী') || str_contains($catTitle, 'ক্লিনিক') || str_contains($catTitle, 'হাসপাতাল') || str_contains($catSlug, 'hospital')) {
+                $catIcon = $catIcon ?: 'fas fa-pills';
+                $catColor = $catColor ?: '#16a34a';
+                $catBg = $catBg ?: '#f0fdf4';
+            } elseif (str_contains($catTitle, 'অর্গানিক')) {
+                $catIcon = $catIcon ?: 'fas fa-seedling';
+                $catColor = $catColor ?: '#10b981';
+                $catBg = $catBg ?: '#ecfdf5';
+            } elseif (str_contains($catTitle, 'ফ্যাশন') || str_contains($catSlug, 'fashion')) {
+                $catIcon = $catIcon ?: 'fas fa-tshirt';
+                $catColor = $catColor ?: '#db2777';
+                $catBg = $catBg ?: '#fdf2f8';
+            } elseif (str_contains($catTitle, 'জুয়েলারি') || str_contains($catTitle, 'কসমেটিক') || str_contains($catSlug, 'jewel')) {
+                $catIcon = $catIcon ?: 'fas fa-gem';
+                $catColor = $catColor ?: '#2563eb';
+                $catBg = $catBg ?: '#eff6ff';
+            } elseif (str_contains($catTitle, 'ইলেকট্রনিক') || str_contains($catTitle, 'ইলেক্ট্রনিক') || str_contains($catTitle, 'গ্যাজেট') || str_contains($catSlug, 'electronic')) {
+                $catIcon = $catIcon ?: 'fas fa-tv';
+                $catColor = $catColor ?: '#4f46e5';
+                $catBg = $catBg ?: '#eef2ff';
+            } elseif (str_contains($catTitle, 'কার্ড') || str_contains($catTitle, 'সাবস্ক্রিপশন')) {
+                $catIcon = $catIcon ?: 'fas fa-id-card';
+                $catColor = $catColor ?: '#dc2626';
+                $catBg = $catBg ?: '#fef2f2';
+            } else {
+                $catIcon = $catIcon ?: $defaultPalette['icon'];
+                $catColor = $catColor ?: $defaultPalette['color'];
+                $catBg = $catBg ?: $defaultPalette['bg'];
+            }
+
+            // Ensure icon class is FontAwesome class string (not an uploaded file path)
+            if (str_contains($catIcon, '/') || str_contains($catIcon, '.')) {
+                $catIcon = $defaultPalette['icon'];
+            }
+
+            return [
+                'title' => $catTitle,
+                'slug' => data_get($cat, 'slug', ''),
+                'icon' => $catIcon,
+                'color' => $catColor,
+                'bg' => $catBg,
+            ];
+        };
     @endphp
     <div class="ettaba-category-strip mb-3">
-        <div class="ettaba-cat-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;">
-            @foreach(collect($displayHomeCats)->take(6) as $cat)
-                @php
-                    $catTitle = data_get($cat, 'name_bn') ?: data_get($cat, 'name_en') ?: data_get($cat, 'name', '');
-                    $catSlug = data_get($cat, 'slug', '');
-                    $catColor = data_get($cat, 'icon_color') ?: data_get($cat, 'color', '#15803d');
-                    $catIcon = data_get($cat, 'icon_class');
-                    if (empty($catIcon)) {
-                        if (str_contains($catTitle, 'ফ্যাশন') || str_contains(strtolower($catSlug), 'fashion')) {
-                            $catIcon = 'fas fa-tshirt';
-                            $catColor = '#16a34a';
-                        } elseif (str_contains($catTitle, 'জুয়েলারি') || str_contains($catTitle, 'কসমেটিক') || str_contains(strtolower($catSlug), 'jewel')) {
-                            $catIcon = 'fas fa-gem';
-                            $catColor = '#2563eb';
-                        } elseif (str_contains($catTitle, 'রেস্টুরেন্ট') || str_contains($catTitle, 'ফুড') || str_contains(strtolower($catSlug), 'food')) {
-                            $catIcon = 'fas fa-utensils';
-                            $catColor = '#ea580c';
-                        } elseif (str_contains($catTitle, 'ক্লিনিক') || str_contains($catTitle, 'হাসপাতাল') || str_contains(strtolower($catSlug), 'hospital')) {
-                            $catIcon = 'fas fa-stethoscope';
-                            $catColor = '#9333ea';
-                        } elseif (str_contains($catTitle, 'ইলেকট্রনিক') || str_contains($catTitle, 'গ্যাজেট') || str_contains(strtolower($catSlug), 'electronic')) {
-                            $catIcon = 'fas fa-desktop';
-                            $catColor = '#0284c7';
-                        } elseif (str_contains($catTitle, 'কার্ড') || str_contains($catTitle, 'সাবস্ক্রিপশন')) {
-                            $catIcon = 'fas fa-id-card';
-                            $catColor = '#dc2626';
-                        } else {
-                            $catIcon = 'fas fa-shopping-cart';
-                        }
-                    }
-                    $catImg = data_get($cat, 'image');
-                    $catUrl = !empty($catSlug) ? route('categoryProducts', ['slug' => $catSlug]) : route('allProducts');
-                @endphp
-                <a href="{{ $catUrl }}" class="ettaba-cat-card text-decoration-none"
-                   style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 3px 6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center;">
-                    <div class="ettaba-cat-icon-box" style="color: {{ $catColor }}; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:4px;">
-                        @if(!empty($catImg))
-                            <img src="{{ config('app.image_url') . $catImg }}"
-                                 onerror="this.src='{{ asset($catImg) }}'"
-                                 style="max-width:30px; max-height:30px; object-fit:contain;"
-                                 alt="{{ $catTitle }}">
-                        @else
-                            <i class="{{ $catIcon }}"></i>
-                        @endif
-                    </div>
-                    <div class="ettaba-cat-title" style="font-size:10.5px; font-weight:700; color:#0f172a; line-height:1.15;">{{ $catTitle }}</div>
-                </a>
-            @endforeach
+        <!-- Centered "অনলাইন ক্যাটাগরি" Section Heading -->
+        <div class="ettaba-online-cat-header d-flex align-items-center justify-content-center mb-2">
+            <span class="ettaba-cat-line"></span>
+            <div class="d-flex align-items-center mx-2 px-1">
+                <i class="fas fa-store text-success mr-1" style="font-size: 16px;"></i>
+                <h4 class="mb-0 font-weight-bold" style="font-size: 17px; color: #0f172a; white-space: nowrap;">অনলাইন ক্যাটাগরি</h4>
+            </div>
+            <span class="ettaba-cat-line"></span>
+        </div>
 
-            <!-- "সব ক্যাটাগরি" Button -->
-            <a href="javascript:void(0)" onclick="$('#allCategoriesModal').modal('show')" class="ettaba-cat-card text-decoration-none"
-               style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 3px 6px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center;">
-                <div class="ettaba-cat-icon-box" style="color: #475569; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:4px;">
-                    <i class="fas fa-th-large"></i>
-                </div>
-                <div class="ettaba-cat-title" style="font-size:10.5px; font-weight:700; color:#0f172a; line-height:1.15;">সব<br>ক্যাটাগরি</div>
-            </a>
+        <div class="ettaba-online-cat-card bg-white border shadow-sm p-2 p-md-3" style="border-radius: 16px;">
+            <div class="ettaba-cat-grid-8">
+                @foreach(collect($displayHomeCats)->take(7)->values() as $idx => $cat)
+                    @php
+                        $cv = $resolveCatVisuals($cat, $idx);
+                        $catUrl = !empty($cv['slug']) ? route('categoryProducts', ['slug' => $cv['slug']]) : route('allProducts');
+                    @endphp
+                    <a href="{{ $catUrl }}" class="ettaba-cat-item-v2 text-decoration-none">
+                        <div class="ettaba-cat-icon-circle" style="background-color: {{ $cv['bg'] }}; color: {{ $cv['color'] }};">
+                            <i class="{{ $cv['icon'] }}"></i>
+                        </div>
+                        <span class="ettaba-cat-name-v2">{{ $cv['title'] }}</span>
+                    </a>
+                @endforeach
+
+                <!-- 8th Item: "সব ক্যাটাগরি" Button -->
+                <a href="javascript:void(0)" onclick="$('#allCategoriesModal').modal('show')" class="ettaba-cat-item-v2 text-decoration-none">
+                    <div class="ettaba-cat-icon-circle" style="background-color: #f1f5f9; color: #475569;">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <span class="ettaba-cat-name-v2">সব ক্যাটাগরি</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -274,22 +341,21 @@
                 </button>
             </div>
             <div class="modal-body p-3">
-                <div class="row no-gutters">
+                <div class="ettaba-cat-grid-8">
                     @if(isset($allCategoriesList) && count($allCategoriesList) > 0)
-                        @foreach($allCategoriesList as $catItem)
-                            <div class="col-4 col-sm-3 p-1">
-                                <a href="{{ !empty($catItem->slug) ? route('categoryProducts', ['slug' => $catItem->slug]) : route('allProducts') }}"
-                                   class="d-flex flex-column align-items-center justify-content-center p-2 border rounded text-center text-decoration-none h-100 bg-light hover-shadow">
-                                    @if(!empty($catItem->image))
-                                        <img src="{{ asset($catItem->image) }}" style="width: 36px; height: 36px; object-fit: contain;" class="mb-1">
-                                    @else
-                                        <i class="{{ $catItem->icon_class ?: 'fas fa-shopping-bag' }} mb-1" style="font-size: 22px; color: {{ $catItem->icon_color ?: '#15803d' }};"></i>
-                                    @endif
-                                    <span class="text-dark font-weight-bold" style="font-size: 12px; line-height: 1.2;">
-                                        {{ $catItem->name_bn ?: $catItem->name_en }}
-                                    </span>
-                                </a>
-                            </div>
+                        @foreach($allCategoriesList as $idx => $catItem)
+                            @php
+                                $cvModal = $resolveCatVisuals($catItem, $idx);
+                            @endphp
+                            <a href="{{ !empty($cvModal['slug']) ? route('categoryProducts', ['slug' => $cvModal['slug']]) : route('allProducts') }}"
+                               class="ettaba-cat-item-v2 text-decoration-none">
+                                <div class="ettaba-cat-icon-circle" style="background-color: {{ $cvModal['bg'] }}; color: {{ $cvModal['color'] }};">
+                                    <i class="{{ $cvModal['icon'] }}"></i>
+                                </div>
+                                <span class="ettaba-cat-name-v2">
+                                    {{ $cvModal['title'] }}
+                                </span>
+                            </a>
                         @endforeach
                     @endif
                 </div>

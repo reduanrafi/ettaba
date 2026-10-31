@@ -43,7 +43,7 @@
         <!-- Block 1: Profile Photo -->
         <div class="form-card-block">
             <h6 class="form-card-title">
-                <i class="fas fa-camera"></i> প্রোফাইল ছবি
+                <i class="fas fa-camera"></i> প্রোফাইল ছবি (ঐচ্ছিক)
             </h6>
             <div class="avatar-upload-block">
                 <div>
@@ -59,7 +59,6 @@
                     <input type="file" 
                            id="image" 
                            name="profile_image" 
-                           {{ isset($profile->profile_image) ? '' : 'required' }}
                            onchange="loadFile(event)" 
                            accept="image/*" 
                            style="display: none;">
@@ -98,13 +97,12 @@
                 <div class="col-md-6 mb-3">
                     <label class="input-label-modern">
                         <span>নামের শেষ অংশ (Last Name)</span>
-                        <span class="text-danger">*</span>
+                        <span class="input-label-badge">ঐচ্ছিক</span>
                     </label>
                     <div class="dash-input-wrap">
                         <i class="fas fa-user dash-input-icon"></i>
                         <input type="text" 
                                name="last_name" 
-                               required 
                                class="dash-control" 
                                value="{{ isset($profile->last_name) ? $profile->last_name : '' }}" 
                                placeholder="উদাঃ চৌধুরী">

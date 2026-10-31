@@ -30,7 +30,7 @@
         <h4><i class="fa fa-info-circle"></i> সেলার অর্ডার নির্দেশনা:</h4>
         <p style="margin-bottom: 0;">
             ১. আপনার দায়িত্ব শুধু <strong>Ready for Pickup (পিকআপের জন্য প্রস্তুত)</strong> স্ট্যাটাস পর্যন্ত থাকবে।<br>
-            ২. এরপরের সব কার্যক্রম (পিকআপ, শিপমেন্ট, কাস্টমারের কাছে ডেলিভারি ও <strong>Delivered</strong> স্ট্যাটাস) অ্যাডমিন পরিচালনা করবেন এবং আপনি এখান থেকে সরাসরি অ্যাডমিনের আপডেট দেখতে পারবেন।
+            ২. এরপরের সব কার্যক্রম (পিকআপ, শিপমেন্ট, কাস্টমারের কাছে ডেলিভারি ও <strong>Delivered</strong> স্ট্যাটাস) লোকাল অফিস পরিচালনা করবেন এবং আপনি এখান থেকে সরাসরি লোকাল অফিসের আপডেট দেখতে পারবেন।
         </p>
     </div>
 
@@ -67,7 +67,7 @@
                 </a>
                 <a href="{{ route('seller.orders.index', ['status' => 'delivered']) }}"
                    class="btn btn-sm {{ $statusFilter === 'delivered' ? 'btn-success' : 'btn-default' }}">
-                    Delivered (এডমিন আপডেট)
+                    Delivered (লোকাল অফিস আপডেট)
                 </a>
             </div>
         </div>
@@ -82,7 +82,7 @@
                         <th>বিক্রয়মূল্য (ERP)</th>
                         <th>সেলার রেট</th>
                         <th>সেলার স্ট্যাটাস (আপনার প্যানেল)</th>
-                        <th>অ্যাডমিন / ডেলিভারি স্ট্যাটাস</th>
+                        <th>লোকাল অফিস / ডেলিভারি স্ট্যাটাস</th>
                         <th>অ্যাকশন (৪টি ধাপ)</th>
                         <th>বিস্তারিত</th>
                     </tr>
@@ -156,7 +156,7 @@
                             </td>
                             <td>
                                 @if($isLockedByAdmin)
-                                    <span class="text-muted small"><i class="fa fa-lock"></i> অ্যাডমিন নিয়ন্ত্রণে ({{ ucfirst($adminStatus) }})</span>
+                                    <span class="text-muted small"><i class="fa fa-lock"></i> লোকাল অফিস নিয়ন্ত্রণে ({{ ucfirst($adminStatus) }})</span>
                                 @elseif($sStatus === 'canceled')
                                     <span class="text-danger small">আপনি অর্ডারটি বাতিল করেছেন</span>
                                 @else
@@ -194,7 +194,7 @@
                                                 </button>
                                             </form>
                                         @elseif($sStatus === 'ready_for_pickup')
-                                            <span class="text-success small"><i class="fa fa-check-circle"></i> পিকআপের জন্য প্রস্তুত (অ্যাডমিন পিকআপ করবেন)</span>
+                                            <span class="text-success small"><i class="fa fa-check-circle"></i> পিকআপের জন্য প্রস্তুত (লোকাল অফিস পিকআপ করবেন)</span>
                                         @endif
                                     </div>
                                 @endif

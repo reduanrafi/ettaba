@@ -13,8 +13,8 @@ const app = {
             trp: 0,
             tcb: 0,
             rateTotal: 0,
-            //cartTotalBn:this.changeNumberToBangla(this.cartTotal),
-            deliveryCharge: 10,
+            deliveryCharge: 0,
+            detailQty: 1,
             paymentMethodId: 0,
             emptyStar: "far fa-star",
             filledStar: "fas fa-star",
@@ -34,63 +34,90 @@ const app = {
             vbCount: 0,
             advancePaymentRequired: false,
             showPolicyTooltip: false
-
         }
-
     },
     methods: {
-        addToCart(product_id, product_name, erp, trp, owner_id, tcb, rate) {
-            let found = false;
+        changeDetailQty(delta) {
+            let next = parseInt(this.detailQty || 1, 10) + parseInt(delta || 0, 10);
+            if (isNaN(next) || next < 1) next = 1;
+            this.detailQty = next;
+            let input = document.getElementById('detailQtyInput');
+            if (input) input.value = next;
+        },
 
-            itemToAdd = {
-                'product_id': product_id,
+        addToCart(product_id, product_name, erp, trp, owner_id, tcb, rate, qty = 1) {
+            let addQty = parseInt(qty || 1, 10);
+            if (isNaN(addQty) || addQty < 1) {
+                let inputEl = document.getElementById('detailQtyInput');
+                addQty = inputEl ? Math.max(1, parseInt(inputEl.value || 1, 10)) : 1;
+            }
+
+            let itemToAdd = {
+                'product_id': String(product_id),
                 'owner_id': owner_id,
                 'name': product_name,
-                'price': erp,
-                'trp': trp,
-                'tcb': tcb,
-                'rate': rate,
-                'quantity': 1
+                'price': parseFloat(erp || 0),
+                'trp': parseFloat(trp || 0),
+                'tcb': parseFloat(tcb || 0),
+                'rate': parseFloat(rate || 0),
+                'quantity': addQty
             };
-            console.log(itemToAdd)
 
-            // Add the item or increase qty
-
-            let itemInCart = this.cartItems.filter(item => item.product_id === itemToAdd.product_id);
-
+            let itemInCart = this.cartItems.filter(item => String(item.product_id) === String(itemToAdd.product_id));
             let isItemInCart = itemInCart.length > 0;
 
             if (isItemInCart === false) {
                 this.cartItems.push(itemToAdd);
             } else {
-                itemInCart[0].quantity += itemToAdd.quantity;
+                itemInCart[0].quantity = parseInt(itemInCart[0].quantity || 0, 10) + itemToAdd.quantity;
             }
 
             localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+            this.setTotal(this.calculateTotal());
+            this.checkAdvancePayment();
+        },
 
-            this.setTotal(this.calculateTotal())
+        decrementItem(index) {
+            if (!this.cartItems[index]) return;
+            let currentQty = parseInt(this.cartItems[index].quantity || 1, 10);
+            if (currentQty > 1) {
+                this.cartItems[index].quantity = currentQty - 1;
+                localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+                this.setTotal(this.calculateTotal());
+                this.checkAdvancePayment();
+            } else {
+                this.removeItem(index);
+            }
+        },
 
-
+        incrementItem(index) {
+            if (!this.cartItems[index]) return;
+            let currentQty = parseInt(this.cartItems[index].quantity || 1, 10);
+            this.cartItems[index].quantity = currentQty + 1;
+            localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
+            this.setTotal(this.calculateTotal());
         },
 
         removeItem(index) {
-
             this.cartItems.splice(index, 1);
-
             localStorage.setItem('cartItems', JSON.stringify(this.cartItems));
-
-            this.setTotal(this.calculateTotal())
+            this.setTotal(this.calculateTotal());
             this.checkAdvancePayment();
-
         },
+
         clearCart() {
             this.cartItems = [];
-            localStorage.clear();
+            localStorage.removeItem('cartItems');
             this.cartTotal = 0;
-
+            this.netTotal = 0;
+            this.trp = 0;
+            this.tcb = 0;
+            this.rateTotal = 0;
         },
+
         calculateTotal() {
-            let items = JSON.parse(localStorage.getItem('cartItems'));
+            let raw = localStorage.getItem('cartItems');
+            let items = (raw && raw !== 'undefined') ? JSON.parse(raw) : [];
             let total = [];
 
             total['erp'] = 0;
@@ -99,15 +126,11 @@ const app = {
             total['rate'] = 0;
 
             items.forEach(item => {
-
-                total['erp'] += item.price * item.quantity;
-
-                total['trp'] += item.trp * item.quantity;
-
-                total['tcb'] += item.tcb * item.quantity;
-
-                total['rate'] += item.rate * item.quantity;
-
+                let q = parseInt(item.quantity || 1, 10);
+                total['erp'] += parseFloat(item.price || 0) * q;
+                total['trp'] += parseFloat(item.trp || 0) * q;
+                total['tcb'] += parseFloat(item.tcb || 0) * q;
+                total['rate'] += parseFloat(item.rate || 0) * q;
             });
 
             return total;
@@ -115,30 +138,25 @@ const app = {
 
         setTotal(total) {
             this.cartTotal = total['erp'];
-
             this.trp = total['trp'];
-
             this.tcb = total['tcb'];
-
             this.rateTotal = total['rate'];
-
             this.netTotal = this.cartTotal;
-
         },
 
         calculateTotalTrp() {
-            let items = JSON.parse(localStorage.getItem('cartItems'));
+            let raw = localStorage.getItem('cartItems');
+            let items = (raw && raw !== 'undefined') ? JSON.parse(raw) : [];
             let totalTrp = 0;
             items.forEach(item => {
-                totalTrp += item.trp * item.quantity;
+                totalTrp += parseFloat(item.trp || 0) * parseInt(item.quantity || 1, 10);
             });
 
             return totalTrp;
         },
+
         calculateVDeductedNetTotal(total, virtualBalance, trp) {
-
             if (this.vbCount == 0) {
-
                 this.dVirtualBalance = trp * 20;
                 this.virtualBalance = virtualBalance - this.dVirtualBalance;
                 if (this.virtualBalance < 0) {
@@ -146,16 +164,15 @@ const app = {
                 }
 
                 this.netTotal = this.netTotal - this.dVirtualBalance;
-
                 this.vbCount++;
                 return this.netTotal;
-
             }
         },
+
         selectPaymentMethod(pmId) {
             this.paymentMethodId = pmId;
-            console.log(this.paymentMethodId)
         },
+
         checkAdvancePayment() {
             if (this.cartItems.length === 0) {
                 this.advancePaymentRequired = false;
@@ -173,11 +190,13 @@ const app = {
                     console.error("Error checking advance payment rules:", error);
                 });
         },
+
         togglePolicyTooltip() {
             if (this.advancePaymentRequired) {
                 this.showPolicyTooltip = !this.showPolicyTooltip;
             }
         },
+
         saveOrder(userId, address, total) {
             if (this.paymentMethodId == 0) {
                 this.message = 'Please select a payment method';
@@ -195,15 +214,10 @@ const app = {
                         "orderItems": this.cartItems,
                         "virtual_balance": this.dVirtualBalance
                     }
-
-                }
-
-                console.log(order)
-
+                };
 
                 axios.post(this.rootUrl + "orders/save", order)
                     .then(response => {
-                        console.log(response);
                         if (response.data.redirect_url) {
                             window.location.href = response.data.redirect_url;
                         } else {
@@ -212,19 +226,14 @@ const app = {
                             this.clearCart();
                         }
                     }).catch(error => {
-                        console.log(error.response);
                         this.message = error.response?.data?.message || 'Error saving order';
                     });
             }
-
-
         },
+
         saveAnonymousOrder() {
-            console.log("test")
-            console.log(this.username)
             if (this.paymentMethodId === 0) {
                 this.message = 'Please select a payment method';
-                console.log(this.message)
                 return false;
             } else if (this.username == null || this.username === "") {
                 this.message = "You must add the user name";
@@ -236,7 +245,6 @@ const app = {
                 this.message = "Address is required";
                 return false;
             } else {
-                console.log("else working here")
                 let order = {
                     'order': {
                         "payment_method_id": this.paymentMethodId,
@@ -250,17 +258,11 @@ const app = {
                         "username": this.username,
                         "phone": this.phone,
                         "address": this.address
-
                     }
-
-                }
-
-                console.log(order)
-
+                };
 
                 axios.post(this.rootUrl + "save-anonymous-order", order)
                     .then(response => {
-                        console.log(response);
                         if (response.data.redirect_url) {
                             window.location.href = response.data.redirect_url;
                         } else {
@@ -269,22 +271,14 @@ const app = {
                             this.clearCart();
                         }
                     }).catch(error => {
-                        console.log(error.response);
                         this.message = error.response?.data?.message || 'Error saving order';
                     });
             }
-
-
         },
 
-
         timeSince: function (date) {
-
             if (date != undefined) {
-
                 var seconds = Math.floor((new Date() - this.sqlToJS(date)) / 1000);
-
-                ////console.log(date)
                 var interval = Math.floor(seconds / 31536000);
 
                 if (interval > 1) {
@@ -299,7 +293,6 @@ const app = {
                     return interval + " days";
                 }
                 if (interval == 1) {
-
                     return interval + " day";
                 }
                 interval = Math.floor(seconds / 3600);
@@ -312,28 +305,28 @@ const app = {
                 }
                 return Math.floor(seconds) + " seconds";
             }
-
         },
 
         changeNumberToBangla(n) {
-            console.log(n)
-            const toBn = n => n.replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
-
-            return toBn(n)
+            const toBn = n => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]);
+            return toBn(n);
         },
+
         ratingUpdate(rating) {
             this.rating = rating;
-            this.changeClass(rating)
-
+            this.changeClass(rating);
+            let ratingInput = document.getElementById('reviewRatingInput');
+            if (ratingInput) ratingInput.value = rating;
         },
-        saveRating() {
 
-            console.log(this.rating)
-            console.log(this.ratingText)
+        saveRating() {
+            let form = document.getElementById('productReviewForm');
+            if (form) {
+                form.submit();
+            }
         },
 
         changeClass() {
-
             if (this.rating == 0) {
                 this.star1 = this.emptyStar;
                 this.star2 = this.emptyStar;
@@ -374,9 +367,7 @@ const app = {
         }
     },
     mounted: function () {
-
         if (localStorage.getItem('cartItems') != 'undefined' && localStorage.getItem('cartItems') != null) {
-
             this.cartItems = JSON.parse(localStorage.getItem('cartItems'));
             this.cartTotal = this.Total['erp'];
             this.trp = this.Total['trp'];
@@ -386,10 +377,13 @@ const app = {
         }
         this.checkAdvancePayment();
 
+        let existingRatingEl = document.getElementById('reviewRatingInput');
+        if (existingRatingEl && parseInt(existingRatingEl.value || 0, 10) > 0) {
+            this.ratingUpdate(parseInt(existingRatingEl.value, 10));
+        }
     },
     computed: {
         Total() {
-            console.log(localStorage.getItem('cartItems'))
             if (localStorage.getItem('cartItems') != 'undefined' && localStorage.getItem('cartItems') != null) {
                 let items = JSON.parse(localStorage.getItem('cartItems'));
 
@@ -401,22 +395,17 @@ const app = {
                 total['rate'] = 0;
 
                 items.forEach(item => {
-                    total['erp'] += item.price * item.quantity;
-                    total['trp'] += item.trp * item.quantity;
-                    total['tcb'] += item.tcb * item.quantity;
-                    total['rate'] += item.rate * item.quantity;
+                    let q = parseInt(item.quantity || 1, 10);
+                    total['erp'] += parseFloat(item.price || 0) * q;
+                    total['trp'] += parseFloat(item.trp || 0) * q;
+                    total['tcb'] += parseFloat(item.tcb || 0) * q;
+                    total['rate'] += parseFloat(item.rate || 0) * q;
                 });
-                if (items.length > 0) {
-                    total['erp'] += this.deliveryCharge;
 
-                }
                 return total;
             }
-
         },
-
     },
-
 };
 
-Vue.createApp(app).mount('#app')
+Vue.createApp(app).mount('#app');

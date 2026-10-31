@@ -12,9 +12,6 @@ class Profile extends Model
     use HasFactory;
     use CommonFunctions;
 
-    /****************************
-     * Property area
-     *****************************/
     protected $fillable = [
         'user_id',
         'nid',
@@ -31,37 +28,34 @@ class Profile extends Model
         'date_of_birth'
     ];
 
-    /****************************
-     * Model Relation area
-     *****************************/
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /****************************
-     * Public Methods area
-     *****************************/
-
-    /***
-     * Method to get data.
-     * @param $data
-     * @return
-     */
-
     public function GetData($data)
     {
         $data['user_id'] = Auth::user()->id;
-        if (isset($data['profile_image']))
-        {
-            $data['profile_image'] = $this->UploadImage($data['profile_image'], 'profiles');
-
+        if (isset($data['profile_image']) && $data['profile_image']) {
+            $uploaded = $this->UploadImage($data['profile_image'], 'profiles');
+            if ($uploaded) {
+                $data['profile_image'] = $uploaded;
+            } else {
+                unset($data['profile_image']);
+            }
+        } else {
+            unset($data['profile_image']);
         }
-        if (isset($data['nid_image']))
-        {
-            $data['nid_image'] = $this->UploadImage($data['nid_image'], 'nid');
 
+        if (isset($data['nid_image']) && $data['nid_image']) {
+            $uploadedNid = $this->UploadImage($data['nid_image'], 'nid');
+            if ($uploadedNid) {
+                $data['nid_image'] = $uploadedNid;
+            } else {
+                unset($data['nid_image']);
+            }
+        } else {
+            unset($data['nid_image']);
         }
         return $data;
     }
@@ -72,12 +66,10 @@ class Profile extends Model
         $profile = $this->GetProfile();
 
         if ($profile != null) {
-            //dd($profile);
             if ($profile->update($data)) {
                 $result = true;
             }
         } else {
-
             if (Profile::create($data)) {
                 $result = true;
             }
@@ -87,14 +79,11 @@ class Profile extends Model
 
     public function GetProfile()
     {
-        return Profile::with('user','user.order')->where('user_id',Auth::user()->id)->first();
+        return Profile::with('user', 'user.order')->where('user_id', Auth::user()->id)->first();
     }
 
     public function GetOrders()
     {
-        return Order::where('user_id',Auth::user()->id)->orderBy('id','desc')->get();
+        return Order::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
     }
-    /****************************
-     * Public Methods area
-     *****************************/
 }

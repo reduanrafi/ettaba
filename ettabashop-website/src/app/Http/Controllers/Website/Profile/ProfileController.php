@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Website\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProfileResource;
 use App\Models\Profile;
+use App\Models\User;
 use App\Models\OnlineCategory;
 use App\Models\RewardSetting;
 use App\Models\UserNotification;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
@@ -37,11 +39,6 @@ class ProfileController extends Controller
 
     public function SaveProfile(Request $request)
     {
-
-       // dd($request->all());
-        $validator =  $request->validate([
-            //'nid' => ['required', 'string', 'unique:profiles'],
-        ]);
         $userObject = new User();
 
         try {
@@ -62,10 +59,8 @@ class ProfileController extends Controller
 
                 if (!\App\Models\UserGenerationGroup::where('user_id', Auth::user()->id)->exists()) {
                     $status = $customerGenerationCommissionGroupService->SaveUserGenerationGroup(Auth::user()->id);
-                    //dd($status);
-                    if ($status==0)
-                    {
-                        return redirect()->back()->with(['error'=>"Generation group already created or there is error in this section"]);
+                    if ($status == 0) {
+                        return redirect()->back()->with(['error' => "Generation group already created or there is error in this section"]);
                     }
                 }
 
@@ -77,18 +72,16 @@ class ProfileController extends Controller
 
                 $this->message = 'প্রোফাইল তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!';
             }
-        } catch (QueryException $ex) {
-            $this->message = $ex->getMessage();
-
+        } catch (\Throwable $ex) {
+            Log::error('SaveProfile failed: ' . $ex->getMessage());
+            return redirect()->back()->with(['error' => 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে: ' . $ex->getMessage()]);
         }
 
         return redirect()->back()->with([
             'status' => 'ok',
-            'message' => $this->message
+            'message' => $this->message ?: 'প্রোফাইল তথ্য সফলভাবে সংরক্ষণ করা হয়েছে!'
         ]);
     }
-
-
 
     public function GetProfile()
     {
@@ -123,8 +116,8 @@ class ProfileController extends Controller
     }
     public function Orders()
     {
-        $message='';
-        $profile  = $this->globalObject->GetProfile();
+        $message = '';
+        $profile = $this->globalObject->GetProfile();
         $earnings = EarningStatisticsService::EarningStatistics(Auth::user()->id);
         $orders = $this->globalObject->GetOrders();
 
@@ -137,95 +130,83 @@ class ProfileController extends Controller
         // Refresh orders list
         $orders = $this->globalObject->GetOrders();
 
-        if(!$profile) {
-            $message =  'You do not have a profile, please create a profile to activate you account !';
+        if (!$profile) {
+            $message = 'You do not have a profile, please create a profile to activate you account !';
         }
 
-        return view('website.profile.index',[
-            'profile'=>$profile,
-            'message'=>$message,
-            'earnings'=>$earnings,
-            'orders'=>$orders,
+        return view('website.profile.index', [
+            'profile' => $profile,
+            'message' => $message,
+            'earnings' => $earnings,
+            'orders' => $orders,
         ]);
     }
     public function Trainings()
     {
-        $message='';
-        $profile  = $this->globalObject->GetProfile();
+        $message = '';
+        $profile = $this->globalObject->GetProfile();
         $earnings = EarningStatisticsService::EarningStatistics(Auth::user()->id);
-        if(!$profile) {
-            $message =  'You do not have a profile, please create a profile to activate you account !';
+        if (!$profile) {
+            $message = 'You do not have a profile, please create a profile to activate you account !';
         }
 
-        return view('website.profile.index',[
-            'profile'=>$profile,
-            'message'=>$message,
-            'earnings'=>$earnings
+        return view('website.profile.index', [
+            'profile' => $profile,
+            'message' => $message,
+            'earnings' => $earnings
         ]);
     }
 
     public function Referral()
     {
-        $message='';
-        $profile  = $this->globalObject->GetProfile();
+        $message = '';
+        $profile = $this->globalObject->GetProfile();
         $earnings = EarningStatisticsService::EarningStatistics(Auth::user()->id);
-        if(!$profile) {
-            $message =  'You do not have a profile, please create a profile to activate you account !';
+        if (!$profile) {
+            $message = 'You do not have a profile, please create a profile to activate you account !';
         }
 
-        return view('website.profile.index',[
-            'profile'=>$profile,
-            'message'=>$message,
-            'earnings'=>$earnings
+        return view('website.profile.index', [
+            'profile' => $profile,
+            'message' => $message,
+            'earnings' => $earnings
         ]);
     }
-
-
 
     public function ChangeEmail(Request $request)
     {
         $user = Auth::user();
-        if ($request->email!='')
-        {
-            if($user->update(['email'=>$request->email]))
-            {
+        if ($request->email != '') {
+            if ($user->update(['email' => $request->email])) {
                 return response()->json([
                     'status' => 'ok',
                     'message ' => 'Email updated successful'
                 ]);
             }
-        }
-
-        else{
+        } else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'unable to update email !'
             ]);
         }
-
     }
 
     public function ChangePhone(Request $request)
     {
         $user = Auth::user();
-        if ($request->phone!='')
-        {
-            if($user->update(['phone'=>$request->phone]))
-            {
+        if ($request->phone != '') {
+            if ($user->update(['phone' => $request->phone])) {
                 return response()->json([
                     'status' => 'ok',
                     'message ' => 'Phone updated successful'
                 ]);
             }
-        }
-
-        else{
+        } else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'unable to update phone !'
             ]);
         }
-
     }
 
     public function CreateReferralCode()
@@ -233,19 +214,15 @@ class ProfileController extends Controller
         $user = Auth::user();
         $code = '';
 
-        if ($user)
-        {
-            $code = "ES".$user->id.Carbon::now()->month;
+        if ($user) {
+            $code = "ES" . $user->id . Carbon::now()->month;
 
-                return response()->json([
-                    'status' => 'ok',
-                    'referral' => $code,
-                    'message ' => 'Successfully created referral code '
-                ]);
-
-        }
-
-        else{
+            return response()->json([
+                'status' => 'ok',
+                'referral' => $code,
+                'message ' => 'Successfully created referral code '
+            ]);
+        } else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'unable to create referral code !'
@@ -297,7 +274,6 @@ class ProfileController extends Controller
                             $merchantCommissionService = new \App\Services\MerchantCommissionDistributionService();
                             $merchantCommissionService->DistributeRateAndPoint($order->id);
                         }
-
                     }
 
                     \Illuminate\Support\Facades\DB::commit();
@@ -313,17 +289,17 @@ class ProfileController extends Controller
     {
         $authUser = Auth::user();
         $message = '';
-        
+
         // Sidebar layout needs profile and earnings of the authenticated user
         $profile = $this->globalObject->GetProfile();
         $earnings = \Facades\App\Services\EarningStatisticsService::EarningStatistics($authUser->id);
-        
+
         // activeUser is the one whose tree is being viewed
         $activeUser = $authUser;
-        
+
         if ($request->has('uid') && !empty($request->uid)) {
             $searchUid = trim($request->uid);
-            
+
             if (substr($searchUid, 0, 2) !== '13') {
                 $message = 'আপনি যে eIDটি লিখেছেন, সেটি সঠিক ফরম্যাটের নয়। অনুগ্রহ করে একটি সঠিক eID দিয়ে পুনরায় চেষ্টা করুন। ধন্যবাদ।';
             } else {
@@ -333,7 +309,7 @@ class ProfileController extends Controller
                 } else {
                     $isValidDescendant = false;
                     $currentCheck = $targetUser;
-                    
+
                     if ($targetUser->id == $authUser->id) {
                         $isValidDescendant = true;
                     } else {
@@ -348,7 +324,7 @@ class ProfileController extends Controller
                             $depth++;
                         }
                     }
-                    
+
                     if (!$isValidDescendant) {
                         $message = 'আপনি যে eIDটি সার্চ করেছেন, সেটি আপনার টিমের অন্তর্ভুক্ত নয়। কোম্পানির পার্টনার নীতিমালা অনুযায়ী আপনি শুধুমাত্র আপনার নিজস্ব টিমের ট্রি দেখতে পারবেন। অনুগ্রহ করে আপনার টিমের কোনো eID দিয়ে পুনরায় সার্চ করুন। ধন্যবাদ।';
                     } else {
@@ -357,60 +333,60 @@ class ProfileController extends Controller
                 }
             }
         }
-        
+
         $activeProfile = Profile::where('user_id', $activeUser->id)->first();
         $activeEarnings = \Facades\App\Services\EarningStatisticsService::EarningStatistics($activeUser->id);
-        
+
         $referrer = null;
         if ($activeUser->parent_id) {
             $referrer = User::with('profile')->find($activeUser->parent_id);
         }
-        
+
         $partners = User::with('profile')->where('parent_id', $activeUser->id)->where('customer_type', 'buy_earn')->get();
-        
+
         $customers = User::with('profile')->where('parent_id', $activeUser->id)
             ->where('type', 'customer')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('customer_type')->orWhere('customer_type', '!=', 'buy_earn');
             })->get();
-        
+
         $merchants = User::with('profile')->where('parent_id', $activeUser->id)
             ->whereIn('type', ['store_owner', 'store_administrator'])
             ->get();
-        
+
         // Closure to fetch stats for each downline member
-        $enrichChild = function($child) {
+        $enrichChild = function ($child) {
             $childEarnings = \Facades\App\Services\EarningStatisticsService::EarningStatistics($child->id);
             $child->total_earned = ($childEarnings['totalEarning'] ?? 0) + ($childEarnings['totalWithdraw'] ?? 0);
             $child->total_reward = $childEarnings['totalPoint'] ?? 0;
-            
+
             $child->total_partners = User::where('parent_id', $child->id)->where('customer_type', 'buy_earn')->count();
             $child->total_customers = User::where('parent_id', $child->id)
                 ->where('type', 'customer')
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->whereNull('customer_type')->orWhere('customer_type', '!=', 'buy_earn');
                 })->count();
             $child->total_merchants = User::where('parent_id', $child->id)
                 ->whereIn('type', ['store_owner', 'store_administrator'])
                 ->count();
-            
+
             return $child;
         };
-        
+
         $partners->transform($enrichChild);
         $customers->transform($enrichChild);
-        $merchants->transform(function($merchant) use ($enrichChild) {
+        $merchants->transform(function ($merchant) use ($enrichChild) {
             $merchant = $enrichChild($merchant);
             $shop = \App\Models\Shop::where('user_id', $merchant->id)->first();
             $merchant->merchant_id = $shop ? $shop->unique_id : $merchant->unique_id;
             return $merchant;
         });
-        
-        if(!$profile) {
+
+        if (!$profile) {
             $message = 'You do not have a profile, please create a profile to activate you account !';
         }
-        
-        return view('website.profile.index',[
+
+        return view('website.profile.index', [
             'profile' => $profile,
             'message' => $message,
             'earnings' => $earnings,

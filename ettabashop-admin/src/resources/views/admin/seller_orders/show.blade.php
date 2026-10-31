@@ -59,7 +59,7 @@
                     @endif
 
                     <p>
-                        <strong>অ্যাডমিন / ডেলিভারি স্ট্যাটাস (Read-only):</strong>
+                        <strong>লোকাল অফিস / ডেলিভারি স্ট্যাটাস (Read-only):</strong>
                         @if($adminStatus === 'on_delivery')
                             <span class="label label-warning"><i class="fa fa-truck"></i> On Delivery (শিপমেন্টে আছে)</span>
                         @elseif(in_array($adminStatus, ['delivered', 'completed', 'done'], true))
@@ -75,7 +75,7 @@
 
                     @if($isLockedByAdmin)
                         <div class="callout callout-success" style="margin-bottom: 0;">
-                            <p><i class="fa fa-lock"></i> পিকআপ পরবর্তী কার্যক্রম বর্তমানে অ্যাডমিনের নিয়ন্ত্রণে রয়েছে।</p>
+                            <p><i class="fa fa-lock"></i> পিকআপ পরবর্তী কার্যক্রম বর্তমানে লোকাল অফিসের নিয়ন্ত্রণে রয়েছে।</p>
                         </div>
                     @elseif($sellerStatus === 'canceled')
                         <div class="callout callout-danger" style="margin-bottom: 0;">

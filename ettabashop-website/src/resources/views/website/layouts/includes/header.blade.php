@@ -23,29 +23,29 @@
                 </a>
             </div>
 
-            <!-- Right: Location (Address only when logged in; only pin icon when logged out) + Notification Icon -->
-            <div class="d-flex align-items-center" style="gap: 6px;">
-                @auth
-                    <!-- Logged-in: Show Location Pin + Registered Municipality/Union/Ward -->
-                    <a href="{{ route('user.profile') }}" class="ettaba-location-pill text-decoration-none" title="আপনার নিবন্ধিত ঠিকানা">
-                        <i class="fas fa-map-marker-alt mr-1" style="color: #15803d; font-size: 15px;"></i>
-                        <span>{{ !empty($headerLocationText) ? $headerLocationText : 'ঠিকানা যুক্ত করুন' }}</span>
-                        <i class="fas fa-chevron-down ml-1 text-muted" style="font-size: 10px;"></i>
-                    </a>
-                @else
-                    <!-- Logged-out: Show ONLY Location Icon (No municipality, union or ward number) -->
-                    <span class="ettaba-location-icon-only" title="লোকেশন">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </span>
-                @endguest
-
+            <!-- Right: Location (Below notification icon on mobile so Ettaba Shop never wraps) + Notification Icon -->
+            <div class="d-flex flex-column flex-md-row align-items-end align-items-md-center" style="gap: 3px 6px;">
                 <!-- Notification Bell Icon + Unread Count (Hidden if 0) -->
-                <a href="{{ route('website.notices.index') }}" class="ettaba-notify-btn" title="নোটিশ ও নোটিফিকেশন">
+                <a href="{{ route('website.notices.index') }}" class="ettaba-notify-btn order-1 order-md-2" title="নোটিশ ও নোটিফিকেশন">
                     <i class="fas fa-bell"></i>
                     @if(isset($unreadNoticeCount) && $unreadNoticeCount > 0)
                         <span class="ettaba-notify-badge">{{ $unreadNoticeCount }}</span>
                     @endif
                 </a>
+
+                @auth
+                    <!-- Logged-in: Show Location Pin + Registered Municipality/Union/Ward -->
+                    <a href="{{ route('user.profile') }}" class="ettaba-location-pill text-decoration-none order-2 order-md-1" title="আপনার নিবন্ধিত ঠিকানা">
+                        <i class="fas fa-map-marker-alt mr-1" style="color: #15803d; font-size: 12px;"></i>
+                        <span>{{ !empty($headerLocationText) ? $headerLocationText : 'ঠিকানা যুক্ত করুন' }}</span>
+                        <i class="fas fa-chevron-down ml-1 text-muted" style="font-size: 9px;"></i>
+                    </a>
+                @else
+                    <!-- Logged-out: Show ONLY Location Icon (No municipality, union or ward number) -->
+                    <span class="ettaba-location-icon-only order-2 order-md-1 d-none d-md-inline-flex" title="লোকেশন">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                @endguest
             </div>
         </div>
 
@@ -87,14 +87,10 @@
                         <h6 class="mb-1 font-weight-bold">@{{ item.name }}</h6>
                         <div class="small text-muted mb-2">পয়েন্ট: @{{ item.trp }} | মূল্য: @{{ item.price }}৳</div>
 
-                        <div class="input-group input-group-sm" style="width: 110px;">
-                            <div class="input-group-prepend">
-                                <button @click="removeItem(index)" class="btn btn-outline-secondary" type="button">-</button>
-                            </div>
-                            <input type="text" class="form-control text-center font-weight-bold px-1" :value="item.quantity" readonly>
-                            <div class="input-group-append">
-                                <button @click="addToCart(item.product_id, item.name, item.price, item.trp, item.owner_id, item.tcb, item.rate)" class="btn btn-outline-secondary" type="button">+</button>
-                            </div>
+                        <div class="d-inline-flex align-items-center" style="border: 1.5px solid #cbd5e1; border-radius: 10px; background: #f8fafc; height: 36px; overflow: hidden;">
+                            <button @click="decrementItem(index)" type="button" style="width: 34px; height: 100%; border: none; background: transparent; font-size: 16px; font-weight: 700; color: #334155; cursor: pointer;">−</button>
+                            <input type="text" :value="item.quantity" readonly style="width: 38px; border: none; background: transparent; text-align: center; font-size: 14px; font-weight: 700; color: #0f172a; outline: none;">
+                            <button @click="incrementItem(index)" type="button" style="width: 34px; height: 100%; border: none; background: transparent; font-size: 16px; font-weight: 700; color: #334155; cursor: pointer;">+</button>
                         </div>
                     </div>
 

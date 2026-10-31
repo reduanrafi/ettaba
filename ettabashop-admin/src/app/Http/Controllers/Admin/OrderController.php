@@ -326,6 +326,8 @@ class OrderController extends Controller
         $charge = max(0, (float) $request->input('delivery_charge', 0));
 
         $order->delivery_charge = $charge;
+        $virtualUsed = (float) ($order->virtual_balance_used ?? 0);
+        $order->net_total = max(0, (float) $order->erp_total - $virtualUsed) + $charge;
         $order->save();
 
         return redirect()->back()->with(['success' => 'ডেলিভারি চার্জ সফলভাবে আপডেট করা হয়েছে (৳' . number_format($charge, 2) . ')।']);

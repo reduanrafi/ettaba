@@ -866,13 +866,13 @@
                     </button>
                 </div>
 
-                <!-- ================= STEP 6: Profile Image Upload ================= -->
+                <!-- ================= STEP 6: Profile Image Upload (Optional) ================= -->
                 <div class="step-section" id="step-6" style="display: none;">
                     <div class="step-icon-wrapper">
                         <i class="fa fa-camera"></i>
                     </div>
-                    <div class="step-title">আপনার একটি ছবি আপলোড করুন</div>
-                    <div class="step-subtitle">প্রোফাইল সম্পূর্ণ করতে স্পষ্ট ছবি নির্বাচন করুন</div>
+                    <div class="step-title">আপনার একটি ছবি আপলোড করুন (ঐচ্ছিক)</div>
+                    <div class="step-subtitle">চাইলে এখন ছবি আপলোড করতে পারেন অথবা সরাসরি পরবর্তী ধাপে যেতে পারেন</div>
 
                     <input type="file"
                            name="profile_image"
@@ -884,7 +884,7 @@
                         <div class="upload-icon">
                             <i class="fa fa-cloud-upload-alt"></i>
                         </div>
-                        <div class="upload-text">ছবি নির্বাচন করুন</div>
+                        <div class="upload-text">ছবি নির্বাচন করুন (ঐচ্ছিক)</div>
                         <div class="upload-hint">(JPG, PNG ফরম্যাট এবং সর্বোচ্চ 2MB পাসপোর্ট সাইজের ছবি ব্যবহার করুন)</div>
                     </div>
 
@@ -897,7 +897,7 @@
                         </div>
                     </div>
 
-                    <button type="button" class="btn-step-next" id="btn-next-6" disabled>
+                    <button type="button" class="btn-step-next" id="btn-next-6">
                         <span>পরবর্তী ধাপে যান</span>
                         <i class="fa fa-arrow-right"></i>
                     </button>
@@ -998,7 +998,7 @@
         '3-customer': { num: '৩.১', title: 'কাস্টমার অতিরিক্ত তথ্য (ঐচ্ছিক)' },
         4: { num: '৪', title: 'রেফার eID লিখুন' },
         5: { num: '৫', title: 'ঠিকানা নির্বাচন করুন' },
-        6: { num: '৬', title: 'ছবি আপলোড করুন' },
+        6: { num: '৬', title: 'ছবি আপলোড করুন (ঐচ্ছিক)' },
         7: { num: '৭', title: 'পাসওয়ার্ড সেট করুন' },
         8: { num: '৮', title: 'একাউন্ট সফলভাবে তৈরি' }
     };
@@ -1060,7 +1060,6 @@
         // ==================== STEP 1: Full Name ====================
         $('#name_input').on('input', function() {
             let val = $(this).val();
-            // Allow Bengali and English letters with space only
             let sanitized = val.replace(/[^a-zA-Z\u0980-\u09FF\s]/g, '');
             if (val !== sanitized) {
                 $(this).val(sanitized);
@@ -1092,7 +1091,6 @@
         let usernameTimer = null;
         $('#phone_input').on('input', function() {
             let val = $(this).val();
-            // Only alphanumeric English letters and digits
             let sanitized = val.replace(/[^a-zA-Z0-9]/g, '');
             if (val !== sanitized) {
                 $(this).val(sanitized);
@@ -1140,7 +1138,6 @@
         });
 
         // ==================== STEP 3: Account Selection ====================
-        // ==================== STEP 3: Account Selection ====================
         $('#customer_type_select').on('change', function() {
             selectedAccountType = $(this).val();
             if (selectedAccountType) {
@@ -1152,11 +1149,9 @@
 
         $('#btn-next-3').on('click', function() {
             if (selectedAccountType === 'buy_earn') {
-                // Partner selected -> Show Partner mandatory extra fields
                 goToStep('3-partner');
                 checkPartnerExtraValidity();
             } else if (selectedAccountType === 'buy_only' || selectedAccountType === 'virtual_agent') {
-                // Customer & Virtual Agent skip 3.1 directly to Step 4
                 setupStep4ForCustomerOrVirtual();
                 goToStep(4);
             }
@@ -1234,7 +1229,6 @@
                 return;
             }
 
-            // Must only be numbers
             let sanitized = val.replace(/[^0-9]/g, '');
             if (val !== sanitized) {
                 $('#customer_referral_input').val(sanitized);
@@ -1465,10 +1459,9 @@
             let wardCount = parseInt(selectedOpt.data('wards')) || 0;
 
             if (currentSelectedUpazilaType === 'city_corporation') {
-                // City Corporation: 4th dropdown becomes Ward/Zone selector
                 $('#union_icon').attr('class', 'fa fa-city input-icon');
                 $('#union_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
-                $('#ward_box').hide(); // Ward is directly chosen in union_select
+                $('#ward_box').hide();
 
                 $.get("{{ url('/api/geo/unions') }}/" + upzId, function(data) {
                     let options = '<option value="" disabled selected>৪. ওয়ার্ড/অঞ্চল নির্বাচন করুন *</option>';
@@ -1477,7 +1470,6 @@
                             options += '<option value="' + (u.bn_name || u.name) + '">' + (u.bn_name || u.name) + '</option>';
                         });
                     } else {
-                        // Generate ward numbers based on ward_count or default
                         let maxWards = wardCount > 0 ? wardCount : 54;
                         for (let w = 1; w <= maxWards; w++) {
                             let wStr = (w < 10 ? '০' : '') + w.toString().replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[d]);
@@ -1488,7 +1480,6 @@
                     checkAddressValidity();
                 });
             } else {
-                // Normal Upazila or Cantonment
                 $('#union_icon').attr('class', 'fa fa-landmark input-icon');
                 $('#union_select').html('<option value="" disabled selected>লোড হচ্ছে...</option>').prop('disabled', true);
                 $('#ward_select').html('<option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন</option>').prop('disabled', true);
@@ -1515,10 +1506,8 @@
             let unionVal = $(this).val();
 
             if (currentSelectedUpazilaType === 'city_corporation') {
-                // For city corporation, ward_no equals the selected union/ward
                 $('#ward_select').html('<option value="' + unionVal + '" selected>' + unionVal + '</option>');
             } else {
-                // Populate ward dropdown (1 to ward_count, default 9)
                 let wards = parseInt(selectedOpt.data('wards')) || 9;
                 let wardOptions = '<option value="" disabled selected>৫. ওয়ার্ড নম্বর নির্বাচন করুন *</option>';
                 for (let w = 1; w <= wards; w++) {
@@ -1552,7 +1541,7 @@
             goToStep(6);
         });
 
-        // ==================== STEP 6: Profile Image with Client Compression ====================
+        // ==================== STEP 6: Profile Image (Optional) ====================
         let isImageUploaded = false;
 
         $('#profile_image_file').on('change', function(e) {
@@ -1569,7 +1558,6 @@
             reader.onload = function(event) {
                 let img = new Image();
                 img.onload = function() {
-                    // Create offscreen canvas to resize & compress image
                     let canvas = document.createElement('canvas');
                     let maxDimension = 600;
                     let width = img.width;
@@ -1592,15 +1580,12 @@
                     let ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Compress to JPEG ~ 150KB - 200KB
                     let compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
 
-                    // Set preview
                     $('#image_preview_el').attr('src', compressedDataUrl);
                     $('#dropzone_box').hide();
                     $('#preview_wrapper').show();
 
-                    // Store in hidden input
                     $('#profile_image_base64').val(compressedDataUrl);
 
                     isImageUploaded = true;
@@ -1612,9 +1597,7 @@
         });
 
         $('#btn-next-6').on('click', function() {
-            if (isImageUploaded) {
-                goToStep(7);
-            }
+            goToStep(7);
         });
 
         // ==================== STEP 7: Password Setup ====================
@@ -1656,13 +1639,11 @@
             $('#submit-btn-icon').removeClass('fa-arrow-right').addClass('fa-spinner fa-spin');
             $('#globalAlert').hide();
 
-            // Prepare Form Data
             let formElement = document.getElementById('multiStepForm');
             let formData = new FormData(formElement);
 
             formData.set('customer_type', selectedAccountType);
 
-            // If partner account, map partner fields
             if (selectedAccountType === 'buy_earn') {
                 formData.set('referral_code_2', $('#partner_referral_input').val().trim());
                 formData.set('referral_code', $('#partner_placement_input').val().trim());
@@ -1696,7 +1677,6 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        // Smooth transition to Step 8
                         goToStep(8);
                         if (response.home_url) {
                             $('#btn_goto_home').attr('href', response.home_url);

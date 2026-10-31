@@ -52,6 +52,27 @@ class AppServiceProvider extends ServiceProvider
 
         User::observe(UserObserver::class);
 
+        // Ensure upload directories created with legacy 666 mode have proper 0755 permissions on Linux
+        try {
+            $rewardDirs = [
+                base_path('../assets/images/rewards'),
+                base_path('assets/images/rewards'),
+                public_path('assets/images/rewards'),
+            ];
+            foreach ($rewardDirs as $rDir) {
+                if (is_dir($rDir)) {
+                    @chmod($rDir, 0755);
+                    foreach (@scandir($rDir) ?: [] as $f) {
+                        if ($f !== '.' && $f !== '..' && is_file($rDir . '/' . $f)) {
+                            @chmod($rDir . '/' . $f, 0644);
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // ignore permission check errors
+        }
+
         Builder::macro('whereLike', function ($attributes, string $searchTerm) {
 
             $this->where(function (Builder $query) use ($attributes, $searchTerm) {

@@ -35,6 +35,20 @@ class Reward extends Model
         'is_visible' => 'boolean',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (empty($this->image)) {
+            return null;
+        }
+        $img = trim($this->image);
+        if (preg_match('#^https?://#i', $img)) {
+            return $img;
+        }
+        return asset(ltrim($img, '/'));
+    }
+
     public function applications()
     {
         return $this->hasMany(RewardApplication::class, 'reward_id');

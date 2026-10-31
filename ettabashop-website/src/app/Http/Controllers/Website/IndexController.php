@@ -63,12 +63,12 @@ class IndexController extends Controller
             $allCategoriesList = (clone $catQuery)->orderBy('id', 'asc')->get();
 
             if (Schema::hasColumn('categories', 'show_on_home')) {
-                $homeCategories = (clone $catQuery)->where('show_on_home', 1)->orderBy('id', 'asc')->take(6)->get();
+                $homeCategories = (clone $catQuery)->where('show_on_home', 1)->orderBy('id', 'asc')->take(7)->get();
                 if ($homeCategories->isEmpty()) {
-                    $homeCategories = $allCategoriesList->where('parent_id', 0)->take(6);
+                    $homeCategories = $allCategoriesList->where('parent_id', 0)->take(7);
                 }
             } else {
-                $homeCategories = $allCategoriesList->where('parent_id', 0)->take(6);
+                $homeCategories = $allCategoriesList->where('parent_id', 0)->take(7);
             }
         } catch (\Throwable $e) {
             $homeCategories = collect([]);
@@ -120,6 +120,18 @@ class IndexController extends Controller
 
     public function detail(Request $request)
     {
+        return $this->resolveAndRenderDetail($request, $request->slug, null);
+    }
+
+    public function sellerProductDetail(Request $request, $shop_slug, $product_code)
+    {
+        return $this->resolveAndRenderDetail($request, $product_code, $shop_slug);
+    }
+
+    protected function resolveAndRenderDetail(Request $request, $identifier, $shopSlug = null)
+    {
+        \App\Models\ProductReview::ensureSchemaColumns();
+
         $category = new Category();
         try {
             $categories = CategoryResource::collection($category->GetCategoriesWithChild());
@@ -132,15 +144,32 @@ class IndexController extends Controller
 
         $detailQuery = Product::with(['category', 'productImages']);
         if ($canReviews) {
-            $detailQuery->with('productReviews')
+            $detailQuery->with(['productReviews' => function ($q) {
+                $q->with('user')->orderByDesc('id');
+            }])
                 ->withCount('productReviews')
                 ->withAvg('productReviews', 'rating');
         }
 
-        $product = (clone $detailQuery)->where('slug', $request->slug)->first();
+        $product = null;
+        $rawId = trim((string) $identifier);
+        $decodedId = urldecode($rawId);
 
-        if (!$product && is_numeric($request->slug)) {
-            $product = (clone $detailQuery)->find((int) $request->slug);
+        if (is_numeric($rawId)) {
+            $product = (clone $detailQuery)->where('unique_id', $rawId)->first();
+            if (!$product) {
+                $product = (clone $detailQuery)->find((int) $rawId);
+            }
+        }
+
+        if (!$product && $rawId !== '') {
+            $product = (clone $detailQuery)->where('slug', $rawId)->first();
+        }
+        if (!$product && $decodedId !== '' && $decodedId !== $rawId) {
+            $product = (clone $detailQuery)->where('slug', $decodedId)->first();
+        }
+        if (!$product && $rawId !== '') {
+            $product = (clone $detailQuery)->where('unique_id', $rawId)->first();
         }
 
         if (!$product) {
@@ -156,11 +185,146 @@ class IndexController extends Controller
             }
         }
 
+        // Check review eligibility for logged-in customer (1 review per delivered purchase, editable, not deletable)
+        $deliveredOrderCount = 0;
+        $userReviews = collect([]);
+        $canAddNewReview = false;
+        $editableReview = null;
+
+        if (Auth::check()) {
+            try {
+                $userId = Auth::id();
+                $deliveredOrderCount = \App\Models\Order::where('user_id', $userId)
+                    ->whereIn('status', ['delivered', 'completed', 'done'])
+                    ->whereHas('orderItems', function ($q) use ($product) {
+                        $q->where('product_id', $product->id);
+                    })
+                    ->count();
+
+                if (Schema::hasColumn('product_reviews', 'user_id')) {
+                    $userReviews = \App\Models\ProductReview::where('product_id', $product->id)
+                        ->where('user_id', $userId)
+                        ->orderByDesc('id')
+                        ->get();
+                }
+
+                $canAddNewReview = ($deliveredOrderCount > $userReviews->count());
+                $editableReview = $userReviews->first();
+            } catch (\Throwable $e) {
+            }
+        }
+
         return view('website.detail', [
             'product' => $product,
             'sellerShop' => $sellerShop,
             'categories' => $categories,
+            'deliveredOrderCount' => $deliveredOrderCount,
+            'userReviews' => $userReviews,
+            'canAddNewReview' => $canAddNewReview,
+            'editableReview' => $editableReview,
         ]);
+    }
+
+    public function saveProductReview(Request $request)
+    {
+        if (!Auth::check()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['status' => 'error', 'message' => 'রিভিউ দেওয়ার জন্য অনুগ্রহ করে লগইন করুন।'], 401);
+            }
+            return redirect()->route('login');
+        }
+
+        \App\Models\ProductReview::ensureSchemaColumns();
+
+        $validated = $request->validate([
+            'product_id' => 'required|integer',
+            'rating' => 'required|integer|min:1|max:5',
+            'review_message' => 'required|string|max:1000',
+            'review_id' => 'nullable|integer',
+        ]);
+
+        $userId = Auth::id();
+        $productId = (int) $validated['product_id'];
+        $reviewId = !empty($validated['review_id']) ? (int) $validated['review_id'] : null;
+
+        // If editing an existing review belonging to this user
+        if ($reviewId) {
+            $existing = \App\Models\ProductReview::where('id', $reviewId)
+                ->where('product_id', $productId)
+                ->where('user_id', $userId)
+                ->first();
+
+            if (!$existing) {
+                $msg = 'আপনার রিভিউটি খুঁজে পাওয়া যায়নি।';
+                return ($request->wantsJson() || $request->ajax())
+                    ? response()->json(['status' => 'error', 'message' => $msg], 403)
+                    : redirect()->back()->with('review_error', $msg);
+            }
+
+            $existing->update([
+                'rating' => (int) $validated['rating'],
+                'review_message' => trim($validated['review_message']),
+            ]);
+
+            $msg = 'আপনার রিভিউ সফলভাবে আপডেট করা হয়েছে!';
+            return ($request->wantsJson() || $request->ajax())
+                ? response()->json(['status' => 'success', 'message' => $msg, 'review' => $existing])
+                : redirect()->back()->with('review_success', $msg);
+        }
+
+        // Check delivered orders for this product by this user
+        $deliveredOrders = \App\Models\Order::where('user_id', $userId)
+            ->whereIn('status', ['delivered', 'completed', 'done'])
+            ->whereHas('orderItems', function ($q) use ($productId) {
+                $q->where('product_id', $productId);
+            })
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $deliveredCount = $deliveredOrders->count();
+        if ($deliveredCount <= 0) {
+            $msg = 'শুধুমাত্র এই পণ্যটি ক্রয় করে ডেলিভারি সফল হওয়ার পর আপনি রিভিউ দিতে পারবেন।';
+            return ($request->wantsJson() || $request->ajax())
+                ? response()->json(['status' => 'error', 'message' => $msg], 403)
+                : redirect()->back()->with('review_error', $msg);
+        }
+
+        $existingReviews = \App\Models\ProductReview::where('product_id', $productId)
+            ->where('user_id', $userId)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        if ($existingReviews->count() >= $deliveredCount) {
+            // Update their latest review instead of creating a duplicate
+            $latestReview = $existingReviews->last();
+            $latestReview->update([
+                'rating' => (int) $validated['rating'],
+                'review_message' => trim($validated['review_message']),
+            ]);
+
+            $msg = 'আপনার রিভিউ সফলভাবে আপডেট করা হয়েছে!';
+            return ($request->wantsJson() || $request->ajax())
+                ? response()->json(['status' => 'success', 'message' => $msg, 'review' => $latestReview])
+                : redirect()->back()->with('review_success', $msg);
+        }
+
+        $reviewedOrderIds = $existingReviews->pluck('order_id')->filter()->toArray();
+        $targetOrder = $deliveredOrders->first(function ($ord) use ($reviewedOrderIds) {
+            return !in_array($ord->id, $reviewedOrderIds);
+        }) ?: $deliveredOrders->last();
+
+        $newReview = \App\Models\ProductReview::create([
+            'product_id' => $productId,
+            'user_id' => $userId,
+            'order_id' => $targetOrder ? $targetOrder->id : null,
+            'rating' => (int) $validated['rating'],
+            'review_message' => trim($validated['review_message']),
+        ]);
+
+        $msg = 'আপনার রিভিউ সফলভাবে জমা হয়েছে! ধন্যবাদ।';
+        return ($request->wantsJson() || $request->ajax())
+            ? response()->json(['status' => 'success', 'message' => $msg, 'review' => $newReview])
+            : redirect()->back()->with('review_success', $msg);
     }
 
     public function products(Request $request)

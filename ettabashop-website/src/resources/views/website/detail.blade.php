@@ -1,10 +1,31 @@
 @extends('website.layouts.layout')
 
-@section('facebook')
-    <title>{{ $product->name_bn ?: $product->name_en }} - Ettaba Shop</title>
-    <meta property="og:title" content="{{ $product->name_bn ?: $product->name_en }}" />
-    <meta property="og:image" content="{{ config('app.image_url') . $product->featured_image }}" />
-    <meta property="og:description" content="{{ strip_tags($product->description_bn ?: $product->description_en) }}" />
+@php
+    $ogTitle = trim($product->name_bn ?: $product->name_en) . ' | ইত্তেবা শপ';
+    $rawDesc = trim(strip_tags($product->description_bn ?: ($product->description_en ?: '')));
+    $ogDesc = $rawDesc !== '' ? \Illuminate\Support\Str::limit(preg_replace('/\s+/u', ' ', $rawDesc), 160) : ($ogTitle . ' - সাশ্রয়ী মূল্যে ক্যাশব্যাক ও রিওয়ার্ড সুবিধাসহ অর্ডার করুন ইত্তেবা শপে।');
+    $ogImage = !empty($product->featured_image)
+        ? (str_starts_with($product->featured_image, 'http') ? $product->featured_image : rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($product->featured_image, '/'))
+        : asset('assets/images/logo/logo.png');
+    $canonicalShareUrl = $product->detail_url ?? request()->fullUrl();
+@endphp
+
+@section('extra-meta')
+    <title>{{ $ogTitle }}</title>
+    <link rel="canonical" href="{{ $canonicalShareUrl }}" />
+    <meta property="og:type" content="product" />
+    <meta property="og:site_name" content="Ettaba Shop" />
+    <meta property="og:url" content="{{ $canonicalShareUrl }}" />
+    <meta property="og:title" content="{{ $ogTitle }}" />
+    <meta property="og:description" content="{{ $ogDesc }}" />
+    <meta property="og:image" content="{{ $ogImage }}" />
+    <meta property="og:image:secure_url" content="{{ $ogImage }}" />
+    <meta property="og:image:width" content="600" />
+    <meta property="og:image:height" content="600" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ $ogTitle }}" />
+    <meta name="twitter:description" content="{{ $ogDesc }}" />
+    <meta name="twitter:image" content="{{ $ogImage }}" />
 @endsection
 
 @section('content')
@@ -329,7 +350,7 @@
         <a href="{{ route('website.index') }}">Home</a>
         @if($product->category)
             <span class="mx-1">/</span>
-            <a href="{{ route('categoryProducts', ['slug' => $product->category->slug]) }}">
+            <a href="{{ route('categoryProducts', ['slug' => !empty($product->category->slug) ? $product->category->slug : $product->category->id]) }}">
                 {{ $product->category->name_bn ?: $product->category->name_en }}
             </a>
         @endif
@@ -408,9 +429,9 @@
                         </div>
                     @else
                         <div class="pdetail-stock-text">
-                            স্টক: {{ $toBanglaNum($soldQty) }}/{{ $toBanglaNum($totalStock) }}
+                            স্টক: {{ $toBanglaNum($soldQty) }}/{{ $toBanglaNum($remainingQty) }}
                             <span class="text-muted font-weight-normal">
-                                ({{ $toBanglaNum($totalStock) }}টির মধ্যে {{ $toBanglaNum($soldQty) }}টি বিক্রি হয়েছে, অবশিষ্ট {{ $toBanglaNum($remainingQty) }}টি)
+                                (বিক্রি হয়েছে {{ $toBanglaNum($soldQty) }}টি, অবশিষ্ট স্টক {{ $toBanglaNum($remainingQty) }}টি)
                             </span>
                         </div>
                         <div class="pdetail-progress-wrap">
@@ -483,11 +504,14 @@
                 </div>
 
                 {{-- 8. Quantity Selector + Add to Cart Button + Wishlist + Share --}}
+                @php
+                    $safeDetailTitle = str_replace(["\\", "'", "\"", "\r", "\n"], ["\\\\", "\\'", "", " ", " "], (string) $fullTitle);
+                @endphp
                 <div class="pdetail-action-row">
                     <div class="pdetail-qty-selector">
-                        <button type="button" class="pdetail-qty-btn" onclick="changeDetailQty(-1)">−</button>
-                        <input type="text" id="detailQtyInput" class="pdetail-qty-input" value="1" readonly>
-                        <button type="button" class="pdetail-qty-btn" onclick="changeDetailQty(1)">+</button>
+                        <button type="button" class="pdetail-qty-btn" @click="changeDetailQty(-1)">−</button>
+                        <input type="text" id="detailQtyInput" class="pdetail-qty-input" :value="detailQty" value="1" readonly>
+                        <button type="button" class="pdetail-qty-btn" @click="changeDetailQty(1)">+</button>
                     </div>
 
                     @if($isSoldOut)
@@ -496,23 +520,35 @@
                         </button>
                     @else
                         <button type="button" class="pdetail-cart-btn"
-                                @click="for(var q=0; q < parseInt(document.getElementById('detailQtyInput').value || 1); q++) { addToCart('{{ $product->id }}', '{{ addslashes($product->name_en) }}', '{{ $erpVal }}', '{{ $trpVal }}', '{{ $product->owner_id }}', '{{ $tcbVal }}', '{{ $product->rate_en }}'); }">
+                                @click="addToCart('{{ $product->id }}', '{{ $safeDetailTitle }}', '{{ $erpVal }}', '{{ $trpVal }}', '{{ $product->owner_id }}', '{{ $tcbVal }}', '{{ $product->rate_en }}', detailQty)"
+                                onclick="if(typeof toggleCartDrawer === 'function') { setTimeout(toggleCartDrawer, 120); }">
                             <i class="fas fa-shopping-cart"></i> কার্টে যুক্ত করুন
                         </button>
                     @endif
 
                     <button type="button" class="pdetail-icon-btn"
-                            onclick="this.classList.toggle('text-danger');"
+                            onclick="toggleEttabaWishlist(this, '{{ $product->id }}')"
                             title="পছন্দের তালিকায় রাখুন">
                         <i class="far fa-heart"></i>
                     </button>
 
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->fullUrl()) }}"
-                       target="_blank"
-                       class="pdetail-icon-btn"
-                       title="শেয়ার করুন">
+                    <button type="button"
+                            class="pdetail-icon-btn"
+                            onclick="shareEttabaProduct('{{ addslashes($canonicalShareUrl) }}', '{{ $safeDetailTitle }}')"
+                            title="শেয়ার করুন">
                         <i class="fas fa-share-alt"></i>
-                    </a>
+                    </button>
+
+                    <button type="button"
+                            class="pdetail-icon-btn"
+                            onclick="copyEttabaProductLink('{{ addslashes($canonicalShareUrl) }}', this)"
+                            title="লিংক কপি করুন ({{ $canonicalShareUrl }})">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+                <div class="mt-2 small text-muted d-flex align-items-center flex-wrap" style="gap: 6px;">
+                    <span><i class="fas fa-globe text-success mr-1"></i> পণ্যের শর্ট লিংক:</span>
+                    <code class="px-2 py-1 bg-light border rounded text-dark font-weight-bold" style="font-size: 11.5px;">{{ $canonicalShareUrl }}</code>
                 </div>
             </div>
         </div>
@@ -534,37 +570,127 @@
         <hr class="my-4">
 
         <div class="row">
-            <div class="col-md-6 mb-3 mb-md-0">
+            <div class="col-md-6 mb-4 mb-md-0">
                 <h5 class="font-weight-bold text-dark mb-2">
                     <i class="fas fa-shipping-fast text-success mr-1"></i> ডেলিভারি নির্দেশিকা
                 </h5>
-                <p class="small text-muted mb-2" style="line-height: 1.6;">
+                <p class="small text-muted mb-3" style="line-height: 1.6;">
                     ইত্তেবা শপ লিমিটেড সমগ্র বাংলাদেশে অনলাইন অর্ডার ও ডেলিভারি সেবা পরিচালনা করছে। তবে কাঁচাবাজার, গ্রোসারি ও দ্রুত পচনশীল স্থানীয় পণ্য নির্দিষ্ট লোকাল এলাকায় দ্রুত ডেলিভারি করা হয়। তাই অর্ডার দেওয়ার আগে পণ্যের পাশে উল্লেখিত <strong>ডেলিভারি এলাকা ({{ $deliveryAreaText }})</strong> যাচাই করে নিন।
                 </p>
+
+                {{-- Customer Reviews List --}}
+                <h5 class="font-weight-bold text-dark mb-2 mt-3">
+                    <i class="fas fa-comments text-primary mr-1"></i> কাস্টমার রিভিউসমূহ ({{ $toBanglaNum($displayReviewCount) }})
+                </h5>
+                @if($product->relationLoaded('productReviews') && $product->productReviews && $product->productReviews->count() > 0)
+                    <div class="pr-1" style="max-height: 280px; overflow-y: auto;">
+                        @foreach($product->productReviews as $rev)
+                            @php
+                                $revUserName = 'ভেরিফাইড কাস্টমার';
+                                if ($rev->relationLoaded('user') && $rev->user) {
+                                    $revUserName = trim(($rev->user->first_name ?? '') . ' ' . ($rev->user->last_name ?? '')) ?: ($rev->user->username ?? 'ভেরিফাইড কাস্টমার');
+                                }
+                                $isOwnReview = auth()->check() && !empty($rev->user_id) && (int)$rev->user_id === (int)auth()->id();
+                            @endphp
+                            <div class="border rounded p-2 mb-2 bg-light">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="font-weight-bold text-dark small">
+                                        <i class="fas fa-user-check text-success mr-1"></i> {{ $revUserName }}
+                                    </div>
+                                    <div class="text-warning small">
+                                        @for($s = 1; $s <= 5; $s++)
+                                            <i class="{{ $s <= (int)$rev->rating ? 'fas fa-star' : 'far fa-star' }}"></i>
+                                        @endfor
+                                    </div>
+                                </div>
+                                <div class="text-dark small" style="line-height: 1.45;">{{ $rev->review_message }}</div>
+                                <div class="d-flex align-items-center justify-content-between mt-1">
+                                    <span class="text-muted" style="font-size: 11px;">
+                                        {{ $rev->created_at ? $rev->created_at->format('d M, Y') : '' }}
+                                    </span>
+                                    @if($isOwnReview)
+                                        <button type="button"
+                                                class="btn btn-link btn-sm p-0 text-primary font-weight-bold"
+                                                style="font-size: 11.5px;"
+                                                onclick="loadReviewForEdit('{{ $rev->id }}', {{ (int)$rev->rating }}, '{{ addslashes(preg_replace('/\r|\n/', ' ', $rev->review_message)) }}')">
+                                            <i class="fas fa-edit mr-1"></i> রিভিউ এডিট করুন
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="border rounded p-3 bg-light text-muted small">
+                        এই পণ্যে এখনো কোনো রিভিউ জমা পড়েনি।
+                    </div>
+                @endif
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6" id="reviewFormSection">
                 <h5 class="font-weight-bold text-dark mb-2">
-                    <i class="fas fa-star text-warning mr-1"></i> আপনার রিভিউ দিন
+                    <i class="fas fa-star text-warning mr-1"></i>
+                    <span id="reviewFormHeading">
+                        {{ (!empty($editableReview) && empty($canAddNewReview)) ? 'আপনার রিভিউ এডিট করুন' : 'আপনার রিভিউ দিন' }}
+                    </span>
                 </h5>
-                <form v-on:submit.prevent="saveRating">
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="small font-weight-bold mr-2">রেটিং নির্বাচন করুন:</span>
-                        <div class="text-warning" style="cursor: pointer;">
-                            <i :class="star1" @mouseover="ratingUpdate(1)"></i>
-                            <i :class="star2" @mouseover="ratingUpdate(2)"></i>
-                            <i :class="star3" @mouseover="ratingUpdate(3)"></i>
-                            <i :class="star4" @mouseover="ratingUpdate(4)"></i>
-                            <i :class="star5" @mouseover="ratingUpdate(5)"></i>
+
+                @if(Session::has('review_success'))
+                    <div class="alert alert-success py-2 px-3 small mb-2">{{ Session::get('review_success') }}</div>
+                @endif
+                @if(Session::has('review_error'))
+                    <div class="alert alert-danger py-2 px-3 small mb-2">{{ Session::get('review_error') }}</div>
+                @endif
+
+                @guest
+                    <div class="border rounded p-3 bg-light text-center">
+                        <p class="small text-muted mb-2">পণ্যটি ক্রয় করে ডেলিভারি গ্রহণের পর রিভিউ দিতে আপনার একাউন্টে লগইন করুন।</p>
+                        <a href="{{ route('login') }}" class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold">লগইন করুন</a>
+                    </div>
+                @else
+                    @if(!empty($canAddNewReview) || !empty($editableReview))
+                        @php
+                            $initialReviewId = (!empty($editableReview) && empty($canAddNewReview)) ? $editableReview->id : '';
+                            $initialRating = (!empty($editableReview) && empty($canAddNewReview)) ? (int)$editableReview->rating : 5;
+                            $initialMessage = (!empty($editableReview) && empty($canAddNewReview)) ? $editableReview->review_message : '';
+                        @endphp
+                        <form id="productReviewForm" method="POST" action="{{ route('product.review.save') }}">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <input type="hidden" name="review_id" id="reviewIdInput" value="{{ $initialReviewId }}">
+                            <input type="hidden" name="rating" id="reviewRatingInput" value="{{ $initialRating }}">
+
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="small font-weight-bold mr-2">রেটিং নির্বাচন করুন:</span>
+                                <div class="text-warning" style="cursor: pointer; font-size: 18px;">
+                                    <i :class="star1" @click="ratingUpdate(1)" @mouseover="ratingUpdate(1)"></i>
+                                    <i :class="star2" @click="ratingUpdate(2)" @mouseover="ratingUpdate(2)"></i>
+                                    <i :class="star3" @click="ratingUpdate(3)" @mouseover="ratingUpdate(3)"></i>
+                                    <i :class="star4" @click="ratingUpdate(4)" @mouseover="ratingUpdate(4)"></i>
+                                    <i :class="star5" @click="ratingUpdate(5)" @mouseover="ratingUpdate(5)"></i>
+                                </div>
+                            </div>
+                            <div class="form-group mb-2">
+                                <textarea name="review_message" id="reviewMessageInput" rows="3" class="form-control form-control-sm" required placeholder="পণ্যটি সম্পর্কে আপনার মতামত লিখুন...">{{ old('review_message', $initialMessage) }}</textarea>
+                            </div>
+                            <button type="submit" id="reviewSubmitBtn" class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold">
+                                {{ (!empty($editableReview) && empty($canAddNewReview)) ? 'রিভিউ আপডেট করুন' : 'রিভিউ জমা দিন' }}
+                            </button>
+                            <div class="text-muted mt-2" style="font-size: 11px;">
+                                <i class="fas fa-info-circle mr-1"></i> রিভিউ প্রদানের পর আপনি পরবর্তীতে তা এডিট করতে পারবেন (ডিলিট করা যাবে না)।
+                            </div>
+                        </form>
+                    @else
+                        <div class="border rounded p-3 bg-light">
+                            <div class="small text-dark font-weight-bold mb-1">
+                                <i class="fas fa-lock text-warning mr-1"></i> শুধুমাত্র ভেরিফাইড ক্রেতাদের জন্য
+                            </div>
+                            <p class="small text-muted mb-0" style="line-height: 1.5;">
+                                যে কাস্টমার পণ্যটি ক্রয় করবেন শুধু সেই রিভিউ দিতে পারবেন। একবার ক্রয় করে ডেলিভারি সফল হলে একবার রিভিউ দেওয়া যাবে এবং পরবর্তীতে রিভিউ এডিট করা যাবে।
+                            </p>
                         </div>
-                    </div>
-                    <div class="form-group mb-2">
-                        <textarea v-model="ratingText" id="message" rows="2" class="form-control form-control-sm" placeholder="পণ্যটি সম্পর্কে আপনার মতামত লিখুন..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4 font-weight-bold">
-                        রিভিউ জমা দিন
-                    </button>
-                </form>
+                    @endif
+                @endguest
             </div>
         </div>
     </div>
@@ -585,6 +711,65 @@
         var thumbs = document.querySelectorAll('.pdetail-thumb-item');
         thumbs.forEach(function (t) { t.classList.remove('active'); });
         el.classList.add('active');
+    }
+
+    function loadReviewForEdit(reviewId, rating, message) {
+        var idEl = document.getElementById('reviewIdInput');
+        var msgEl = document.getElementById('reviewMessageInput');
+        var ratingEl = document.getElementById('reviewRatingInput');
+        var headingEl = document.getElementById('reviewFormHeading');
+        var btnEl = document.getElementById('reviewSubmitBtn');
+
+        if (idEl) idEl.value = reviewId;
+        if (msgEl) {
+            msgEl.value = message;
+            msgEl.focus();
+        }
+        if (ratingEl) ratingEl.value = rating;
+        if (headingEl) headingEl.textContent = 'আপনার রিভিউ এডিট করুন';
+        if (btnEl) btnEl.textContent = 'রিভিউ আপডেট করুন';
+
+        var sec = document.getElementById('reviewFormSection');
+        if (sec && sec.scrollIntoView) {
+            sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function shareEttabaProduct(shareUrl, title) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: title + ' - ইত্তেবা শপ',
+                url: shareUrl
+            }).catch(function () {});
+        } else {
+            window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(shareUrl), '_blank', 'width=600,height=450');
+        }
+    }
+
+    function copyEttabaProductLink(shareUrl, btnEl) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl).then(function () {
+                showCopyFeedback(btnEl);
+            });
+        } else {
+            var temp = document.createElement('input');
+            document.body.appendChild(temp);
+            temp.value = shareUrl;
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showCopyFeedback(btnEl);
+        }
+    }
+
+    function showCopyFeedback(btnEl) {
+        if (!btnEl) return;
+        var origHtml = btnEl.innerHTML;
+        btnEl.innerHTML = '<i class="fas fa-check text-success"></i>';
+        setTimeout(function () {
+            btnEl.innerHTML = origHtml;
+        }, 1800);
     }
 </script>
 @endsection

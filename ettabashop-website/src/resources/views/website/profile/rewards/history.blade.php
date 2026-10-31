@@ -121,8 +121,8 @@
                                     <td>
                                         <div class="d-flex align-items-center">
                                             @if(!empty($app->reward_image))
-                                                <img src="{{ config('app.image_url') . $app->reward_image }}" 
-                                                     onerror="this.src='{{ asset($app->reward_image) }}'" 
+                                                <img src="{{ rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($app->reward_image, '/') }}" 
+                                                     onerror="this.onerror=null; this.src='{{ asset($app->reward_image) }}';" 
                                                      alt="Reward" 
                                                      style="width: 42px; height: 42px; object-fit: cover; border-radius: 8px; margin-right: 10px; border: 1px solid #e2e8f0;">
                                             @else

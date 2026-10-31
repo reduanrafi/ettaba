@@ -108,9 +108,13 @@ class AppServiceProvider extends ServiceProvider
 
                     if (!empty($areaName)) {
                         if (!empty($wardNo)) {
-                            // Strip non-digit prefix if stored like "ওয়ার্ড নং: 7"
-                            $cleanWard = preg_replace('/^.*[:\s]/u', '', $wardNo);
-                            $wardBn = str_replace($enDigits, $bnDigits, $cleanWard ?: $wardNo);
+                            // Extract only the ward number (digits in English or Bangla) so it formats cleanly as "বৌলাই ইউনিয়ন/৬"
+                            if (preg_match('/([0-9০-৯]+)/u', $wardNo, $matches)) {
+                                $cleanWard = $matches[1];
+                            } else {
+                                $cleanWard = trim(preg_replace('/(ওয়ার্ড|ওয়ার্ড|নং|ward|no|[:\-\s\.])/iu', '', $wardNo));
+                            }
+                            $wardBn = str_replace($enDigits, $bnDigits, $cleanWard !== '' ? $cleanWard : $wardNo);
                             $headerLocationText = $areaName . '/' . $wardBn;
                         } else {
                             $headerLocationText = $areaName;

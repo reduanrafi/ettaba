@@ -63,8 +63,8 @@
                 <div class="p-4 text-center border-bottom">
                     <div class="detail-reward-image-wrap mb-3">
                         @if(!empty($reward->image))
-                            <img src="{{ config('app.image_url') . $reward->image }}" 
-                                 onerror="this.src='{{ asset($reward->image) }}'" 
+                            <img src="{{ $reward->image_url ?? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($reward->image, '/')) }}" 
+                                 onerror="this.onerror=null; this.src='{{ asset($reward->image) }}';" 
                                  alt="{{ $reward->reward_name }}" 
                                  class="img-fluid">
                         @else

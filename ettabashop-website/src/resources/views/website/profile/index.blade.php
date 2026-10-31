@@ -200,7 +200,7 @@
         @endif
 
         <!-- PART C: Online Categories UI (10. Online Categories Section) -->
-        @include('website.profile.partials.online_categories')
+
 
         <!-- Mobile Horizontal Quick Navigation Bar (Touch Friendly App-like Bar) -->
         <div class="mobile-quick-nav-wrap">
