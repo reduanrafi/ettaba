@@ -126,10 +126,83 @@
                                             <i class="fa fa-spinner fa-spin"></i> Pending
                                         </span>
                                     </td>
-                                    <td>
-                                        <a href="{{ route('admin.rewardApplications.show', $app->id) }}" class="btn btn-sm btn-primary btn-block">
-                                            <i class="fa fa-eye"></i> যাচাই ও সিদ্ধান্ত
+                                    <td style="white-space: nowrap;">
+                                        <a href="{{ route('admin.rewardApplications.show', $app->id) }}" class="btn btn-xs btn-primary" title="যাচাই ও সিদ্ধান্ত">
+                                            <i class="fa fa-eye"></i> বিস্তারিত
                                         </a>
+                                        <button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#quickAcceptModal{{ $app->id }}" title="দ্রুত অনুমোদন (Accept)">
+                                            <i class="fa fa-check"></i> অনুমোদন
+                                        </button>
+                                        <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#quickRejectModal{{ $app->id }}" title="বাতিল (Reject)">
+                                            <i class="fa fa-times"></i> বাতিল
+                                        </button>
+
+                                        <!-- Quick Accept Modal -->
+                                        <div class="modal fade text-left" id="quickAcceptModal{{ $app->id }}" tabindex="-1" role="dialog">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form method="POST" action="{{ route('admin.rewardApplications.accept', $app->id) }}">
+                                                        @csrf
+                                                        <div class="modal-header bg-green text-white">
+                                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <h4 class="modal-title"><i class="fa fa-check-circle"></i> আবেদন অনুমোদন (Accept): {{ $app->application_no }}</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="callout callout-info" style="margin-bottom: 12px; padding: 8px 12px;">
+                                                                <p style="margin: 0; font-size: 13px;">অনুমোদন করলে ব্যবহারকারীর অ্যাকাউন্ট থেকে <strong>{{ number_format($app->required_points) }}</strong> পয়েন্ট কেটে নেওয়া হবে।</p>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>এডমিন নোট <span class="text-danger">*</span></label>
+                                                                <textarea name="admin_note" rows="2" class="form-control" required>আপনার {{ $app->reward_name }} পুরস্কারের আবেদন গ্রহণ করা হয়েছে। অনুগ্রহ করে নির্ধারিত সময়ে উপস্থিত হয়ে পুরস্কার গ্রহণ করুন।</textarea>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-xs-6">
+                                                                    <div class="form-group">
+                                                                        <label>গ্রহণের তারিখ:</label>
+                                                                        <input type="text" name="collection_date" class="form-control input-sm" value="{{ date('d M, Y', strtotime('+7 days')) }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6">
+                                                                    <div class="form-group">
+                                                                        <label>গ্রহণের স্থান:</label>
+                                                                        <input type="text" name="collection_place" class="form-control input-sm" value="Ettaba Shop অফিস, কিশোরগঞ্জ">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">বন্ধ করুন</button>
+                                                            <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> নিশ্চিত অনুমোদন করুন</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quick Reject Modal -->
+                                        <div class="modal fade text-left" id="quickRejectModal{{ $app->id }}" tabindex="-1" role="dialog">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form method="POST" action="{{ route('admin.rewardApplications.reject', $app->id) }}">
+                                                        @csrf
+                                                        <div class="modal-header bg-red text-white">
+                                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <h4 class="modal-title"><i class="fa fa-times-circle"></i> আবেদন বাতিল (Reject): {{ $app->application_no }}</h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="form-group">
+                                                                <label>বাতিলের কারণ ও নোট <span class="text-danger">*</span></label>
+                                                                <textarea name="admin_note" rows="3" class="form-control" placeholder="বাতিলের কারণ লিখুন..." required>শর্ত পূরণ না হওয়ায় আবেদনটি বাতিল করা হলো।</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default" data-dismiss="modal">বন্ধ করুন</button>
+                                                            <button type="submit" class="btn btn-danger"><i class="fa fa-times"></i> বাতিল করুন</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

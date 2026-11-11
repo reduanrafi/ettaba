@@ -37,6 +37,20 @@ Route::get('/clear-cache', function() {
     $exitCode = Artisan::call('view:clear');
     return redirect()->back();
 });
+Route::get('/run-migrate', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'status' => 'success',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
 Route::get('/test', [TestController::class, 'test']);
 
 //WEBSITE PUBLIC ROUTES
@@ -70,6 +84,12 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
     Route::get('/shop-dashboard', [DashboardController::class, 'ShopDashboard'])->name('dashboard.shop');
     Route::get('/sales-dashboard', [DashboardController::class, 'SalesDashboard'])->name('dashboard.sales');
     Route::get('/hand-cash-dashboard', [DashboardController::class, 'HandCashDashboard'])->name('dashboard.handcash');
+
+    // Shared Geo & Slug AJAX helpers for both Admin and Sellers
+    Route::get('/ajax/geo/districts/{division_id}', [GeoController::class, 'getDistrictsAjax'])->name('geo.ajax.districts');
+    Route::get('/ajax/geo/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('geo.ajax.upazilas');
+    Route::get('/ajax/geo/unions/{upazila_id}', [GeoController::class, 'getUnionsAjax'])->name('geo.ajax.unions');
+    Route::get('/ajax/check-shop-slug', [GeoController::class, 'checkShopSlugAjax'])->name('ajax.checkShopSlug');
 
 
     /**********************************************************************************/
@@ -158,8 +178,16 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             Route::delete('/unions/{id}', [GeoController::class, 'unionDestroy'])->name('geo.unions.destroy');
 
             // AJAX helper
+            Route::get('/ajax/districts/{division_id}', [GeoController::class, 'getDistrictsAjax'])->name('geo.ajax.districts');
             Route::get('/ajax/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('geo.ajax.upazilas');
+            Route::get('/ajax/unions/{upazila_id}', [GeoController::class, 'getUnionsAjax'])->name('geo.ajax.unions');
+            Route::get('/ajax/check-shop-slug', [GeoController::class, 'checkShopSlugAjax'])->name('ajax.checkShopSlug');
         });
+
+        // Admin Shop Management (Edit any seller shop profile & social links)
+        Route::get('/admin-shop-edit/{id}', [ShopController::class, 'adminEdit'])->name('admin.shop.edit');
+        Route::post('/admin-shop-update/{id}', [ShopController::class, 'adminUpdate'])->name('admin.shop.update');
+        Route::post('/admin-shop-toggle-social/{id}', [ShopController::class, 'toggleSocialApproved'])->name('admin.shop.toggleSocial');
 
         // Reward Management Routes
         Route::group(['prefix' => 'rewards'], function () {
@@ -193,6 +221,16 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             Route::post('/update/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'update'])->name('admin.onlineCategories.update');
             Route::get('/toggle-hide/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'toggleHide'])->name('admin.onlineCategories.toggleHide');
             Route::get('/delete/{id}', [\App\Http\Controllers\Admin\OnlineCategoryController::class, 'destroy'])->name('admin.onlineCategories.destroy');
+        });
+
+        // Custom Page / Policy Builder (Pages 16-17 spec)
+        Route::group(['prefix' => 'custom-pages'], function () {
+            Route::get('/', [\App\Http\Controllers\Admin\CustomPageController::class, 'index'])->name('admin.customPages.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\CustomPageController::class, 'create'])->name('admin.customPages.create');
+            Route::post('/store', [\App\Http\Controllers\Admin\CustomPageController::class, 'store'])->name('admin.customPages.store');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\CustomPageController::class, 'edit'])->name('admin.customPages.edit');
+            Route::post('/update/{id}', [\App\Http\Controllers\Admin\CustomPageController::class, 'update'])->name('admin.customPages.update');
+            Route::get('/delete/{id}', [\App\Http\Controllers\Admin\CustomPageController::class, 'destroy'])->name('admin.customPages.destroy');
         });
     });
 
@@ -263,6 +301,17 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
         Route::get('/seller-orders', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'index'])->name('seller.orders.index');
         Route::get('/seller-orders/{orderId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'show'])->name('seller.orders.show');
         Route::post('/seller-orders/update-status/{orderId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'updateStatus'])->name('seller.orders.updateStatus');
+        Route::post('/seller-orders/update-delivery-charge/{orderId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'updateDeliveryCharge'])->name('seller.orders.updateDeliveryCharge');
+        Route::post('/seller-orders/remove-item/{itemId}', [\App\Http\Controllers\Shopper\SellerOrderController::class, 'removeItem'])->name('seller.orders.removeItem');
+
+        // Seller Add Money routes (Pages 9-12 spec)
+        Route::get('/seller/add-money', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'index'])->name('seller.addMoney.index');
+        Route::post('/seller/add-money/initiate', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'initiate'])->name('seller.addMoney.initiate');
+        Route::get('/seller/add-money/success/{transaction_id}', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'paymentSuccess'])->name('seller.addMoney.success');
+        Route::get('/seller/add-money/fail/{transaction_id}', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'paymentFail'])->name('seller.addMoney.fail');
+        Route::get('/seller/add-money/cancel/{transaction_id}', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'paymentCancel'])->name('seller.addMoney.cancel');
+        Route::get('/seller/add-money/gateway/{transaction_id}', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'simulateGateway'])->name('seller.addMoney.gateway');
+        Route::post('/seller/add-money/gateway/{transaction_id}/process', [\App\Http\Controllers\Shopper\SellerAddMoneyController::class, 'simulateProcess'])->name('seller.addMoney.gateway.process');
 
         Route::get('/my-withdraws/',   [WRController::class,'index'])->name('mywithdraws');
         Route::get('/create-withdraw-request',   [WRController::class,'create'])->name('withdraw.create');

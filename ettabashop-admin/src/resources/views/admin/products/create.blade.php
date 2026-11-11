@@ -356,15 +356,6 @@
                         <textarea id="description_en" name="description_en" class="app-textarea" rows="5"
                                   placeholder="পণ্যের বিস্তারিত বিবরণ, গুণগত মান এবং অন্যান্য তথ্য লিখুন... 🌟✨">{{ old('description_en') }}</textarea>
                     </div>
-
-                    <!-- Delivery Area and Fee -->
-                    <div class="app-form-group" style="margin-bottom: 0;">
-                        <label class="app-label" for="delivery_area_en">
-                            <i class="fa fa-truck text-muted"></i> Delivery Area & Delivery Fee
-                        </label>
-                        <textarea id="delivery_area_en" name="delivery_area_en" class="app-textarea" rows="3"
-                                  placeholder="ডেলিভারি এরিয়া এবং চার্জ লিখুন... (যেমন: ঢাকা সিটির ভিতরে ৮০ টাকা, বাহিরে ১৫০ টাকা)">{{ old('delivery_area_en') }}</textarea>
-                    </div>
                 </div>
 
                 <!-- Section 2: Pricing & Commission Rules -->
@@ -377,14 +368,11 @@
                         <div class="col-md-4 col-sm-12">
                             <div class="app-form-group">
                                 <label class="app-label" for="priceEn">
-                                    Seller Rate with VAT (৳) <span class="required">*</span>
+                                    Seller Rate (৳) <span class="required">*</span>
                                 </label>
                                 <input type="text" class="app-input" id="priceEn" name="rate_en" required
                                        placeholder="e.g. 130" value="{{ old('rate_en') }}"
                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                <div id="sellerRateError" style="display: none; color: #dc2626; font-size: 12px; font-weight: 700; margin-top: 5px;">
-                                    <i class="fa fa-exclamation-triangle"></i> সেলার রেট অবশ্যই ভ্যাট (১৫%) থেকে অন্তত ১ টাকা বেশি হতে হবে! (সর্বনিম্ন: <span id="minSellerRateText">৳0.00</span>)
-                                </div>
                             </div>
                         </div>
 
@@ -396,8 +384,8 @@
                                 <input type="text" class="app-input" id="erp_en" name="erp_en" required
                                        placeholder="e.g. 230" value="{{ old('erp_en') }}"
                                        oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                                <div id="erpError" style="display: none; color: #dc2626; font-size: 12px; font-weight: 700; margin-top: 5px;">
-                                    <i class="fa fa-exclamation-triangle"></i> Seller Rate এবং ERP এর মধ্যে কমপক্ষে ১০ টাকা ব্যবধান থাকতে হবে!
+                                <div id="erpHelperText" style="color: #2563eb; font-size: 12px; font-weight: 600; margin-top: 5px;">
+                                    <i class="fa fa-info-circle"></i> ERP অবশ্যই Seller Rate থেকে (<span id="marginPercentText">{{ $marginPercent ?? 5 }}%</span>) এর ব্যবধান হতে হবে (সর্বনিম্ন: <span id="minErpText">৳0.00</span> টাকা)। কাস্টমারের সুবিধার্থে সেলার ইচ্ছে করলে, আরো বেশি ব্যবধান রাখতে পারেন।
                                 </div>
                             </div>
                         </div>
@@ -470,10 +458,6 @@
                         <div class="row">
                             <div class="col-md-6 col-sm-12">
                                 <div class="calc-item">
-                                    <span class="calc-item-label">Seller Payable Amount</span>
-                                    <span class="calc-item-value text-success" id="sellerPayableText">৳0.00</span>
-                                </div>
-                                <div class="calc-item">
                                     <span class="calc-item-label">Total Reward Points :</span>
                                     <span class="calc-item-value" id="trpText">0.00</span>
                                 </div>
@@ -483,16 +467,16 @@
                                     <span class="calc-item-label">Total Customer Cashback:</span>
                                     <span class="calc-item-value" id="tcbText">0.00</span>
                                 </div>
-                                <div class="calc-item">
-                                    <span class="calc-item-label">VAT (15% of ERP):</span>
-                                    <span class="calc-item-value" id="vatText">৳0.00</span>
-                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Hidden calculated fields sent with request -->
                     <input type="hidden" id="sellerPayable" name="seller_payable" value="0">
+                    <input type="hidden" id="trp_en_readonly" name="trp_en" value="0">
+                    <input type="hidden" id="tcb_en_readonly" name="tcb_en" value="0">
+                    <input type="hidden" id="vat" name="vat_percent" value="0">
+                </div>
                     <input type="hidden" id="trp_en_readonly" name="trp_en" value="0">
                     <input type="hidden" id="tcb_en_readonly" name="tcb_en" value="0">
                     <input type="hidden" id="vat" name="vat_percent" value="0">
@@ -537,10 +521,10 @@
                         <div class="col-md-6 col-sm-12">
                             <div class="app-form-group">
                                 <label class="app-label" for="weight">
-                                    Product Weight <small class="text-muted">(gm/kg)</small>
+                                    Product Weight (gm/kg) <span class="required">*</span>
                                 </label>
                                 <div style="display: flex; gap: 8px;">
-                                    <input type="text" class="app-input" id="weight" name="weight"
+                                    <input type="text" class="app-input" id="weight" name="weight" required
                                            placeholder="e.g. 500" value="{{ old('weight') }}"
                                            style="flex: 2;"
                                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
@@ -552,6 +536,36 @@
                                 </div>
                                 <small class="text-muted" style="font-size: 11px; margin-top: 4px; display: block;">
                                     <i class="fa fa-info-circle"></i> ওয়েবসাইটে ডেলিভারি চার্জ হিসাবের জন্য পণ্যের ওজন ও একক (gm/kg) নির্বাচন করুন।
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Size & Color Variants (Optional) -->
+                    <div class="row" style="margin-top: 6px; padding-top: 14px; border-top: 1px dashed #e2e8f0;">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="sizes">
+                                    Product Sizes <small class="text-muted">(Optional)</small>
+                                </label>
+                                <input type="text" class="app-input" id="sizes" name="sizes"
+                                       placeholder="e.g. 100ml, 200ml, S, M, L, 2-3Y" value="{{ old('sizes') }}">
+                                <small class="text-muted" style="font-size: 11px; margin-top: 4px; display: block;">
+                                    <i class="fa fa-tags"></i> একাধিক সাইজ লিখতে কমা (,) ব্যবহার করুন। যেমন: 100ml, 200ml, S, M, L, 2-3Y
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12">
+                            <div class="app-form-group">
+                                <label class="app-label" for="colors">
+                                    Product Colors <small class="text-muted">(Optional - শুধু বাংলা ও ইংরেজি বর্ণ)</small>
+                                </label>
+                                <input type="text" class="app-input" id="colors" name="colors"
+                                       placeholder="e.g. Red, Green, লাল, সবুজ" value="{{ old('colors') }}"
+                                       oninput="this.value = this.value.replace(/[^A-Za-z\u0980-\u09FF,\s]/g, '')">
+                                <small class="text-muted" style="font-size: 11px; margin-top: 4px; display: block;">
+                                    <i class="fa fa-paint-brush"></i> একাধিক কালার লিখতে কমা (,) ব্যবহার করুন (কোনো সংখ্যা বা চিহ্ন লেখা যাবে না)।
                                 </small>
                             </div>
                         </div>
@@ -613,38 +627,22 @@
                 let directRefer = parseFloat($('#direct_refer_commission').val()) || 0;
 
                 // VAT calculation
-                let vat = erp * 0.15;
-                $('#vat').val(vat.toFixed(2));
-                $('#vatText').text('৳ ' + vat.toFixed(2));
+                // Per-seller configurable ERP margin percentage (default 5%)
+                let marginPct = parseFloat("{{ $marginPercent ?? 5 }}") || 5.0;
+                let minDiff = (rate * marginPct) / 100.0;
+                let minErp = rate + minDiff;
+                $('#minErpText').text('৳' + minErp.toFixed(2));
 
-                // Rule: Seller Rate must be at least VAT + 1 Tk
-                let minSellerRate = vat + 1;
-                if (erp > 0 && rate < minSellerRate) {
-                    $('#priceEn').addClass('app-input-error');
-                    $('#minSellerRateText').text('৳' + minSellerRate.toFixed(2));
-                    $('#sellerRateError').show();
-                } else {
-                    $('#priceEn').removeClass('app-input-error');
-                    $('#sellerRateError').hide();
-                }
-
-                // Seller Payable calculation
-                let payable = rate - vat;
-                let payableFormatted = (payable > 0 ? payable.toFixed(2) : '0.00');
-                $('#sellerPayable').val(payableFormatted);
-                $('#sellerPayableText').text('৳ ' + payableFormatted);
-
-                // Rule 3: Seller Rate vs ERP difference at least 10 Tk
                 let diff = erp - rate;
                 $('#rateDifferenceBadge').text('Diff: ৳' + diff.toFixed(2));
 
-                if (erp > 0 && erp < (rate + 10)) {
+                if (erp > 0 && erp < minErp) {
                     $('#erp_en').addClass('app-input-error');
-                    $('#erpError').show();
+                    $('#erpHelperText').css({'color': '#dc2626', 'font-weight': '700'});
                     $('#rateDifferenceBadge').css({'background': '#fee2e2', 'color': '#b91c1c'});
                 } else {
                     $('#erp_en').removeClass('app-input-error');
-                    $('#erpError').hide();
+                    $('#erpHelperText').css({'color': '#16a34a', 'font-weight': '600'});
                     $('#rateDifferenceBadge').css({'background': '#dbeafe', 'color': '#1e40af'});
                 }
 

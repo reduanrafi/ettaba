@@ -21,6 +21,13 @@ class Shop extends Model
         'description_en',
         'description_bn',
         'mobile',
+        'nid_tin',
+        'date_of_birth',
+        'division_id',
+        'district_id',
+        'upazila_id',
+        'union_name',
+        'ward_no',
         'address_en',
         'address_bn',
         'delivery_area_en',
@@ -32,11 +39,32 @@ class Shop extends Model
         'ratings',
         'fb_link',
         'youtube_link',
+        'instagram_link',
+        'social_approved',
+        'delivery_type',
+        'erp_margin_percent',
+        'seller_ebalance',
+        'allowed_categories',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function division()
+    {
+        return $this->belongsTo(Division::class, 'division_id');
+    }
+
+    public function district()
+    {
+        return $this->belongsTo(District::class, 'district_id');
+    }
+
+    public function upazila()
+    {
+        return $this->belongsTo(Upazila::class, 'upazila_id');
     }
 
     public static function formatSlugString($raw)

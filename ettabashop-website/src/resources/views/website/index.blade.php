@@ -89,28 +89,34 @@
                 : (!empty($rewardImg) ? (rtrim(preg_replace('#/storage/?$#', '', config('app.image_url')), '/') . '/' . ltrim($rewardImg, '/')) : null);
             $rewardDetailUrl = isset($nextReward) && !empty($nextReward->id) ? route('profile.rewards.detail', $nextReward->id) : route('profile.rewards');
         @endphp
-        <div class="ettaba-reward-home-card bg-white border shadow-sm mb-3 p-2 p-md-3" style="border-radius: 14px;">
+        <div class="ettaba-reward-home-card bg-white border shadow-sm mb-3 p-2 p-md-3" style="border-radius: 12px; border-color: #e2e8f0;">
             <!-- Top Header Row -->
             <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
                 <a href="{{ $rewardDetailUrl }}" class="d-flex align-items-center text-decoration-none" style="min-width: 0;">
                     <i class="fas fa-gift text-danger mr-1 mr-sm-2" style="font-size: 18px;"></i>
-                    <span class="ettaba-reward-card-heading">আপনার পরবর্তী পুরস্কার</span>
+                    <span class="ettaba-reward-card-heading" style="font-weight: 700; color: #b91c1c;">আপনার পরবর্তী পুরস্কার</span>
                 </a>
-                <a href="{{ route('profile.rewards') }}" class="ettaba-see-all-btn text-decoration-none">
+                <a href="{{ route('profile.rewards') }}" class="ettaba-see-all-btn text-decoration-none" style="font-size: 12px; font-weight: 600; color: #15803d;">
                     সকল পুরস্কার দেখুন <i class="fas fa-arrow-right ml-1"></i>
                 </a>
+            </div>
+
+            <!-- "পাবেন: [পুরস্কারের নাম]" Sub-banner (Page 1 spec) -->
+            <div class="mb-2 px-2 py-1" style="background: #fef2f2; border-radius: 6px; border: 1px dashed #fca5a5;">
+                <span style="font-size: 13px; font-weight: 700; color: #991b1b;">পাবেন:</span>
+                <span style="font-size: 13px; font-weight: 700; color: #15803d; margin-left: 4px;">{{ $rewardName }}</span>
             </div>
 
             <!-- Reward Body Row (Entire area clickable to go to reward details) -->
             <a href="{{ $rewardDetailUrl }}" class="d-flex align-items-center text-decoration-none text-reset ettaba-reward-body-link">
                 <!-- Left: Specific Reward Image -->
-                <div class="ettaba-reward-gift-thumb mr-2 mr-md-3">
+                <div class="ettaba-reward-gift-thumb mr-2 mr-md-3" style="width: 50px; height: 50px; min-width: 50px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fff;">
                     @if(!empty($rewardImg))
                         <img src="{{ $rewardImgUrl }}"
                              onerror="this.onerror=null; this.src='{{ asset($rewardImg) }}';"
-                             alt="{{ $rewardName }}">
+                             alt="{{ $rewardName }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                     @else
-                        <div class="ettaba-reward-gift-fallback">
+                        <div class="ettaba-reward-gift-fallback text-danger" style="font-size: 24px;">
                             <i class="fas fa-gift"></i>
                         </div>
                     @endif
@@ -119,26 +125,25 @@
                 <!-- Right: Stats + Progress Bar -->
                 <div class="flex-grow-1" style="min-width: 0;">
                     <div class="row no-gutters text-center align-items-center mb-2">
-                        <div class="col-3 border-right px-1 text-left">
-                            <div class="ettaba-rw-lbl">মোট পয়েন্ট</div>
-                            <div class="ettaba-rw-val-red">{{ number_format($currentPoints, 2) }}</div>
+                        <div class="col-4 border-right px-1 text-center">
+                            <div class="ettaba-rw-lbl" style="font-size: 10.5px; font-weight: 600; color: #475569;">বর্তমান পয়েন্ট</div>
+                            <div class="ettaba-rw-val-red" style="font-size: 13px; font-weight: 800; color: #dc2626;">{{ number_format($currentPoints, 2) }}</div>
                         </div>
-                        <div class="col-5 border-right px-1">
-                            <div class="ettaba-rw-lbl">পরবর্তী পুরস্কার পেতে</div>
-                            <div class="ettaba-rw-val-dark">{{ number_format($neededPoints, 2) }} <small>পয়েন্ট বাকি</small></div>
+                        <div class="col-4 border-right px-1 text-center">
+                            <div class="ettaba-rw-lbl" style="font-size: 10.5px; font-weight: 600; color: #475569;">পরবর্তী পুরস্কার পেতে</div>
+                            <div class="ettaba-rw-val-dark" style="font-size: 13px; font-weight: 800; color: #1e293b;">{{ number_format($neededPoints, 2) }} <small style="font-size: 9.5px; font-weight: 600;">বাকি</small></div>
                         </div>
-                        <div class="col-4 pl-2 text-right">
-                            <div class="ettaba-rw-lbl">পরবর্তী পুরস্কার</div>
-                            <div class="ettaba-rw-val-green">{{ number_format($targetPoints, 0) }} পয়েন্ট</div>
-                            <div class="ettaba-rw-subname text-truncate" title="{{ $rewardName }}">{{ $rewardName }}</div>
+                        <div class="col-4 px-1 text-center">
+                            <div class="ettaba-rw-lbl" style="font-size: 10.5px; font-weight: 600; color: #475569;">পরবর্তী পুরস্কার পাবেন</div>
+                            <div class="ettaba-rw-val-green" style="font-size: 13px; font-weight: 800; color: #15803d;">{{ number_format($targetPoints, 0) }} পয়েন্ট-এ</div>
                         </div>
                     </div>
 
                     <!-- Progress Bar -->
-                    <div class="progress" style="height: 8px; border-radius: 10px; background: #e2e8f0;">
+                    <div class="progress" style="height: 7px; border-radius: 10px; background: #e2e8f0;">
                         <div class="progress-bar"
                              role="progressbar"
-                             style="width: {{ max(4, $progressPercent) }}%; background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%); border-radius: 10px;"
+                             style="width: {{ max(4, $progressPercent) }}%; background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%); border-radius: 10px;"
                              aria-valuenow="{{ $progressPercent }}"
                              aria-valuemin="0"
                              aria-valuemax="100"></div>
@@ -149,6 +154,17 @@
                     </div>
                 </div>
             </a>
+
+            <!-- Motivational Message Box below progress bar (Page 1 spec) -->
+            <div class="mt-2 pt-2 border-top d-flex align-items-center" style="background: #f8fafc; border-radius: 8px; padding: 6px 10px; border: 1px solid #e2e8f0;">
+                <div class="mr-2 text-success" style="font-size: 18px; line-height: 1;">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div style="line-height: 1.35;">
+                    <div style="font-size: 11px; font-weight: 700; color: #1e293b;">যতবেশি কেনাকাটা ও সার্ভিস নিবেন, তত বড় পুরস্কার পাবেন!</div>
+                    <div style="font-size: 10px; color: #64748b; font-weight: 500;">তাই ইত্তেবা অ্যাপ বা ইত্তেবা লোকাল মার্চেন্ট থেকে নিয়মিত কেনাকাটা করুন ও সার্ভিস নিন!</div>
+                </div>
+            </div>
         </div>
     @endauth
 

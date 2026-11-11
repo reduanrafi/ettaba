@@ -616,6 +616,54 @@
                     </div>
                 </div>
 
+                {{-- Size & Color Variant Selector (If added by Seller) --}}
+                @php
+                    $sizeList = !empty($product->sizes) ? array_filter(array_map('trim', explode(',', $product->sizes))) : [];
+                    $colorList = !empty($product->colors) ? array_filter(array_map('trim', explode(',', $product->colors))) : [];
+                @endphp
+
+                @if(!empty($sizeList) || !empty($colorList))
+                    <div class="pdetail-variants-box mb-3 p-3 rounded" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                        @if(!empty($sizeList))
+                            <div class="mb-2">
+                                <div class="small font-weight-bold text-dark mb-1 d-flex align-items-center">
+                                    <i class="fas fa-ruler-combined text-primary mr-1"></i> সাইজ নির্বাচন করুন:
+                                    <span id="selectedSizeLabel" class="ml-2 badge badge-info text-white font-weight-normal">{{ reset($sizeList) }}</span>
+                                </div>
+                                <div class="d-flex flex-wrap" style="gap: 6px;">
+                                    @foreach($sizeList as $sIdx => $sz)
+                                        <button type="button" class="btn btn-sm variant-size-btn {{ $sIdx === 0 ? 'btn-primary' : 'btn-outline-secondary' }}"
+                                                data-size="{{ $sz }}" onclick="selectProductSize('{{ $sz }}', this)"
+                                                style="border-radius: 8px; font-weight: 600; padding: 4px 12px;">
+                                            {{ $sz }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" id="selectedSizeInput" value="{{ reset($sizeList) }}">
+                            </div>
+                        @endif
+
+                        @if(!empty($colorList))
+                            <div class="{{ !empty($sizeList) ? 'mt-3' : '' }}">
+                                <div class="small font-weight-bold text-dark mb-1 d-flex align-items-center">
+                                    <i class="fas fa-palette text-danger mr-1"></i> কালার নির্বাচন করুন:
+                                    <span id="selectedColorLabel" class="ml-2 badge badge-danger text-white font-weight-normal">{{ reset($colorList) }}</span>
+                                </div>
+                                <div class="d-flex flex-wrap" style="gap: 6px;">
+                                    @foreach($colorList as $cIdx => $cl)
+                                        <button type="button" class="btn btn-sm variant-color-btn {{ $cIdx === 0 ? 'btn-danger' : 'btn-outline-secondary' }}"
+                                                data-color="{{ $cl }}" onclick="selectProductColor('{{ $cl }}', this)"
+                                                style="border-radius: 8px; font-weight: 600; padding: 4px 12px;">
+                                            {{ $cl }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                                <input type="hidden" id="selectedColorInput" value="{{ reset($colorList) }}">
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 {{-- 8. Quantity Selector + Add to Cart Button + Wishlist + Share --}}
                 @php
                     $safeDetailTitle = str_replace(["\\", "'", "\"", "\r", "\n"], ["\\\\", "\\'", "", " ", " "], (string) $fullTitle);
@@ -633,7 +681,7 @@
                         </button>
                     @else
                         <button type="button" class="pdetail-cart-btn"
-                                @click="addToCart('{{ $product->id }}', '{{ $safeDetailTitle }}', '{{ $erpVal }}', '{{ $trpVal }}', '{{ $product->owner_id }}', '{{ $tcbVal }}', '{{ $product->rate_en }}', detailQty)"
+                                @click="addToCart('{{ $product->id }}', '{{ $safeDetailTitle }}', '{{ $erpVal }}', '{{ $trpVal }}', '{{ $product->owner_id }}', '{{ $tcbVal }}', '{{ $product->rate_en }}', detailQty, getSelectedProductVariants())"
                                 onclick="if(typeof toggleCartDrawer === 'function') { setTimeout(toggleCartDrawer, 120); }">
                             <i class="fas fa-shopping-cart"></i> কার্টে যুক্ত করুন
                         </button>
@@ -687,8 +735,11 @@
                 <h5 class="font-weight-bold text-dark mb-2">
                     <i class="fas fa-shipping-fast text-success mr-1"></i> ডেলিভারি নির্দেশিকা
                 </h5>
-                <p class="small text-muted mb-3" style="line-height: 1.6;">
-                    ইত্তেবা শপ লিমিটেড সমগ্র বাংলাদেশে অনলাইন অর্ডার ও ডেলিভারি সেবা পরিচালনা করছে। তবে কাঁচাবাজার, গ্রোসারি ও দ্রুত পচনশীল স্থানীয় পণ্য নির্দিষ্ট লোকাল এলাকায় দ্রুত ডেলিভারি করা হয়। তাই অর্ডার দেওয়ার আগে পণ্যের পাশে উল্লেখিত <strong>ডেলিভারি এলাকা ({{ $deliveryAreaText }})</strong> যাচাই করে নিন।
+                <p class="small text-muted mb-3" style="line-height: 1.65; font-size: 13px;">
+                    ইত্তেবা শপ লিমিটেড সমগ্র বাংলাদেশে অনলাইন অর্ডার ও ডেলিভারি সেবা পরিচালনা করছে। তবে কাঁচাবাজার, গ্রোসারি, রেস্টুরেন্ট ও দ্রুত পচনশীল কিছু স্থানীয় পণ্য, নির্দিষ্ট লোকাল এলাকায় ডেলিভারি দেওয়া হয়। তাই অর্ডার করার আগে পণ্যটির ডেলিভারি এলাকা যাচাই করে নিন।<br>
+                    <span style="display: inline-block; margin-top: 6px; padding: 4px 10px; background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 8px; color: #047857; font-weight: 700;">
+                        এই পণ্যটি ডেলিভারি হয়: <span style="color: #b91c1c; font-size: 13.5px;">[{{ $deliveryAreaText }}]</span>
+                    </span>
                 </p>
 
                 {{-- Customer Reviews List --}}
@@ -950,6 +1001,41 @@
         setTimeout(function () {
             btnEl.innerHTML = origHtml;
         }, 1800);
+    }
+
+    function selectProductSize(size, btn) {
+        document.querySelectorAll('.variant-size-btn').forEach(function(b) {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary');
+        var input = document.getElementById('selectedSizeInput');
+        if (input) input.value = size;
+        var label = document.getElementById('selectedSizeLabel');
+        if (label) label.textContent = size;
+    }
+
+    function selectProductColor(color, btn) {
+        document.querySelectorAll('.variant-color-btn').forEach(function(b) {
+            b.classList.remove('btn-danger');
+            b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-danger');
+        var input = document.getElementById('selectedColorInput');
+        if (input) input.value = color;
+        var label = document.getElementById('selectedColorLabel');
+        if (label) label.textContent = color;
+    }
+
+    function getSelectedProductVariants() {
+        var sizeInput = document.getElementById('selectedSizeInput');
+        var colorInput = document.getElementById('selectedColorInput');
+        return {
+            size: sizeInput ? sizeInput.value : '',
+            color: colorInput ? colorInput.value : ''
+        };
     }
 </script>
 @endsection

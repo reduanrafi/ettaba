@@ -111,19 +111,80 @@ class MerchantController extends Controller
 
     public function ChangeStatus(Request $request)
     {
+        $userId = $request->id;
+        $status = $request->status;
 
         try
         {
-            if ($this->globalObject->ChangeUserStatus($request->id,$request->status))
-            {
-                return redirect()->back()->with(['success'=> $this->moduleName." updated successfully"]);
+            $user = User::findOrFail($userId);
+
+            if ($status == 'block') {
+                $user->is_active = 0;
+                $user->is_blocked = 1;
+                $user->is_new = 0;
+                $user->save();
+
+                $phone = $user->phone;
+                $nid = optional($user->profile)->nid ?: optional($user->shop)->nid_tin;
+
+                // Cross-blocking rule: Blocking a merchant also blocks seller account with same phone/NID
+                $linkedSellers = User::where('type', 'store_owner')
+                    ->where('id', '!=', $user->id)
+                    ->where(function($q) use ($phone, $nid) {
+                        $q->where('phone', $phone);
+                        if (!empty($nid)) {
+                            $q->orWhereHas('profile', function($pq) use ($nid) {
+                                $pq->where('nid', $nid);
+                            })->orWhereHas('shop', function($sq) use ($nid) {
+                                $sq->where('nid_tin', $nid);
+                            });
+                        }
+                    })->get();
+
+                foreach ($linkedSellers as $ls) {
+                    $ls->is_active = 0;
+                    $ls->is_blocked = 1;
+                    $ls->is_new = 0;
+                    $ls->save();
+                }
+
+                // Add to BlockedUser as seller_merchant so they cannot create seller or merchant account
+                \App\Models\BlockedUser::updateOrCreate(
+                    ['phone' => $phone, 'type' => 'seller_merchant'],
+                    [
+                        'user_id' => $user->id,
+                        'nid' => $nid,
+                        'reason' => 'Merchant account blocked by admin (linked seller also blocked; customer account unaffected)'
+                    ]
+                );
+
+                return redirect()->back()->with(['success' => "Merchant blocked successfully. Any associated Seller account is also blocked. Customer account remains completely unaffected."]);
+            }
+            elseif ($status == 'activate') {
+                $user->is_active = 1;
+                $user->is_blocked = 0;
+                $user->is_new = 0;
+                $user->save();
+
+                \App\Models\BlockedUser::where('user_id', $user->id)->where('type', 'seller_merchant')->delete();
+                \App\Models\BlockedUser::where('phone', $user->phone)->where('type', 'seller_merchant')->delete();
+
+                return redirect()->back()->with(['success' => "Merchant activated successfully."]);
+            }
+            elseif ($status == 'inactivate') {
+                $user->is_active = 0;
+                $user->is_blocked = 0;
+                $user->is_new = 0;
+                $user->save();
+
+                return redirect()->back()->with(['success' => "Merchant marked inactive successfully."]);
             }
         }
         catch (QueryException $ex)
         {
-            return redirect()->back()->with(['error'=>$ex->getMessage()]);
+            return redirect()->back()->with(['error' => $ex->getMessage()]);
         }
-        return redirect()->back()->with(['error'=>"Unable to handle this request !"]);
+        return redirect()->back()->with(['error' => "Unable to handle this request !"]);
     }
 
 }

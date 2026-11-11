@@ -20,6 +20,20 @@
 
     @yield('extra-style')
 
+    <style>
+        /* Immediate stable layout for Admin tables & widgets to avoid FOUC (Page 18 spec) */
+        table.table {
+            table-layout: fixed;
+            width: 100% !important;
+        }
+        .dataTables_wrapper .dataTables_processing {
+            display: none !important;
+        }
+        .table-responsive {
+            min-height: 250px;
+        }
+    </style>
+
     <![endif]-->
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">

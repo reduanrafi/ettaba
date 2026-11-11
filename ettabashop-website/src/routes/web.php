@@ -102,6 +102,7 @@ Route::get('/shop-detail/', [ShopController::class, 'detail'])->name('shop.detai
 
 Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('website.privacy');
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('website.terms');
+Route::get('/page/{slug}', [StaticPageController::class, 'showCustomPage'])->name('website.customPage');
 Route::post('/save-anonymous-order', [AnonymousOrderController::class, 'SaveOrder']);
 /* Auth routes */
 Auth::routes();

@@ -36,5 +36,14 @@ class StaticPageController extends Controller
         return view('website.legal.terms');
     }
 
+    public function showCustomPage($slug)
+    {
+        $page = \App\Models\CustomPage::where('slug', $slug)
+            ->where('is_published', 1)
+            ->firstOrFail();
+
+        return view('website.legal.custom_page', compact('page'));
+    }
+
 
 }

@@ -132,25 +132,25 @@ class Order extends Model
     }
     public static function all($key=null)
     {
-        return Order::with('user','paymentMethod')->whereNotIn('orders.status', ['pending_payment', 'completed'])->orderByDesc('id')->get();
+        return Order::with('user','paymentMethod','orderItems.product.owner.shop')->whereNotIn('orders.status', ['pending_payment', 'completed'])->orderByDesc('id')->get();
     }
     public function GetDailyOrders()
     {
-        return Order::with('user','paymentMethod')->where('orders.status', '!=', 'pending_payment')->where('orders.created_at','>=',Carbon::today())->orderByDesc('id')->get();
+        return Order::with('user','paymentMethod','orderItems.product.owner.shop')->where('orders.status', '!=', 'pending_payment')->where('orders.created_at','>=',Carbon::today())->orderByDesc('id')->get();
 
     }
     public function NewOrders($status)
     {
-        return Order::with('user.profile','paymentMethod')->where('orders.status',$status)->where('orders.created_at','>=',Carbon::today())->orderByDesc('id')->get();
+        return Order::with('user.profile','paymentMethod','orderItems.product.owner.shop')->where('orders.status',$status)->where('orders.created_at','>=',Carbon::today())->orderByDesc('id')->get();
 
     }
     public function GetOrderByStatus($status)
     {
-        return Order::with('user.profile','paymentMethod')->where('orders.status',$status)->orderByDesc('id')->get();
+        return Order::with('user.profile','paymentMethod','orderItems.product.owner.shop')->where('orders.status',$status)->orderByDesc('id')->get();
     }
     public function GetCompletedOrders()
     {
-        return Order::with('user.profile','paymentMethod')->where('orders.status', 'completed')->orderByDesc('id')->paginate(100);
+        return Order::with('user.profile','paymentMethod','orderItems.product.owner.shop')->where('orders.status', 'completed')->orderByDesc('id')->paginate(100);
     }
     public function GetDetail($id)
     {

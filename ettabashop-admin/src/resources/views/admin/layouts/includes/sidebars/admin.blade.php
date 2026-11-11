@@ -172,6 +172,14 @@
             </span>
         </a>
     </li>
+    <li class="{{ Request::is('private-panel/custom-pages*') ? 'active' : '' }}">
+        <a href="{{ route('admin.customPages.index') }}">
+            <i class="fa fa-file-text-o" style="color: #38bdf8;"></i> <span>কাস্টম পেজ ও পলিসি</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+    </li>
     <hr>
     <li class="treeview {{ Request::is('private-panel/geo*') ? 'active' : '' }}">
         <a href="#">

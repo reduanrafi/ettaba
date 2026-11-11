@@ -139,6 +139,10 @@
                     <button type="button" class="ettaba-btn-cart w-100" style="background: #94a3b8; cursor: not-allowed;" disabled>
                         স্টক আউট
                     </button>
+                @elseif(!empty($product->sizes) || !empty($product->colors))
+                    <a href="{{ $detailUrl }}" class="ettaba-btn-cart w-100 text-decoration-none d-flex align-items-center justify-content-center" title="সাইজ ও কালার নির্বাচন করতে বিস্তারিত দেখুন">
+                        <i class="fas fa-sliders-h mr-1"></i> অপশন বাছাই
+                    </a>
                 @else
                     <button type="button"
                             class="ettaba-btn-cart w-100"

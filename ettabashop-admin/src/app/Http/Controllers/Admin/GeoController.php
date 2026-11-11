@@ -253,6 +253,18 @@ class GeoController extends Controller
     }
 
     /**
+     * AJAX helper to get Districts for a Division.
+     */
+    public function getDistrictsAjax($division_id)
+    {
+        $districts = District::where('division_id', $division_id)
+            ->select('id', 'name', 'bn_name')
+            ->orderBy('name')
+            ->get();
+        return response()->json($districts);
+    }
+
+    /**
      * AJAX helper to get Upazilas for a District.
      */
     public function getUpazilasAjax($district_id)
@@ -275,5 +287,74 @@ class GeoController extends Controller
         }
 
         return response()->json($upazilas);
+    }
+
+    /**
+     * AJAX helper to get Unions / Municipalities for an Upazila.
+     */
+    public function getUnionsAjax($upazila_id)
+    {
+        try {
+            $unions = Union::where('upazila_id', $upazila_id)
+                ->select('id', 'name', 'bn_name', 'type', 'ward_count')
+                ->orderBy('bn_name')
+                ->get();
+        } catch (\Throwable $e) {
+            $unions = collect([]);
+        }
+
+        return response()->json($unions);
+    }
+
+    /**
+     * AJAX helper to check if a Custom Shop URL (Slug) is available.
+     */
+    public function checkShopSlugAjax(Request $request)
+    {
+        $raw = trim((string)$request->get('slug', ''));
+        $ignoreId = (int)$request->get('ignore_id', 0);
+
+        if (empty($raw)) {
+            return response()->json([
+                'available' => false,
+                'message' => 'Please enter a shop URL (slug).'
+            ]);
+        }
+
+        $formatted = \App\Models\Shop::formatSlugString($raw);
+        $reserved = [
+            'login', 'register', 'logout', 'forgot-password', 'products', 'category-products',
+            'all-products', 'search', 'detail', 'checkout', 'about', 'contact', 'shop',
+            'shop-search', 'shop-detail', 'privacy', 'terms', 'orders', 'profile', 'notices',
+            'offer', 'section', 'api', 'admin', 'clear-cache', 'run-migrate', 'payment',
+        ];
+
+        if (in_array(strtolower($formatted), $reserved, true)) {
+            return response()->json([
+                'available' => false,
+                'slug' => $formatted,
+                'message' => 'এই URLটি সিস্টেম রিজার্ভ করা, অনুগ্রহ করে অন্য নাম ব্যবহার করুন।'
+            ]);
+        }
+
+        $exists = \App\Models\Shop::whereRaw('LOWER(slug) = ?', [strtolower($formatted)])
+            ->when($ignoreId > 0, function($q) use ($ignoreId) {
+                $q->where('id', '!=', $ignoreId);
+            })
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'available' => false,
+                'slug' => $formatted,
+                'message' => 'এই URLটি ইতিমধ্যে ব্যবহার করা হয়েছে। অনুগ্রহ করে অন্য নাম দিন।'
+            ]);
+        }
+
+        return response()->json([
+            'available' => true,
+            'slug' => $formatted,
+            'message' => 'অভিনন্দন! এই Shop URL (slug) টি খালি আছে এবং ব্যবহারযোগ্য।'
+        ]);
     }
 }

@@ -137,17 +137,31 @@ class RegisterController extends Controller
             ]);
         }
 
-        $exists = User::where('phone', $username)->exists();
+        // Check if blocked as customer
+        $isBlocked = \App\Models\BlockedUser::where('phone', $username)
+            ->where(function ($q) {
+                $q->where('type', 'customer')->orWhere('type', 'all')->orWhereNull('type');
+            })->exists();
+
+        if ($isBlocked) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'এই মোবাইল নম্বরটি কাস্টমার হিসেবে ব্লক করা রয়েছে।'
+            ]);
+        }
+
+        // Customer account uniqueness check (only checks customer type)
+        $exists = User::where('phone', $username)->where('type', 'customer')->exists();
         if ($exists) {
             return response()->json([
                 'valid' => false,
-                'message' => 'এই ইউজার নেম/মোবাইল নম্বরটি ইতিমধ্যে ব্যবহার করা হয়েছে।'
+                'message' => 'এই মোবাইল নম্বরটি দিয়ে ইতিমধ্যে একটি কাস্টমার একাউন্ট খোলা হয়েছে।'
             ]);
         }
 
         return response()->json([
             'valid' => true,
-            'message' => 'ইউজার নেমটি ব্যবহারযোগ্য।'
+            'message' => 'মোবাইল নম্বরটি ব্যবহারযোগ্য।'
         ]);
     }
 
@@ -256,7 +270,9 @@ class RegisterController extends Controller
                 'alpha_num',
                 'min:5',
                 'max:255',
-                'unique:users,phone'
+                \Illuminate\Validation\Rule::unique('users', 'phone')->where(function ($query) {
+                    return $query->where('type', 'customer');
+                })
             ],
             'customer_type' => ['required', 'in:buy_only,buy_earn,virtual_agent'],
             'account_number' => ['required_if:customer_type,buy_earn', 'nullable', 'string', 'in:first,subsequent'],
@@ -307,6 +323,36 @@ class RegisterController extends Controller
         if ($request->has('phone')) {
             $cleanedPhone = preg_replace('/[^a-zA-Z0-9]/', '', (string)$request->phone);
             $request->merge(['phone' => $cleanedPhone]);
+
+            // Check if phone is blocked as customer
+            $phoneBlocked = \App\Models\BlockedUser::where('phone', $cleanedPhone)
+                ->where(function ($q) {
+                    $q->where('type', 'customer')->orWhere('type', 'all')->orWhereNull('type');
+                })->exists();
+
+            if ($phoneBlocked) {
+                $msg = 'এই মোবাইল নম্বরটি কাস্টমার হিসেবে ব্লক করা রয়েছে।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
+        }
+
+        // Check if NID is blocked as customer
+        if ($request->filled('nid')) {
+            $nidBlocked = \App\Models\BlockedUser::where('nid', $request->nid)
+                ->where(function ($q) {
+                    $q->where('type', 'customer')->orWhere('type', 'all')->orWhereNull('type');
+                })->exists();
+
+            if ($nidBlocked) {
+                $msg = 'এই NID নম্বরটি কাস্টমার হিসেবে ব্লক করা রয়েছে।';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return redirect()->back()->withInput()->with(['error' => $msg]);
+            }
         }
 
         // 2. Adjust referral codes based on customer_type

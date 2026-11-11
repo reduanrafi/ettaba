@@ -1,165 +1,482 @@
 @extends('admin.layouts.layout')
+
+@section('extra-style')
+<style>
+    .shop-profile-box {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 30px;
+    }
+    .shop-profile-box .box-header {
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 16px 24px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+    .shop-profile-box .box-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .shop-form-card {
+        padding: 24px;
+    }
+    .form-section-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0284c7;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e0f2fe;
+    }
+    .form-group label {
+        font-weight: 600;
+        color: #334155;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+    .form-control {
+        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 13.5px;
+        transition: all 0.2s ease;
+        height: auto;
+    }
+    .form-control:focus {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+    .input-hint {
+        font-size: 11.5px;
+        color: #64748b;
+        margin-top: 5px;
+        display: block;
+    }
+    .slug-input-group {
+        display: flex;
+        gap: 8px;
+    }
+    .btn-check-slug {
+        border-radius: 8px;
+        font-weight: 600;
+        padding: 8px 16px;
+        white-space: nowrap;
+        background: #0284c7;
+        color: #fff;
+        border: none;
+    }
+    .btn-check-slug:hover {
+        background: #0369a1;
+        color: #fff;
+    }
+    .slug-status-badge {
+        font-size: 12px;
+        font-weight: 600;
+        margin-top: 6px;
+        display: none;
+    }
+    .logo-preview-box {
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f8fafc;
+        margin-top: 10px;
+    }
+    .logo-preview-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+@endsection
+
 @section('content')
 <section class="content">
     <div class="row">
-        <div class="col-md-12">
-            <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Update your shop information</h3>
-                    <div class="pull-right box-tools">
-                        <a href="{{ route('shop.index') }}"
-                           class="btn btn-block btn-primary btn-flat pull-right btn-sm"><i class="fa fa-mail-forward"></i> View Shop</a>
+        <div class="col-md-10 col-md-offset-1">
+            <div class="shop-profile-box">
+                <div class="box-header">
+                    <h3 class="box-title"><i class="fa fa-pencil text-primary"></i> Update Shop Profile</h3>
+                    <div class="pull-right">
+                        <a href="{{ route('shop.index') }}" class="btn btn-sm btn-default btn-flat">
+                            <i class="fa fa-arrow-left"></i> Back to Shop
+                        </a>
                     </div>
                 </div>
 
-                <form class="form-horizontal" action="{{ route('shop.update', ['shop' => $shop->id]) }}" method="post" enctype="multipart/form-data">
-                    @csrf
-                    {!! method_field('PUT') !!}
-                    <input type="hidden" name="shop" value="{{ $shop->id }}">
-                    <div class="box-body">
+                <div class="shop-form-card">
+                    @if(Session::has('success'))
+                        @include('admin.layouts.message.success')
+                    @elseif(Session::has('error'))
+                        @include('admin.layouts.message.error')
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger" style="border-radius: 8px;">
+                            <ul style="margin-bottom: 0;">
+                                @foreach($errors->all() as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('shop.update', ['shop' => $shop->id]) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        {!! method_field('PUT') !!}
+                        <input type="hidden" name="shop" id="shop_id" value="{{ $shop->id }}">
+
+                        <!-- 1. Basic Shop Info -->
+                        <div class="form-section-title"><i class="fa fa-id-badge"></i> 1. Shop Identity</div>
                         <div class="row">
-                            <div class="col-md-8 col-md-offset-2" id="messageDiv">
-                                @if(Session::has('success'))
-                                    @include('admin.layouts.message.success')
-                                @elseif(Session::has('error'))
-                                    @include('admin.layouts.message.error')
-                                @endif
-                            </div>
-
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="name_en" class="col-sm-3 control-label">Shop name english</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->name_en }}" class="form-control" id="name_en" name="name_en" placeholder="Shop Name English" required>
-                                    </div>
+                                    <label for="name">Shop Name (English/Bangla) <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                           value="{{ old('name', $shop->name_en ?: $shop->name_bn) }}"
+                                           placeholder="e.g. Gadgets Bro / গ্যাজেটস ব্রো"
+                                           required oninput="autoUpdateSlug(this.value)">
                                 </div>
                             </div>
-
-                            <div class="col-md-8">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="name_bn" class="col-sm-3 control-label">Shop name bangla</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->name_bn }}" class="form-control" id="name_bn" name="name_bn" placeholder="বাংলায় আপনার দোকানের নাম লিখুন" required>
+                                    <label for="slug">Custom Shop URL (Slug) <span class="text-danger">*</span></label>
+                                    <div class="slug-input-group">
+                                        <input type="text" class="form-control" id="slug" name="slug"
+                                               value="{{ old('slug', $shop->slug) }}" placeholder="e.g. Gadgets_Bro" required>
+                                        <button type="button" class="btn btn-check-slug" onclick="verifyShopSlug()">
+                                            <i class="fa fa-search"></i> Check
+                                        </button>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="slug" class="col-sm-3 control-label">Custom Shop URL (Slug)</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->slug }}" class="form-control" id="slug" name="slug" placeholder="Gadgets_Bro" required>
-                                        <small class="text-muted">আপনার শপ লিংক: <strong>ettabashop.com/{{ $shop->slug }}</strong></small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="description_en" class="col-sm-3 control-label">Shop description english</label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" id="description_en" name="description_en" placeholder="Write few words about your shop">{{ trim($shop->description_en) }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="description_bn" class="col-sm-3 control-label">Shop description Bangla</label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" id="description_bn" name="description_bn" placeholder="বাংলায় আপনার দোকান সম্পর্কে কিছু লিখুন">{{ trim($shop->description_bn) }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="address_en" class="col-sm-3 control-label">Shop address english</label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" id="address_en" name="address_en" placeholder="Your shop location" required>{{ trim($shop->address_en) }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="address_bn" class="col-sm-3 control-label">Shop address bangla</label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" id="address_bn" name="address_bn" placeholder="বাংলায় আপনার দোকানের অবস্থান লিখুন" required>{{ trim($shop->address_bn) }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="delivery_area_bn" class="col-sm-3 control-label">ডেলিভারি এলাকা (বাংলায়)</label>
-                                    <div class="col-sm-9">
-                                        <textarea class="form-control" id="delivery_area_bn" name="delivery_area_bn" placeholder="যেমন: শুধু কিশোরগঞ্জ সদর অথবা কিশোরগঞ্জ সদর, করিমগঞ্জ পৌরসভা, কটিয়াদি পৌরসভা">{{ trim($shop->delivery_area_bn ?? '') }}</textarea>
-                                        <small class="text-muted">সেলার পেজে এবং প্রোডাক্ট ডিটেইলস পেজে 'এই সেলার ডেলিভারি দেয়-' এর পাশে এটি দেখাবে।</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="mobile" class="col-sm-3 control-label">Mobile</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->mobile }}" class="form-control" id="mobile" name="mobile" placeholder="Mobile number" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="fb_link" class="col-sm-3 control-label">Facebook page link</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->fb_link }}" class="form-control" id="fb_link" name="fb_link" placeholder="Facebook page link">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="youtube_link" class="col-sm-3 control-label">Youtube channel link</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" value="{{ $shop->youtube_link }}" class="form-control" id="youtube_link" name="youtube_link" placeholder="Youtube channel link">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="logo_image" class="col-sm-3 control-label">Logo image</label>
-                                    <div class="col-sm-9">
-                                        <input type="file" class="form-control" onchange="loadFile(event)"
-                                               id="logo_image" name="logo_image">
-                                        <p><img id="output" width="200"/></p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="banner_image" class="col-sm-3 control-label">Banner image</label>
-                                    <div class="col-sm-9">
-                                        <input type="file" class="form-control" id="banner_image" name="banner_image">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">Action</label>
-                                    <div class="col-sm-9">
-                                        <input type="submit" value="Save" class="btn btn-success">
-                                    </div>
+                                    <small class="input-hint">
+                                        Your public shop link: <strong>ettabashop.com/<span id="slugPreviewText">{{ $shop->slug }}</span></strong>
+                                    </small>
+                                    <div id="slugStatusMsg" class="slug-status-badge"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+
+                        <!-- 2. Legal / Registration Details -->
+                        <div class="form-section-title" style="margin-top: 15px;"><i class="fa fa-file-text-o"></i> 2. Legal & Identification</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nid_tin">Seller NID/TIN Certificate No <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nid_tin" name="nid_tin"
+                                           value="{{ old('nid_tin', $shop->nid_tin ?: optional($shop->user->profile)->nid) }}"
+                                           placeholder="ব্যক্তি মালিকানা ব্যবসার ক্ষেত্রে NID এবং কোম্পানির ক্ষেত্রে TIN Certificate No ব্যবহার করুন"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth">Date of birth <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                                           value="{{ old('date_of_birth', $shop->date_of_birth ? date('Y-m-d', strtotime($shop->date_of_birth)) : (optional($shop->user->profile)->date_of_birth ? date('Y-m-d', strtotime(optional($shop->user->profile)->date_of_birth)) : '')) }}"
+                                           placeholder="NID এর ক্ষেত্রে জন্ম তারিখ এবং TIN এর ক্ষেত্রে TIN তৈরি তারিখ উল্লেখ করুন"
+                                           required>
+                                    <small class="input-hint">NID এর ক্ষেত্রে জন্ম তারিখ এবং TIN এর ক্ষেত্রে TIN তৈরি তারিখ উল্লেখ করুন</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Cascading Shop Address -->
+                        <div class="form-section-title" style="margin-top: 15px;"><i class="fa fa-map-marker"></i> 3. Shop Address</div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="division_id">Division <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="division_id" name="division_id" required onchange="loadDistricts(this.value)">
+                                        <option value="">-- Select Division --</option>
+                                        @foreach($divisions as $div)
+                                            <option value="{{ $div->id }}" {{ (old('division_id', $shop->division_id ?: optional($shop->user)->division_id) == $div->id) ? 'selected' : '' }}>
+                                                {{ $div->bn_name ?: $div->name }} ({{ $div->name }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="district_id">District <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="district_id" name="district_id" required onchange="loadUpazilas(this.value)">
+                                        <option value="">-- Select District --</option>
+                                        @foreach($districts as $dst)
+                                            <option value="{{ $dst->id }}" {{ (old('district_id', $shop->district_id ?: optional($shop->user)->district_id) == $dst->id) ? 'selected' : '' }}>
+                                                {{ $dst->bn_name ?: $dst->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="upazila_id">Upazila / City Corporation <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="upazila_id" name="upazila_id" required onchange="loadUnions(this.value)">
+                                        <option value="">-- Select Upazila --</option>
+                                        @foreach($upazilas as $upz)
+                                            <option value="{{ $upz->id }}" {{ (old('upazila_id', $shop->upazila_id ?: optional($shop->user)->upazila_id) == $upz->id) ? 'selected' : '' }}>
+                                                {{ $upz->bn_name ?: $upz->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="union_name">Municipality / Union <span class="text-danger">*</span></label>
+                                    <div class="input-group" style="width: 100%;">
+                                        <select class="form-control" id="union_select" onchange="applyUnionSelection(this.value)">
+                                            <option value="">-- Select Union / Municipality --</option>
+                                            @foreach($unions as $un)
+                                                <option value="{{ $un->bn_name ?: $un->name }}" {{ ($shop->union_name == ($un->bn_name ?: $un->name)) ? 'selected' : '' }}>
+                                                    {{ $un->bn_name ?: $un->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <input type="text" class="form-control" id="union_name" name="union_name"
+                                           value="{{ old('union_name', $shop->union_name ?: optional($shop->user->profile)->union_name) }}"
+                                           placeholder="বা সরাসরি ইউনিয়ন/পৌরসভার নাম লিখুন"
+                                           style="margin-top: 6px;" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="ward_no">Ward No <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="ward_no" name="ward_no"
+                                           value="{{ old('ward_no', $shop->ward_no ?: optional($shop->user->profile)->ward_no) }}"
+                                           placeholder="e.g. 01, 02, বা ১, ২" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Delivery Area & Contact -->
+                        <div class="form-section-title" style="margin-top: 15px;"><i class="fa fa-truck"></i> 4. Delivery Area & Mobile</div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="delivery_area_bn">Delivery area: (Bangla/English) <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="delivery_area_bn" name="delivery_area_bn" rows="3"
+                                              placeholder="আপনার পণ্য কোথায় ডেলিভারি দেওয়া হয় স্পষ্ট করে লিখুন। যেমন- নির্দিষ্ট কোনো জেলা, উপজেলা, পৌরসভা বা ইউনিয়ন? নাকি সমগ্র বাংলাদেশ? সেটা লিখুন। একাধিক এলাকা লিখতে কমা (,) ব্যবহার করুন"
+                                              required>{{ old('delivery_area_bn', $shop->delivery_area_bn ?: $shop->delivery_area_en) }}</textarea>
+                                    <small class="input-hint">
+                                        সেলার পেজে এবং প্রোডাক্ট ডিটেইলস পেজে 'এই সেলার ডেলিভারি দেয়-' এর পাশে এটি দেখাবে।
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mobile">Mobile Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="mobile" name="mobile"
+                                           value="{{ old('mobile', $shop->mobile ?: optional($shop->user)->phone) }}"
+                                           placeholder="e.g. 01712345678" maxlength="11" pattern="01[0-9]{9}" required>
+                                    <small class="input-hint">English digits only, must start with 01 and be exactly 11 digits.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Social Media Links -->
+                        <div class="form-section-title" style="margin-top: 15px;"><i class="fa fa-share-alt"></i> 5. Social Media Links (Optional)</div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="youtube_link">Youtube channel link</label>
+                                    <input type="url" class="form-control" id="youtube_link" name="youtube_link"
+                                           value="{{ old('youtube_link', $shop->youtube_link) }}" placeholder="https://youtube.com/@channel">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="fb_link">Facebook page link</label>
+                                    <input type="url" class="form-control" id="fb_link" name="fb_link"
+                                           value="{{ old('fb_link', $shop->fb_link) }}" placeholder="https://facebook.com/page">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="instagram_link">Instagram profile link</label>
+                                    <input type="url" class="form-control" id="instagram_link" name="instagram_link"
+                                           value="{{ old('instagram_link', $shop->instagram_link) }}" placeholder="https://instagram.com/profile">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <small class="text-muted" style="font-weight: 600; display: block; margin-top: -5px; margin-bottom: 15px;">
+                                    <i class="fa fa-info-circle text-info"></i> লোকাল অফিস/এডমিনের অনুমোদন সাপেক্ষে এই প্রোফাইল আপনার সেলার পেজে শো করবে।
+                                    @if(isset($shop->social_approved))
+                                        <span class="label {{ $shop->social_approved ? 'label-success' : 'label-warning' }}" style="margin-left: 8px;">
+                                            Status: {{ $shop->social_approved ? 'Approved by Admin' : 'Pending Admin Approval' }}
+                                        </span>
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- 6. Logo Image -->
+                        <div class="form-section-title" style="margin-top: 15px;"><i class="fa fa-image"></i> 6. Shop Logo</div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="logo_image">Change Logo Image (Optional)</label>
+                                    <input type="file" class="form-control" id="logo_image" name="logo_image"
+                                           accept="image/*" onchange="previewLogo(event)">
+                                    <small class="input-hint">Leave blank to keep existing logo.</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Current Logo Preview:</label>
+                                <div class="logo-preview-box">
+                                    <img id="logoOutput" src="{{ !empty($shop->logo_image) ? asset($shop->logo_image) : asset('assets/images/logo/logo.png') }}" alt="Shop Logo">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="row" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-success btn-lg" style="border-radius: 8px; font-weight: 700; padding: 12px 30px;">
+                                    <i class="fa fa-save"></i> Update Shop Profile
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    function autoUpdateSlug(val) {
+        var slugInput = document.getElementById('slug');
+        if (slugInput && !slugInput.dataset.manuallyEdited) {
+            var formatted = val.trim().replace(/\s+/g, '_').replace(/[^A-Za-z0-9_\-\u0980-\u09FF]/g, '');
+            slugInput.value = formatted;
+            var preview = document.getElementById('slugPreviewText');
+            if (preview) preview.textContent = formatted || 'Gadgets_Bro';
+        }
+    }
+
+    document.getElementById('slug').addEventListener('input', function() {
+        this.dataset.manuallyEdited = "1";
+        var preview = document.getElementById('slugPreviewText');
+        if (preview) preview.textContent = this.value || 'Gadgets_Bro';
+    });
+
+    function verifyShopSlug() {
+        var slugVal = document.getElementById('slug').value.trim();
+        var shopId = document.getElementById('shop_id').value;
+        var statusBadge = document.getElementById('slugStatusMsg');
+        if (!slugVal) {
+            alert('Please enter a shop slug to check.');
+            return;
+        }
+        statusBadge.style.display = 'block';
+        statusBadge.innerHTML = '<span class="text-info"><i class="fa fa-spinner fa-spin"></i> Checking availability...</span>';
+
+        fetch("{{ route('ajax.checkShopSlug') }}?slug=" + encodeURIComponent(slugVal) + "&ignore_id=" + shopId)
+            .then(res => res.json())
+            .then(data => {
+                if (data.available) {
+                    statusBadge.innerHTML = '<span class="text-success"><i class="fa fa-check-circle"></i> ' + data.message + '</span>';
+                } else {
+                    statusBadge.innerHTML = '<span class="text-danger"><i class="fa fa-times-circle"></i> ' + data.message + '</span>';
+                }
+            })
+            .catch(err => {
+                statusBadge.innerHTML = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> Verification failed, please try again.</span>';
+            });
+    }
+
+    function loadDistricts(divId) {
+        var districtSelect = document.getElementById('district_id');
+        var upazilaSelect = document.getElementById('upazila_id');
+        var unionSelect = document.getElementById('union_select');
+
+        districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+        upazilaSelect.innerHTML = '<option value="">-- Select District First --</option>';
+        unionSelect.innerHTML = '<option value="">-- Select Upazila First --</option>';
+
+        if (!divId) return;
+
+        fetch("{{ url('private-panel/ajax/geo/districts') }}/" + divId)
+            .then(res => res.json())
+            .then(data => {
+                var html = '<option value="">-- Select District --</option>';
+                data.forEach(function(d) {
+                    html += '<option value="' + d.id + '">' + (d.bn_name || d.name) + ' (' + d.name + ')</option>';
+                });
+                districtSelect.innerHTML = html;
+            });
+    }
+
+    function loadUpazilas(distId) {
+        var upazilaSelect = document.getElementById('upazila_id');
+        var unionSelect = document.getElementById('union_select');
+
+        upazilaSelect.innerHTML = '<option value="">Loading upazilas...</option>';
+        unionSelect.innerHTML = '<option value="">-- Select Upazila First --</option>';
+
+        if (!distId) return;
+
+        fetch("{{ url('private-panel/ajax/geo/upazilas') }}/" + distId)
+            .then(res => res.json())
+            .then(data => {
+                var html = '<option value="">-- Select Upazila / City Corp --</option>';
+                data.forEach(function(u) {
+                    html += '<option value="' + u.id + '">' + (u.bn_name || u.name) + ' (' + u.name + ')</option>';
+                });
+                upazilaSelect.innerHTML = html;
+            });
+    }
+
+    function loadUnions(upzId) {
+        var unionSelect = document.getElementById('union_select');
+        unionSelect.innerHTML = '<option value="">Loading unions...</option>';
+
+        if (!upzId) return;
+
+        fetch("{{ url('private-panel/ajax/geo/unions') }}/" + upzId)
+            .then(res => res.json())
+            .then(data => {
+                var html = '<option value="">-- Select Union / Municipality --</option>';
+                if (data && data.length > 0) {
+                    data.forEach(function(un) {
+                        html += '<option value="' + (un.bn_name || un.name) + '">' + (un.bn_name || un.name) + '</option>';
+                    });
+                } else {
+                    html += '<option value="">(উপরে সরাসরি নাম টাইপ করুন)</option>';
+                }
+                unionSelect.innerHTML = html;
+            });
+    }
+
+    function applyUnionSelection(val) {
+        if (val) {
+            document.getElementById('union_name').value = val;
+        }
+    }
+
+    function previewLogo(event) {
+        var reader = new FileReader();
+        reader.onload = function(){
+            var output = document.getElementById('logoOutput');
+            output.src = reader.result;
+        };
+        if(event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    }
+</script>
 @endsection

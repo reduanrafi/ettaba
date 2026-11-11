@@ -55,6 +55,28 @@ class LoginController extends Controller
 //        }
 //    }
 
+    protected function credentials(Request $request)
+    {
+        $loginValue = $request->input($this->username());
+        $cleanPhone = preg_replace('/[^0-9]/', '', (string)$loginValue);
+
+        return [
+            'phone' => $cleanPhone ?: $loginValue,
+            'password' => $request->input('password'),
+            'type' => 'customer',
+        ];
+    }
+
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->is_blocked == 1) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                $this->username() => 'আপনার কাস্টমার একাউন্টটি সাময়িকভাবে ব্লক করা হয়েছে। অনুগ্রহ করে কর্তৃপক্ষের সাথে যোগাযোগ করুন।'
+            ]);
+        }
+    }
+
     public function logout(Request $request)
     {
 //        Auth::logout();

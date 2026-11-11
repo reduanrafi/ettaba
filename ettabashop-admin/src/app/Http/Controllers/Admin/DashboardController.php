@@ -85,7 +85,14 @@ class DashboardController extends Controller
         $yearStart = Carbon::now()->startOfYear();
 
         // Row 1: Balance & Reward Metrics
-        $eBalance = (float) $this->GetShopBalance(Earning::class);
+        $shop = Shop::where('user_id', $userId)->first();
+        $isSelfDelivery = $shop && $shop->delivery_type === 'self';
+
+        if ($isSelfDelivery) {
+            $eBalance = (float) ($shop->seller_ebalance ?? 0);
+        } else {
+            $eBalance = (float) $this->GetShopBalance(Earning::class);
+        }
         $pendingBalance = (float) $this->GetShopBalance(UserPendingFund::class);
         $totalPoint = (float) $this->GetShopBalance(Point::class);
         $pendingPoint = (float) $this->GetShopBalance(PendingPoint::class);
@@ -265,6 +272,42 @@ class DashboardController extends Controller
             ->where('is_deleted', 1)
             ->count();
 
+        // If self delivery, calculate total pending due (difference between ERP and seller rate) for undelivered orders
+        if ($isSelfDelivery) {
+            $sellerUndeliveredItems = OrderItem::with(['order', 'product'])
+                ->where(function ($q) use ($userId, $hasOwnerCol) {
+                    if ($hasOwnerCol) {
+                        $q->where('order_items.owner_id', $userId)
+                          ->orWhereHas('product', function ($pq) use ($userId) {
+                              $pq->where('owner_id', $userId);
+                          });
+                    } else {
+                        $q->whereHas('product', function ($pq) use ($userId) {
+                            $pq->where('owner_id', $userId);
+                        });
+                    }
+                })
+                ->whereHas('order', function ($oq) {
+                    $oq->whereNotIn('status', ['pending_payment', 'canceled', 'delivered', 'completed', 'done']);
+                })
+                ->where(function ($q) {
+                    $q->whereNull('seller_status')
+                      ->orWhereNotIn('seller_status', ['canceled', 'delivered', 'done']);
+                })
+                ->get();
+
+            $pendingDueTotal = 0.0;
+            foreach ($sellerUndeliveredItems as $it) {
+                $unitErp = (float) ($it->price ?: ($it->product ? $it->product->erp_en : 0));
+                $unitRate = (float) ($it->product ? $it->product->rate_en : 0);
+                $qty = max(1, (int) $it->quantity);
+                $pendingDueTotal += max(0, ($unitErp - $unitRate) * $qty);
+            }
+
+            // Display as negative pending balance per Page 10 requirement (e.g., -২৬২০)
+            $pendingBalance = -$pendingDueTotal;
+        }
+
         $earnedPointsToday = $this->DailyEarnings(PointHistory::class);
 
         return view('admin.index', [
@@ -315,6 +358,9 @@ class DashboardController extends Controller
             'stockShort' => $stockShort,
             'stockOut' => $stockOut,
             'hideProducts' => $hideProducts,
+
+            'isSelfDelivery' => $isSelfDelivery,
+            'shop' => $shop,
 
             'earnedPointsToday' => $earnedPointsToday,
         ]);

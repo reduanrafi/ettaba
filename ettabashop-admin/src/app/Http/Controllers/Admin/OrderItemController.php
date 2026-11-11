@@ -25,12 +25,30 @@ class OrderItemController extends Controller
     }
     public function RemoveItem(Request $request)
     {
-//        dd($this->globalObject->destroy(intval($request->id)));
+        $item = OrderItem::find($request->id);
+        if ($item && !empty($item->product_id)) {
+            $product = \App\Models\Product::find($item->product_id);
+            if ($product) {
+                $restoreQty = max(1, (int) $item->quantity);
+                $product->increment('quantity', $restoreQty);
+                if ($product->is_sold_out && $product->quantity > 0) {
+                    $product->is_sold_out = 0;
+                    $product->save();
+                }
+            }
+        }
+
         if ($this->globalObject->destroy($request->id))
         {
             if ($this->globalObject->UpdateOrderValue($request,'remove')==1)
             {
-                return redirect()->back()->with(['success'=>'Item  removed successfully']);
+                try {
+                    \Illuminate\Support\Facades\Cache::flush();
+                } catch (\Throwable $e) {
+                }
+                return redirect()->back()->with(['success'=>'Item removed successfully and stock restored']);
+
+            }
 
             }
             else{

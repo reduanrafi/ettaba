@@ -16,9 +16,10 @@
             <div class="col-sm-4 invoice-col">
                 From
                 <address>
-                    <strong>Ettabashop</strong><br>
-                    Kishoregonj,Bangladesh<br>
-                    Phone: 01911122252
+                    <strong>Ettaba Shop Limited</strong><br>
+                    Mohammadpur-1207,<br>
+                    Dhaka, Bangladesh.<br>
+                    Phone: +8801911122252
                 </address>
             </div>
             <!-- /.col -->

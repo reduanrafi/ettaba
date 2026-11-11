@@ -90,20 +90,91 @@
 
     <div class="row">
         <div class="col-xs-12 dashboard-header">
-            <h1>Local Merchant Dashboard</h1>
+            <h1>Merchant Dashboard</h1>
         </div>
         
-        <!-- 1. Current e-Balance -->
+        <!-- 1. Merchant e-Balance -->
         <div class="col-lg-3 col-sm-6 col-xs-12">
             <div class="premium-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
                 <div class="inner">
                     <h3>{{ number_format((float)$currentEBalance, 2, '.', '') }}</h3>
-                    <p>Current e-Balance</p>
+                    <p>Merchant e-Balance</p>
                 </div>
                 <div class="icon">
                     <i class="ion ion-wallet"></i>
                 </div>
                 <a href="{{ route('handcash.virtual_balance.create') }}" class="premium-card-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+
+        <!-- কাস্টমারকে ক্যাশব্যাক দিন CTA Button (Page 14 spec) -->
+        <div class="col-xs-12" style="margin-bottom: 15px;">
+            <a href="{{ route('handcash.sale.index') }}" class="btn btn-success btn-lg btn-block" style="border-radius: 12px; font-weight: 800; font-size: 17px; padding: 12px 20px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); display: flex; align-items: center; justify-content: space-between;">
+                <span><i class="fa fa-money"></i> কাস্টমারকে ক্যাশব্যাক দিন</span>
+                <i class="fa fa-chevron-circle-right" style="font-size: 20px;"></i>
+            </a>
+        </div>
+
+        @php
+            // Merchant Reward card (Page 14 spec)
+            $merchantPoints = floatval($totalMerchantRewards ?? 0);
+            $rewardService = app(\App\Services\RewardService::class);
+            $merchantNextReward = null;
+            try {
+                $merchantNextReward = $rewardService->getNextRewardForUser(Auth::user());
+            } catch (\Throwable $e) {
+                $merchantNextReward = null;
+            }
+            $targetPoints = isset($merchantNextReward) && $merchantNextReward->required_points > 0 ? floatval($merchantNextReward->required_points) : 1000;
+            $neededPoints = max(0, $targetPoints - $merchantPoints);
+            $progressPercent = $targetPoints > 0 ? min(100, round(($merchantPoints / $targetPoints) * 100, 1)) : 0;
+            $rewardName = isset($merchantNextReward) && !empty($merchantNextReward->reward_name) ? $merchantNextReward->reward_name : 'একটি আকর্ষণীয় মগ';
+        @endphp
+
+        <!-- Merchant Next Reward Card (Page 14 spec) -->
+        <div class="col-xs-12" style="margin-bottom: 20px;">
+            <div class="box box-solid" style="border-radius: 12px; border: 1px solid #fed7aa; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <div class="box-body" style="padding: 14px 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fee2e2; padding-bottom: 8px; margin-bottom: 12px;">
+                        <div>
+                            <span style="font-size: 16px; font-weight: 800; color: #dc2626;"><i class="fa fa-gift"></i> আপনার পরবর্তী পুরস্কার</span>
+                            <span style="font-size: 14px; font-weight: 700; color: #166534; margin-left: 8px;">পাবেন: {{ $rewardName }}</span>
+                        </div>
+                        <a href="{{ route('handcash.rewards.index') }}" style="font-size: 13px; font-weight: 600; color: #15803d; text-decoration: none;">
+                            সকল পুরস্কার দেখুন &rarr;
+                        </a>
+                    </div>
+
+                    <div class="row text-center" style="margin-bottom: 10px;">
+                        <div class="col-xs-4" style="border-right: 1px solid #f1f5f9;">
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">মোট পয়েন্ট</div>
+                            <div style="font-size: 15px; font-weight: 800; color: #dc2626;">{{ number_format($merchantPoints, 2) }}</div>
+                        </div>
+                        <div class="col-xs-4" style="border-right: 1px solid #f1f5f9;">
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">পরবর্তী পুরস্কার পেতে</div>
+                            <div style="font-size: 15px; font-weight: 800; color: #0f172a;">{{ number_format($neededPoints, 2) }} <small style="font-size: 10.5px;">পয়েন্ট বাকি</small></div>
+                        </div>
+                        <div class="col-xs-4">
+                            <div style="font-size: 11px; color: #64748b; font-weight: 600;">পরবর্তী পুরস্কার পাবেন</div>
+                            <div style="font-size: 15px; font-weight: 800; color: #15803d;">{{ number_format($targetPoints, 0) }} পয়েন্ট-এ</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress" style="height: 8px; border-radius: 8px; background: #e2e8f0; margin-bottom: 6px;">
+                        <div class="progress-bar" style="width: {{ max(4, $progressPercent) }}%; background: linear-gradient(90deg, #dc2626 0%, #ea580c 100%);"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 10px;">
+                        <span class="text-danger">{{ number_format($merchantPoints, 2) }}</span>
+                        <span>{{ number_format($targetPoints, 0) }}</span>
+                    </div>
+
+                    <!-- Motivational Message -->
+                    <div style="background: #f8fafc; border-radius: 8px; padding: 8px 12px; border: 1px solid #e2e8f0; display: flex; align-items: center;">
+                        <i class="fa fa-line-chart text-success" style="font-size: 18px; margin-right: 10px;"></i>
+                        <span style="font-size: 13px; font-weight: 700; color: #1e293b;">যতবেশি ক্যাশব্যাক দিবেন, তত বড় পুরস্কার পাবেন</span>
+                    </div>
+                </div>
             </div>
         </div>
 

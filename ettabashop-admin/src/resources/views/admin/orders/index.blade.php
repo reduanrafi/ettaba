@@ -60,6 +60,7 @@
 
                                 <th>Order Id</th>
                                 <th>unique Order Id</th>
+                                <th>Delivery Mode</th>
                                 <th>Status</th>
                                 <th>Payment</th>
 
@@ -73,10 +74,36 @@
                             <tbody>
                             @if($orders)
                                 @foreach($orders as $order)
-                                    <tr>
+                                    @php
+                                        // Detect if this order belongs to Self Delivery seller(s)
+                                        $hasSelfDelivery = false;
+                                        if ($order->orderItems) {
+                                            foreach ($order->orderItems as $oit) {
+                                                if (optional(optional($oit->product)->owner)->shop && $oit->product->owner->shop->delivery_type === 'self') {
+                                                    $hasSelfDelivery = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    @endphp
+                                    <tr style="{{ $hasSelfDelivery ? 'background-color: #fffbeb;' : '' }}">
                                         <td>{{ $order->id }}</td>
                                         <td>
                                             {{ $order->unique_order_id }}
+                                            @if(empty($order->user_id) && Auth::user()->type === 'admin')
+                                                <br><span class="label label-danger" style="font-size: 10px;">গেস্ট / অ্যানোনিমাস</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($hasSelfDelivery)
+                                                <span class="label label-warning" style="font-size: 11px;">
+                                                    <i class="fa fa-truck"></i> Self Delivery
+                                                </span>
+                                            @else
+                                                <span class="label label-info" style="font-size: 11px;">
+                                                    <i class="fa fa-cube"></i> Ettaba Delivery
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="text-center">
                                             @if($order->status=='delivered')

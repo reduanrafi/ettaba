@@ -611,13 +611,13 @@
                     </div>
                 </div>
 
-                <!-- ================= STEP 2: Mobile / Username ================= -->
+                <!-- ================= STEP 2: Mobile Number ================= -->
                 <div class="step-section" id="step-2" style="display: none;">
                     <div class="step-icon-wrapper">
                         <i class="fa fa-mobile-alt"></i>
                     </div>
                     <div class="step-title">আপনার মোবাইল নম্বর লিখুন</div>
-                    <div class="step-subtitle">আপনার মোবাইল নম্বরটি ইউজার নেম হিসেবে ব্যবহৃত হবে</div>
+                    <div class="step-subtitle">আপনার মোবাইল নম্বরটি একাউন্ট নম্বর হিসেবে ব্যবহৃত হবে</div>
 
                     <div class="form-group-custom">
                         <i class="fa fa-phone input-icon"></i>
@@ -625,9 +625,10 @@
                                name="phone"
                                id="phone_input"
                                class="form-control-custom"
-                               placeholder="মোবাইল/ইউজার নম্বর"
+                               placeholder="মোবাইল নম্বর লিখুন (01 দিয়ে শুরু)"
+                               maxlength="11"
                                value="{{ old('phone') }}">
-                        <small class="field-hint" id="phone_hint">শুধু ইংরেজি সংখ্যা ও লেটার। কমপক্ষে ৫টি অক্ষর বা সংখ্যা হতে হবে।</small>
+                        <small class="field-hint" id="phone_hint">শুধু ইংরেজি সংখ্যা, 01 দিয়ে শুরু হতে হবে এবং মোট ১১ সংখ্যা হতে হবে।</small>
                     </div>
 
                     <button type="button" class="btn-step-next" id="btn-next-2" disabled>
@@ -1087,11 +1088,12 @@
             }
         });
 
-        // ==================== STEP 2: Mobile / Username ====================
+        // ==================== STEP 2: Mobile Number ====================
         let usernameTimer = null;
         $('#phone_input').on('input', function() {
             let val = $(this).val();
-            let sanitized = val.replace(/[^a-zA-Z0-9]/g, '');
+            // Strict English digits only (Page 12 spec)
+            let sanitized = val.replace(/[^0-9]/g, '');
             if (val !== sanitized) {
                 $(this).val(sanitized);
                 val = sanitized;
@@ -1101,12 +1103,27 @@
             isUsernameAvailable = false;
             $('#btn-next-2').prop('disabled', true);
 
-            if (val.length < 5) {
-                $('#phone_hint').text('কমপক্ষে ৫টি সংখ্যা বা লেটার হতে হবে।').addClass('error').removeClass('success');
+            if (val.length === 0) {
+                $('#phone_hint').text('শুধু ইংরেজি সংখ্যা, 01 দিয়ে শুরু হতে হবে এবং মোট ১১ সংখ্যা হতে হবে।').removeClass('error success');
                 return;
             }
 
-            $('#phone_hint').text('ইউজার নেম যাচাই করা হচ্ছে...').removeClass('error success');
+            if (!val.startsWith('01')) {
+                $('#phone_hint').text('মোবাইল নম্বর অবশ্যই 01 দিয়ে শুরু হতে হবে।').addClass('error').removeClass('success');
+                return;
+            }
+
+            if (val.length < 11) {
+                $('#phone_hint').text('১১ সংখ্যা পূর্ণ করুন (বর্তমানে ' + val.length + ' সংখ্যা)।').addClass('error').removeClass('success');
+                return;
+            }
+
+            if (val.length > 11) {
+                val = val.substring(0, 11);
+                $(this).val(val);
+            }
+
+            $('#phone_hint').text('মোবাইল নম্বর যাচাই করা হচ্ছে...').removeClass('error success');
 
             usernameTimer = setTimeout(function() {
                 $.ajax({

@@ -52,6 +52,8 @@ class Product extends Model
         'unit',
         'weight',
         'weight_unit',
+        'sizes',
+        'colors',
         'direct_refer_commission',
         'is_sold_out',
         'is_featured',

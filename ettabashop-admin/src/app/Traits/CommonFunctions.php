@@ -14,7 +14,13 @@ trait CommonFunctions
         $filePath       = 'assets/images/' . $folderName;
         $image_resize   = Image::make($imageFile->getRealPath());
         if ($width > 0 && $height > 0) {
-            $image_resize->resize(null, $height, function ($constraint) {
+            $image_resize->resize($width, $height, function ($constraint) {
+                $constraint->aspectRatio();
+                $constraint->upsize();
+            });
+        } else {
+            // Auto resize max width to 800px preserving aspect ratio
+            $image_resize->resize(800, null, function ($constraint) {
                 $constraint->aspectRatio();
                 $constraint->upsize();
             });
@@ -25,7 +31,8 @@ trait CommonFunctions
         @chmod($filePath, 0755);
 
         $fullSavedPath = $filePath . '/' . $fileName;
-        $image_resize->save($fullSavedPath);
+        // Save with 78% compression to optimize file size to roughly 100KB-300KB
+        $image_resize->save($fullSavedPath, 78);
         @chmod($fullSavedPath, 0644);
 
         // Also mirror to sibling website public assets if on the same server

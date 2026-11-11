@@ -2,9 +2,25 @@
     <!-- Logo -->
     <a href="" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini"><b>SD</b></span>
+        <span class="logo-mini">
+            @if(Auth::check() && Auth::user()->type == 'store_owner')
+                <b>EOS</b>
+            @elseif(Auth::check() && Auth::user()->type == 'store_administrator')
+                <b>EM</b>
+            @else
+                <b>SD</b>
+            @endif
+        </span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>{{ config('app.name', 'SD App') }}</b></span>
+        <span class="logo-lg">
+            @if(Auth::check() && Auth::user()->type == 'store_owner')
+                <b>Ettaba Online Seller</b>
+            @elseif(Auth::check() && Auth::user()->type == 'store_administrator')
+                <b>Ettaba Local Merchant</b>
+            @else
+                <b>{{ config('app.name', 'SD App') }}</b>
+            @endif
+        </span>
     </a>
     <!-- Header Navbar -->
     <nav class="navbar navbar-static-top" role="navigation">
@@ -12,6 +28,15 @@
         <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
             <span class="sr-only">Toggle navigation</span>
         </a>
+
+        @if(Auth::check() && Auth::user()->type == 'store_owner')
+            <!-- Inline title between hamburger and logout for mobile/top nav (Page 3 spec) -->
+            <div class="visible-xs-inline-block text-center" style="position: absolute; left: 45px; right: 80px; top: 0; line-height: 50px; height: 50px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; color: #fff; font-size: 15px;">
+                Ettaba Online Seller
+            </div>
+        @elseif(Auth::check() && Auth::user()->type == 'store_administrator')
+            <!-- Merchant mobile view: No Ettaba Admin text, only hamburger and logout visible (Page 14 spec) -->
+        @endif
         <!-- Navbar Right Menu -->
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">

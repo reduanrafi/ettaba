@@ -254,6 +254,31 @@
                     <i class="fas fa-truck"></i>
                     <span>এই সেলার ডেলিভারি দেয়- {{ $deliveryAreaDisplay }}</span>
                 </div>
+
+                @if(!empty($shop->social_approved) && $shop->social_approved == 1)
+                    @if(!empty($shop->youtube_link) || !empty($shop->fb_link) || !empty($shop->instagram_link))
+                        <div class="d-flex align-items-center mt-2 pt-1 border-top" style="gap: 8px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #475569;">সেলারের সোশ্যাল মিডিয়া দেখুন:</span>
+                            <div class="d-flex align-items-center" style="gap: 6px;">
+                                @if(!empty($shop->youtube_link))
+                                    <a href="{{ $shop->youtube_link }}" target="_blank" rel="noopener" style="color: #ef4444; font-size: 16px;" title="YouTube">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                @endif
+                                @if(!empty($shop->fb_link))
+                                    <a href="{{ $shop->fb_link }}" target="_blank" rel="noopener" style="color: #2563eb; font-size: 16px;" title="Facebook">
+                                        <i class="fab fa-facebook"></i>
+                                    </a>
+                                @endif
+                                @if(!empty($shop->instagram_link))
+                                    <a href="{{ $shop->instagram_link }}" target="_blank" rel="noopener" style="color: #e1306c; font-size: 16px;" title="Instagram">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @endif
             </div>
         </div>
     </div>

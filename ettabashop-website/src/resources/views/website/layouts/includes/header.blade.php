@@ -111,16 +111,21 @@
         </div>
     </div>
 
-    <div v-if="cartItems && cartItems.length > 0" class="cart-drawer-footer bg-light border-top p-4">
+    <div v-if="cartItems && cartItems.length > 0" class="cart-drawer-footer bg-light border-top p-3 p-md-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="text-muted font-weight-bold">সর্বমোট মূল্য:</span>
             <h4 class="text-danger font-weight-bold mb-0">@{{ cartTotal }}৳</h4>
         </div>
-        <a href="{{ route('website.checkout') }}" class="btn btn-danger btn-block rounded-pill py-3 font-weight-bold mb-2 shadow" style="background: #dc2626;">
+        <a href="{{ route('website.checkout') }}" class="btn btn-danger btn-block rounded-pill py-3 font-weight-bold mb-3 shadow" style="background: #dc2626;">
             অর্ডার সম্পন্ন করুন (Checkout) <i class="fas fa-arrow-right ml-2"></i>
         </a>
-        <button class="btn btn-link btn-block text-muted text-decoration-none small font-weight-bold" @click="clearCart()">
-            <i class="fas fa-trash-alt mr-1"></i> সম্পূর্ণ কার্ট মুছুন
-        </button>
+        <div class="d-flex align-items-center justify-content-between" style="gap: 10px;">
+            <button type="button" class="btn btn-outline-success btn-sm flex-fill py-2 font-weight-bold" onclick="toggleCartDrawer()" style="border-radius: 8px;">
+                <i class="fas fa-shopping-bag mr-1"></i> আরো শপিং করুন
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm flex-fill py-2 font-weight-bold" @click="clearCart()" style="border-radius: 8px;">
+                <i class="fas fa-trash-alt mr-1"></i> সম্পূর্ণ কার্ট মুছুন
+            </button>
+        </div>
     </div>
 </div>

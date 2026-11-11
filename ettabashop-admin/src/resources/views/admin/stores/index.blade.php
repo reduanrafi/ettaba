@@ -74,14 +74,30 @@
                                     <td> {{ ucfirst($store->type) }}</td>
                                     <td class="text-center">
                                         @if($store->shop==null)
-                                            <span class="label label-sm label-warning">Shop is not yet been created</span>
+                                            <span class="label label-sm label-warning">Shop not yet created</span>
                                             <br>
                                             <br>
-                                        <a   href="#"   class="btn btn-xs label label-sm label-warning">Notify</a>
+                                            <a href="#" class="btn btn-xs label label-sm label-warning">Notify</a>
+                                        @else
+                                            <a href="{{ route('admin.shop.edit', $store->id) }}" class="btn btn-xs btn-info" style="font-weight: 600;">
+                                                <i class="fa fa-edit"></i> Edit Shop
+                                            </a>
+                                            <div style="margin-top: 4px;">
+                                                @if(isset($store->shop->social_approved) && $store->shop->social_approved == 1)
+                                                    <span class="label label-success" style="font-size: 10px;">Social: Approved</span>
+                                                @else
+                                                    <span class="label label-warning" style="font-size: 10px;">Social: Pending</span>
+                                                @endif
+                                            </div>
                                         @endif
                                     </td>
                                     {{--<td>{{ date('y-m-d',strtotime($store->created_at)) }}</td>--}}
                                     <td class="text-center">
+                                        @if($store->shop)
+                                            <a href="{{ route('admin.shop.edit', $store->id) }}" class="btn btn-xs btn-primary" title="Manage Shop Profile" style="margin-right: 4px;">
+                                                <i class="fa fa-pencil"></i> Edit
+                                            </a>
+                                        @endif
                                         @if($store->is_active==1&& $store->is_new==0 && $store->is_blocked==0)
                                             <a href="{{ route('store.changeStatus',['id'=>$store->id,'status'=>'inactivate']) }}"
                                                class="btn btn-xs label label-sm label-default ">Mark Inactive</a>

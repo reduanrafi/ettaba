@@ -229,19 +229,19 @@ class ProductService
         $slug = $section->slug ?? '';
 
         if ($type === 'high_cashback' || $type === 'auto_cashback' || $slug === 'high-cashback') {
-            return $query->orderByRaw('CAST(REPLACE(COALESCE(tcb_en, "0"), ",", "") AS DECIMAL(10,2)) DESC, COALESCE(sold_amount, 0) DESC, id DESC');
+            return $query->inRandomOrder();
         }
 
         if ($type === 'high_point' || $type === 'auto_point' || $slug === 'high-point') {
-            return $query->orderByRaw('CAST(REPLACE(COALESCE(trp_en, "0"), ",", "") AS DECIMAL(10,2)) DESC, COALESCE(sold_amount, 0) DESC, id DESC');
+            return $query->inRandomOrder();
         }
 
         if ($type === 'featured' || $slug === 'featured-products') {
             $featuredCount = (clone $query)->where('is_featured', 1)->count();
             if ($featuredCount > 0) {
-                return $query->where('is_featured', 1)->orderByDesc('id');
+                return $query->where('is_featured', 1)->inRandomOrder();
             }
-            return $query->orderByDesc('sold_amount')->orderByDesc('id');
+            return $query->inRandomOrder();
         }
 
         // Gather category IDs from either category_ids (JSON array) or category_id
@@ -264,12 +264,9 @@ class ProductService
 
         if ($type === 'local_products' || $slug === 'local-products') {
             if (!empty($sectionCatIds)) {
-                $catCount = (clone $query)->whereIn('category_id', $sectionCatIds)->count();
-                if ($catCount > 0) {
-                    return $query->whereIn('category_id', $sectionCatIds)->orderByDesc('id');
-                }
+                return $query->whereIn('category_id', $sectionCatIds)->inRandomOrder();
             }
-            return $query->orderByDesc('sold_amount')->orderByDesc('id');
+            return $query->inRandomOrder();
         }
 
         if ($type === 'category' || !empty($sectionCatIds)) {
@@ -304,16 +301,14 @@ class ProductService
             }
 
             if (!empty($catIds)) {
-                $catProductCount = (clone $query)->whereIn('category_id', $catIds)->count();
-                if ($catProductCount > 0) {
-                    return $query->whereIn('category_id', $catIds)->orderByDesc('id');
-                }
+                // Strictly filter only assigned categories
+                return $query->whereIn('category_id', $catIds)->inRandomOrder();
             }
 
-            return $query->orderByDesc('id');
+            return $query->inRandomOrder();
         }
 
-        return $query->orderByDesc('id');
+        return $query->inRandomOrder();
     }
 
     public function getCategoryAndChildrenIds($categoryId)

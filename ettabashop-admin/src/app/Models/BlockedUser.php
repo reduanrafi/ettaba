@@ -12,10 +12,11 @@ class BlockedUser extends Model
      * Property area
      *****************************/
     protected $fillable = [
-            'user_id',
-            'nid',
-            'phone',
-            'reason',
+        'user_id',
+        'nid',
+        'phone',
+        'reason',
+        'type',
     ];
 
     /****************************
@@ -24,27 +25,38 @@ class BlockedUser extends Model
 
     public function user()
     {
-        return $this->belongsTo(  User::class);
+        return $this->belongsTo(User::class);
     }
 
     /****************************
      * Public Methods area
      *****************************/
 
-    /***
-     * Method to get data.
-     * @param $data
-     * @return
-     */
-
     public function GetData($data)
     {
         return $data;
     }
 
-    public function checkNid($nid)
+    public function checkNid($nid, $type = null)
     {
-        return BlockedUser::where('nid',$nid)->first();
+        $q = BlockedUser::where('nid', $nid);
+        if ($type) {
+            $q->where(function ($query) use ($type) {
+                $query->where('type', $type)->orWhere('type', 'all')->orWhereNull('type');
+            });
+        }
+        return $q->first();
+    }
+
+    public function checkPhone($phone, $type = null)
+    {
+        $q = BlockedUser::where('phone', $phone);
+        if ($type) {
+            $q->where(function ($query) use ($type) {
+                $query->where('type', $type)->orWhere('type', 'all')->orWhereNull('type');
+            });
+        }
+        return $q->first();
     }
 
     /****************************

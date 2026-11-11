@@ -168,36 +168,70 @@ class CustomerController extends Controller
     public function ChangeStatus(Request $request)
     {
         $userId = $request->id;
-        //dd($userId);
-
+        $status = $request->status;
 
         try
         {
-            if ($request->status=='approve') {
+            $user = User::findOrFail($userId);
 
+            if ($status == 'block') {
+                $user->is_active = 0;
+                $user->is_blocked = 1;
+                $user->is_new = 0;
+                $user->save();
 
+                // Add to BlockedUser as customer only (Seller/Merchant unaffected)
+                $nid = optional($user->profile)->nid;
+                \App\Models\BlockedUser::updateOrCreate(
+                    ['user_id' => $user->id, 'type' => 'customer'],
+                    [
+                        'phone' => $user->phone,
+                        'nid' => $nid,
+                        'reason' => 'Customer account blocked by admin'
+                    ]
+                );
+
+                return redirect()->back()->with(['success' => "Customer account blocked successfully. Any Seller or Merchant account for this person remains completely unaffected."]);
+            }
+            elseif ($status == 'activate') {
+                $user->is_active = 1;
+                $user->is_blocked = 0;
+                $user->is_new = 0;
+                $user->save();
+
+                \App\Models\BlockedUser::where('user_id', $user->id)->where('type', 'customer')->delete();
+
+                return redirect()->back()->with(['success' => "Customer account activated successfully."]);
+            }
+            elseif ($status == 'inactivate') {
+                $user->is_active = 0;
+                $user->is_blocked = 0;
+                $user->is_new = 0;
+                $user->save();
+
+                return redirect()->back()->with(['success' => "Customer account marked inactive successfully."]);
+            }
+            elseif ($status == 'approve') {
                 $customerGenerationCommissionGroupService = new CustomerGenerationCommissionGroupService($this->globalObject);
-
-                $status = $customerGenerationCommissionGroupService->SaveUserGenerationGroup($userId);
-                if ($status==0)
-                {
-                    return redirect()->back()->with(['error'=>"Generation group already created or there is error in this section"]);
+                $resStatus = $customerGenerationCommissionGroupService->SaveUserGenerationGroup($userId);
+                if ($resStatus == 0) {
+                    return redirect()->back()->with(['error' => "Generation group already created or there is error in this section"]);
                 }
 
-            }
-            if ($this->globalObject->ChangeUserStatus($userId,$request->status))
-            {
-                return redirect()->back()->with(['success'=> $this->moduleName." updated successfully"]);
-            }
-            else{
-                return redirect()->back()->with(['error'=>"this status  already updated"]);
+                $user->is_approved = 1;
+                $user->is_active = 0;
+                $user->is_blocked = 0;
+                $user->is_new = 1;
+                $user->save();
+
+                return redirect()->back()->with(['success' => "Customer approved successfully."]);
             }
         }
         catch (QueryException $ex)
         {
-            return redirect()->back()->with(['error'=>$ex->getMessage()]);
+            return redirect()->back()->with(['error' => $ex->getMessage()]);
         }
-        return redirect()->back()->with(['error'=>"Unable to handle this request !"]);
+        return redirect()->back()->with(['error' => "Unable to handle this request !"]);
     }
 
     public function ChangeSearchAccess(Request $request)

@@ -47,6 +47,38 @@ class OrderStatus extends Model
         if ($status=='canceled')
         {
             $this->RemovePendingFundAndPoints($id);
+
+            // Sync item-level seller statuses and restore inventory stock (Pages 3 & 13 spec)
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('order_items')) {
+                    $orderItems = \App\Models\OrderItem::where('order_id', $id)->get();
+                    foreach ($orderItems as $item) {
+                        // Restore product stock quantity if not already canceled
+                        if (($item->seller_status ?? '') !== 'canceled' && !empty($item->product_id)) {
+                            $product = \App\Models\Product::find($item->product_id);
+                            if ($product) {
+                                $restoreQty = max(1, (int)$item->quantity);
+                                $product->increment('quantity', $restoreQty);
+                                if ($product->is_sold_out && $product->quantity > 0) {
+                                    $product->is_sold_out = 0;
+                                    $product->save();
+                                }
+                            }
+                        }
+
+                        // Update seller_status to canceled
+                        if (\Illuminate\Support\Facades\Schema::hasColumn('order_items', 'seller_status')) {
+                            $item->seller_status = 'canceled';
+                            if (\Illuminate\Support\Facades\Schema::hasColumn('order_items', 'seller_updated_at')) {
+                                $item->seller_updated_at = now();
+                            }
+                            $item->save();
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error("Error syncing canceled order items: " . $e->getMessage());
+            }
         }
         return DB::table('orders')->where('id',$id)->update(['status'=>$status]);
     }

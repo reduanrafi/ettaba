@@ -39,10 +39,20 @@
             <div class="col-sm-4 invoice-col">
                 To
                 <address>
-                    <strong>{{ optional(optional($order->user)->profile)->first_name }} {{ optional(optional($order->user)->profile)->last_name }}</strong><br>
-                    {{ optional(optional($order->user)->profile)->address }}<br>
-                    Phone: {{ optional($order->user)->phone }}<br>
-                    Email: {{ optional($order->user)->email }}
+                    @if($order->user)
+                        <strong>{{ optional(optional($order->user)->profile)->first_name }} {{ optional(optional($order->user)->profile)->last_name }}</strong><br>
+                        {{ optional(optional($order->user)->profile)->address }}<br>
+                        Phone: {{ optional($order->user)->phone }}<br>
+                        Email: {{ optional($order->user)->email }}
+                    @else
+                        <strong>{{ $order->username ?: 'Guest / Anonymous Customer' }}</strong>
+                        @if(Auth::user()->type === 'admin')
+                            <span class="label label-danger" style="margin-left: 5px;">গেস্ট / অ্যানোনিমাস অর্ডার</span>
+                        @endif
+                        <br>
+                        {{ $order->address }}<br>
+                        Phone: {{ $order->phone }}<br>
+                    @endif
                 </address>
             </div>
             <div class="col-sm-4 invoice-col">

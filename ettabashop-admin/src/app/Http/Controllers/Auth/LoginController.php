@@ -41,6 +41,23 @@ class LoginController extends Controller
 
     }
 
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->type === 'customer') {
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Customer accounts cannot log in to the Seller/Admin panel. Please log in via the customer website.'
+            ]);
+        }
+
+        if ($user->is_blocked == 1) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'This account has been blocked by administration. Customer accounts remain unaffected.'
+            ]);
+        }
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();

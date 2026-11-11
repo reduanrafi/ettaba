@@ -63,12 +63,6 @@
         </div>
     </div>
 
-    <!-- Start Map -->
-    <div class="map-responsive">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3639.0830321806197!2d90.9354240153952!3d24.20387138436781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3756a1a4d2ee4ac9%3A0xa90b613906f9cf38!2sEkjog!5e0!3m2!1sen!2sbd!4v1634170604411!5m2!1sen!2sbd" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-    </div>
-    <!-- End Map -->
-
     <!-- Start Contact -->
     <div class="container py-5">
         <div class="row py-3">
