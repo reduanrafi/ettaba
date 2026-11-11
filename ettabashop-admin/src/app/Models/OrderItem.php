@@ -53,16 +53,35 @@ class OrderItem extends Model
         $order = Order::find($request->order_id);
 
         if ($product != null && $order != null) {
-            $trp = max(0, $order->trp - (float) $product->trp_en);
-            $tcb = max(0, $order->tcb - (float) $product->tcb_en);
-            $erp = max(0, $order->erp_total - (float) $product->erp_en);
-            $rate = max(0, $order->rate_total - (float) $product->rate_en);
+            $qty = max(1, (int) ($request->quantity ?? 1));
+            $unitTrp = (float) $product->trp_en;
+            $unitTcb = (float) $product->tcb_en;
+            $unitErp = (float) $product->erp_en;
+            $unitRate = (float) $product->rate_en;
+
+            if ($operation === 'remove') {
+                $trp = max(0, $order->trp - ($unitTrp * $qty));
+                $tcb = max(0, $order->tcb - ($unitTcb * $qty));
+                $erp = max(0, $order->erp_total - ($unitErp * $qty));
+                $rate = max(0, $order->rate_total - ($unitRate * $qty));
+                $amount = max(0, (float) $order->amount - ($unitErp * $qty));
+                $netTotal = max(0, (float) $order->net_total - ($unitErp * $qty));
+            } else {
+                $trp = $order->trp + ($unitTrp * $qty);
+                $tcb = $order->tcb + ($unitTcb * $qty);
+                $erp = $order->erp_total + ($unitErp * $qty);
+                $rate = $order->rate_total + ($unitRate * $qty);
+                $amount = (float) $order->amount + ($unitErp * $qty);
+                $netTotal = (float) $order->net_total + ($unitErp * $qty);
+            }
 
             if ($order->update([
                 'trp' => $trp,
                 'tcb' => $tcb,
                 'erp_total' => $erp,
                 'rate_total' => $rate,
+                'amount' => $amount,
+                'net_total' => $netTotal,
             ])) {
                 return 1;
             }

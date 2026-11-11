@@ -26,16 +26,29 @@ class OrderItemController extends Controller
     public function RemoveItem(Request $request)
     {
         $item = OrderItem::find($request->id);
-        if ($item && !empty($item->product_id)) {
-            $product = \App\Models\Product::find($item->product_id);
-            if ($product) {
-                $restoreQty = max(1, (int) $item->quantity);
-                $product->increment('quantity', $restoreQty);
-                if ($product->is_sold_out && $product->quantity > 0) {
-                    $product->is_sold_out = 0;
-                    $product->save();
+        if ($item) {
+            $productId = $item->product_id ?: $request->product_id;
+            $orderId = $item->order_id ?: $request->order_id;
+            $qty = max(1, (int) $item->quantity);
+
+            // Restore stock
+            if (!empty($productId)) {
+                $product = \App\Models\Product::find($productId);
+                if ($product) {
+                    $product->increment('quantity', $qty);
+                    if ($product->is_sold_out && $product->quantity > 0) {
+                        $product->is_sold_out = 0;
+                        $product->save();
+                    }
                 }
             }
+
+            // Ensure request has needed properties for UpdateOrderValue
+            $request->merge([
+                'product_id' => $productId,
+                'order_id' => $orderId,
+                'quantity' => $qty,
+            ]);
         }
 
         if ($this->globalObject->destroy($request->id))
@@ -47,8 +60,6 @@ class OrderItemController extends Controller
                 } catch (\Throwable $e) {
                 }
                 return redirect()->back()->with(['success'=>'Item removed successfully and stock restored']);
-
-            }
 
             }
             else{
