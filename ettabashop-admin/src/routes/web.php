@@ -178,10 +178,10 @@ Route::group(['prefix' => 'private-panel', 'middleware' => ['auth']], function (
             Route::delete('/unions/{id}', [GeoController::class, 'unionDestroy'])->name('geo.unions.destroy');
 
             // AJAX helper
-            Route::get('/ajax/districts/{division_id}', [GeoController::class, 'getDistrictsAjax'])->name('geo.ajax.districts');
-            Route::get('/ajax/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('geo.ajax.upazilas');
-            Route::get('/ajax/unions/{upazila_id}', [GeoController::class, 'getUnionsAjax'])->name('geo.ajax.unions');
-            Route::get('/ajax/check-shop-slug', [GeoController::class, 'checkShopSlugAjax'])->name('ajax.checkShopSlug');
+            Route::get('/ajax/districts/{division_id}', [GeoController::class, 'getDistrictsAjax'])->name('admin.geo.ajax.districts');
+            Route::get('/ajax/upazilas/{district_id}', [GeoController::class, 'getUpazilasAjax'])->name('admin.geo.ajax.upazilas');
+            Route::get('/ajax/unions/{upazila_id}', [GeoController::class, 'getUnionsAjax'])->name('admin.geo.ajax.unions');
+            Route::get('/ajax/check-shop-slug', [GeoController::class, 'checkShopSlugAjax'])->name('admin.ajax.checkShopSlug');
         });
 
         // Admin Shop Management (Edit any seller shop profile & social links)
