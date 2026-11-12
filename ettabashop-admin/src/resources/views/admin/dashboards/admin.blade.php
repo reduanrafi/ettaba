@@ -95,7 +95,7 @@
                 <span class="info-box-icon bg-aqua"><i class="fa fa-1x">৳</i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Main Fund</span>
-                    <span class="info-box-number"> {{ $funds['mainFund']+ $funds['phishingFund']}}</span>
+                    <span class="info-box-number"> {{ number_format((float)($funds['mainFund'] ?? 0) + (float)($funds['phishingFund'] ?? 0), 2) }}</span>
                 </div>
 
             </div>

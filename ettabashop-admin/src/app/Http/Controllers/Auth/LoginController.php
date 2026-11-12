@@ -50,7 +50,7 @@ class LoginController extends Controller
             ]);
         }
 
-        if ($user->is_blocked == 1) {
+        if (isset($user->is_blocked) && $user->is_blocked == 1) {
             Auth::logout();
             return redirect()->route('login')->withErrors([
                 'email' => 'This account has been blocked by administration. Customer accounts remain unaffected.'
@@ -65,6 +65,51 @@ class LoginController extends Controller
     }
 
     /**
+     * Attempt to log the user into the application.
+     * Supports both email and phone number input.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function attemptLogin(Request $request)
+    {
+        $loginValue = trim((string)$request->input('email'));
+        $password = $request->input('password');
+        $remember = $request->filled('remember');
+
+        // Check if value is a valid email
+        if (filter_var($loginValue, FILTER_VALIDATE_EMAIL)) {
+            if ($this->guard()->attempt(['email' => $loginValue, 'password' => $password], $remember)) {
+                return true;
+            }
+        }
+
+        // Check digits for phone
+        $cleanPhone = preg_replace('/[^0-9]/', '', $loginValue);
+        if (!empty($cleanPhone)) {
+            if ($this->guard()->attempt(['phone' => $cleanPhone, 'password' => $password], $remember)) {
+                return true;
+            }
+            if (strlen($cleanPhone) === 10 && $this->guard()->attempt(['phone' => '0' . $cleanPhone, 'password' => $password], $remember)) {
+                return true;
+            }
+            if (strlen($cleanPhone) === 11 && str_starts_with($cleanPhone, '0') && $this->guard()->attempt(['phone' => substr($cleanPhone, 1), 'password' => $password], $remember)) {
+                return true;
+            }
+        }
+
+        // Direct fallback attempts
+        if ($this->guard()->attempt(['email' => $loginValue, 'password' => $password], $remember)) {
+            return true;
+        }
+        if ($this->guard()->attempt(['phone' => $loginValue, 'password' => $password], $remember)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the needed authorization credentials from the request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -72,11 +117,9 @@ class LoginController extends Controller
      */
     protected function credentials(Request $request)
     {
-        $loginValue = $request->input('email');
-        
-        // If the value is a valid email, authenticate using email. Otherwise, use phone.
+        $loginValue = trim((string)$request->input('email'));
         $field = filter_var($loginValue, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        
+
         return [
             $field => $loginValue,
             'password' => $request->input('password')

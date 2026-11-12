@@ -26,26 +26,58 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        if (Auth::user()->type == 'direct_selling') {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $type = strtolower(trim(Auth::user()->type ?? ''));
+
+        if ($type === 'direct_selling') {
             return redirect()->route('direct-seller.dashboard');
-        } elseif (Auth::user()->type == 'store_owner') {
+        } elseif ($type === 'store_owner') {
             return redirect()->route('dashboard.shop');
-        } elseif (Auth::user()->type == 'admin') {
+        } elseif ($type === 'admin') {
             return redirect()->route('dashboard.admin');
-        } elseif (Auth::user()->type == 'sales_staff') {
+        } elseif ($type === 'sales_staff') {
             return redirect()->route('dashboard.sales');
-        } elseif (Auth::user()->type == 'store_administrator') {
+        } elseif ($type === 'store_administrator') {
             return redirect()->route('dashboard.handcash');
         }
+
+        // Safe fallback for other roles or admin variants
+        return redirect()->route('dashboard.admin');
     }
 
     public function AdminDashboard()
     {
-        $orders = Order::count();
-        $products = Product::count();
-        $shops = Shop::count();
-        $customers = User::where('type', 'customer')->where('is_active', 1)->count();
-        $funds = CompanyFundsService::GetCompanyFunds();
+        try {
+            $orders = Order::count();
+        } catch (\Throwable $e) { $orders = 0; }
+
+        try {
+            $products = Product::count();
+        } catch (\Throwable $e) { $products = 0; }
+
+        try {
+            $shops = Shop::count();
+        } catch (\Throwable $e) { $shops = 0; }
+
+        try {
+            $customers = User::where('type', 'customer')->where('is_active', 1)->count();
+        } catch (\Throwable $e) { $customers = 0; }
+
+        try {
+            $funds = CompanyFundsService::GetCompanyFunds();
+        } catch (\Throwable $e) {
+            $funds = [
+                'mainFund' => '0.00', 'incentiveFund' => '0.00', 'executiveFund' => '0.00',
+                'dailyFund' => '0.00', 'weeklyFund' => '0.00', 'vendorFund' => '0.00',
+                'localOfficeFund' => '0.00', 'upFund' => '0.00', 'districtFund' => '0.00',
+                'divisionFund' => '0.00', 'marketingFund' => '0.00', 'phishingFund' => '0.00',
+                'totalWithdraw' => '0.00', 'todayWithdraw' => '0.00',
+            ];
+        }
+
         $earnedMoneyToday = $this->DailyAdminEarnings(EarningHistory::class);
         $earnedPointsToday = $this->DailyAdminEarnings(PointHistory::class);
 
@@ -368,25 +400,37 @@ class DashboardController extends Controller
 
     public function HandCashDashboard()
     {
-        $userId = Auth::user()->id;
-        $currentEBalance = User::find($userId)->virtual_balance ?? 0;
+        try {
+            $userId = Auth::user()->id;
+            $user = User::find($userId);
+            $currentEBalance = $user ? ($user->virtual_balance ?? 0) : 0;
 
-        $todayReceivedCustomer = HandCashOrder::where('owner_id', $userId)
-            ->whereDate('created_at', Carbon::today())
-            ->count();
+            $todayReceivedCustomer = HandCashOrder::where('owner_id', $userId)
+                ->whereDate('created_at', Carbon::today())
+                ->count();
 
-        $todayMerchantRewards = HandCashOrder::where('owner_id', $userId)
-            ->whereDate('created_at', Carbon::today())
-            ->sum('trp');
+            $todayMerchantRewards = HandCashOrder::where('owner_id', $userId)
+                ->whereDate('created_at', Carbon::today())
+                ->sum('trp');
 
-        $todayWithdrawal = WithdrawHistory::where('user_id', $userId)
-            ->whereDate('created_at', Carbon::today())
-            ->sum('amount');
+            $todayWithdrawal = WithdrawHistory::where('user_id', $userId)
+                ->whereDate('created_at', Carbon::today())
+                ->sum('amount');
 
-        $totalReceivedCustomer = HandCashOrder::where('owner_id', $userId)->count();
-        $totalMerchantRewards = HandCashOrder::where('owner_id', $userId)->sum('trp');
-        $totalWithdrawal = Withdraw::where('user_id', $userId)->sum('amount');
-        $activeCounter = 0;
+            $totalReceivedCustomer = HandCashOrder::where('owner_id', $userId)->count();
+            $totalMerchantRewards = HandCashOrder::where('owner_id', $userId)->sum('trp');
+            $totalWithdrawal = Withdraw::where('user_id', $userId)->sum('amount');
+            $activeCounter = 0;
+        } catch (\Throwable $e) {
+            $currentEBalance = 0;
+            $todayReceivedCustomer = 0;
+            $todayMerchantRewards = 0;
+            $todayWithdrawal = 0;
+            $totalReceivedCustomer = 0;
+            $totalMerchantRewards = 0;
+            $totalWithdrawal = 0;
+            $activeCounter = 0;
+        }
 
         return view('admin.index', [
             'currentEBalance' => $currentEBalance,
@@ -402,19 +446,31 @@ class DashboardController extends Controller
 
     private function GetShopBalance($className)
     {
-        $userId = Auth::user()->id;
-        return $className::where('user_id', $userId)->sum('amount');
+        try {
+            $userId = Auth::user()->id;
+            return (float) $className::where('user_id', $userId)->sum('amount');
+        } catch (\Throwable $e) {
+            return 0.0;
+        }
     }
 
     private function DailyEarnings($className)
     {
-        $userId = Auth::user()->id;
-        return $className::where('user_id', $userId)->whereDate('created_at', '=', Carbon::today())->sum('amount');
+        try {
+            $userId = Auth::user()->id;
+            return (float) $className::where('user_id', $userId)->whereDate('created_at', '=', Carbon::today())->sum('amount');
+        } catch (\Throwable $e) {
+            return 0.0;
+        }
     }
 
     private function DailyAdminEarnings($className)
     {
-        $amount = $className::whereDate('created_at', '=', Carbon::today())->sum('amount');
-        return number_format((float) $amount, 2, '.', '');
+        try {
+            $amount = $className::whereDate('created_at', '=', Carbon::today())->sum('amount');
+            return number_format((float) $amount, 2, '.', '');
+        } catch (\Throwable $e) {
+            return '0.00';
+        }
     }
 }

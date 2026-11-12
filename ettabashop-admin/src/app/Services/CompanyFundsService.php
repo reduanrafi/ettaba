@@ -51,23 +51,35 @@ class CompanyFundsService
 
     private function GetStatistics($className)
     {
-        $fund = $className::first();
+        try {
+            $fund = $className::first();
 
-        if ($fund!=null)
-        {
-            return  number_format((float)$fund->amount, 2, '.', '');
+            if ($fund != null && isset($fund->amount)) {
+                return number_format((float)$fund->amount, 2, '.', '');
+            }
+        } catch (\Throwable $e) {
         }
+        return '0.00';
     }
-
 
     private function CalculateSum($className)
     {
-        $amount =  $className::sum('amount');
-        return number_format((float)$amount, 2, '.', '');
+        try {
+            $amount = $className::sum('amount');
+            return number_format((float)$amount, 2, '.', '');
+        } catch (\Throwable $e) {
+            return '0.00';
+        }
     }
+
     private function DailyWithdraw($className)
     {
-        return $className::wheredate('created_at',Carbon::now()->today())->sum('amount');
+        try {
+            $amount = $className::whereDate('created_at', Carbon::today())->sum('amount');
+            return number_format((float)$amount, 2, '.', '');
+        } catch (\Throwable $e) {
+            return '0.00';
+        }
     }
 
 //    private function TotalEarningOfUser()
